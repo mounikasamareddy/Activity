@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#F5F5F5" 
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp">
+
+   <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please enter new activity name." 
+        android:layout_marginTop="30dp"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"
+    	android:layout_marginRight="10dp"/>
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:ems="10"
+        android:layout_marginTop="20dp"
+        android:singleLine="true"
+    	android:lines="1"
+   	 	android:maxLines="1"
+    	android:scrollHorizontally="true"
+    	android:ellipsize="end"
+    	android:inputType="text"
+    	android:background="@drawable/roundframe"
+    	android:paddingLeft="10dp" 
+    	android:layout_marginLeft="10dp"
+    	android:layout_marginRight="10dp">
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_close_popup"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:text="Copy"
+        android:layout_marginTop="20dp"
+        android:background="#f49800"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"/>
+
+</LinearLayout>

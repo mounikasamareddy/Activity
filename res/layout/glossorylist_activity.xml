@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5" >
+    
+<FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0.0dip"
+        android:background="#F5F5F5"
+        android:orientation="horizontal"
+        android:padding="0.0dip" >
+
+        <LinearLayout
+            android:id="@+id/image_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/addimage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_margin="10dip"
+                android:padding="10dip"
+                android:src="@drawable/plus" >
+            </ImageView>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dip"
+            android:padding="10dip"
+            android:text="Trade"
+            android:textColor="#000000"
+            android:textSize="18sp" >
+        </TextView>
+
+      <LinearLayout 
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_gravity="center|left"
+    android:id="@+id/back_layout">
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/backimage2"
+            android:layout_gravity="center|left"/>
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADD LABOR" 
+          	android:layout_gravity="center"
+          	android:layout_marginLeft="-15dp"
+          	android:textSize="13dp"
+          	android:textColor="#f49800"/>
+</LinearLayout>
+    </FrameLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/greeting"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="#f49800"
+                android:gravity="center|left"
+                android:lines="1"
+                android:padding="10dip"
+                android:text="Select an item"
+                android:textSize="18sp" 
+                android:textColor="#FFFFFF">
+            </TextView>
+        </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="20dp"
+        android:background="#FFFFFF">
+    </ListView>
+        
+</LinearLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <item><layer-list>
+         <item><shape>
+                <gradient android:angle="90" android:endColor="#FFA500" android:startColor="#FFA500" android:type="linear" />
+ 			<padding android:bottom="10dp"/>
+            </shape></item> 
+        <item ><bitmap android:gravity="right|center_vertical" android:src="@drawable/dropimage" /> 
+            
+        </item>
+      </layer-list></item>
+
+ </selector>

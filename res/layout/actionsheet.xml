@@ -1,0 +1,157 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#333333"
+    android:gravity="center|top"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/frameborder"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:id="@+id/labor_linear" 
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circleyellow"
+                android:gravity="center"
+                android:text="L"
+                android:layout_marginRight="10dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/labor_textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="Labor"
+
+               android:paddingRight="40dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#0096FF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:id="@+id/equipment_linear" >
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circleblack"
+                android:gravity="center"
+                android:text="E"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FFFFFF"
+                android:layout_marginRight="10dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/equipment_textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="Equipment"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#0096FF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" 
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:id="@+id/material_linear">
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circleblue"
+                android:gravity="center"
+                android:text="M"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FFFFFF"
+                android:layout_marginRight="10dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/material_textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="Material"
+                android:paddingRight="20dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#0096FF" />
+        </LinearLayout>
+    </LinearLayout>
+    <!--
+<LinearLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp">  
+         <TextView
+        android:id="@+id/labor_textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Labor" 
+        android:gravity="center"
+        android:textColor="#0096FF"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="10dp"/>  
+        <TextView
+        android:id="@+id/equipment_textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Equipment" 
+        android:gravity="center"
+        android:textColor="#0096FF"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="10dp"/>
+        
+        <TextView
+        android:id="@+id/material_textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Material" 
+        android:gravity="center"
+        android:textColor="#0096FF"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="10dp" />
+  
+
+</LinearLayout>
+    -->
+
+<TextView
+    android:id="@+id/cancel_textView4"
+    android:layout_width="320dp"
+    android:layout_height="40dp"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/frameborder"
+    android:gravity="center"
+    android:text="Cancel"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:textColor="#0096FF" />
+
+</LinearLayout>

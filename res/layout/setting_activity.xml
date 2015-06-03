@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0.0dip"
+        android:orientation="horizontal"
+        android:padding="0.0dip" 
+        android:background="#F5F5F5">
+
+        <TextView
+            android:id="@+id/logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dip"
+            android:padding="10dip"
+            android:text="Settings"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/backimage2"
+            android:layout_gravity="center|left" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BACK" 
+          	android:layout_gravity="center|left"
+          	android:layout_marginLeft="30dp" 
+          	android:textSize="15sp"
+          	android:textColor="#f49800"/>
+       
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp" 
+        android:background="@drawable/frameborder">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="Enable Tasks"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:checked="false"
+            android:background="@drawable/roundframe" 
+            android:layout_marginRight="10dp"/>
+
+    </RelativeLayout>
+   <!--  <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/frameborder" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="Use Cellular data"
+            android:layout_marginLeft="10dp" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout> -->
+
+    <!-- <TextView
+        android:id="@+id/textView3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Turn off cellular data to restrict all data to Wi-Fi"
+        android:textSize="13sp" 
+        android:gravity="center"
+        android:textColor="#777777"
+        android:layout_marginTop="15dp"/> -->
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:background="@drawable/frameborder">
+    </ListView>
+
+</LinearLayout>

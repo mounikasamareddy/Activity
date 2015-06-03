@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5" >
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0.0dip"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:padding="0.0dip" >
+
+        <LinearLayout
+            android:id="@+id/image_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/save"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_margin="10dip"
+                android:padding="10dip"
+                android:src="@drawable/plus" >
+            </ImageView>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textdata"
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/addname_text"
+            android:textColor="#000000"
+            android:textSize="18sp" >
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_margin="10dip"
+            android:text="@string/cancel_text"
+            android:textColor="#f49800"
+            android:textSize="15sp" >
+        </TextView>
+    </FrameLayout>
+ 
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:ems="10"
+        android:layout_marginTop="20dp"
+        android:background="#FFFFFF"
+        android:hint="@string/addname_text"
+        android:paddingLeft="10dp"
+        android:singleLine="true"
+    	android:lines="1"
+   	 	android:maxLines="1"
+    	android:scrollHorizontally="true"
+    	android:ellipsize="end"
+    	android:inputType="text">
+   
+    </EditText>
+    
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:ems="10"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/frameborder"
+        android:hint="Unity" 
+        android:paddingLeft="10dp"
+        android:visibility="gone">
+   
+    </EditText>
+
+</LinearLayout>
