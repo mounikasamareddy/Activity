@@ -59,8 +59,11 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 
 			@Override
 			public void onClick(View v) {
-				singleton.setNewEntryFlag(true);
-				showActionSheet(v);
+				
+					singleton.setNewEntryFlag(true);
+					showActionSheet(v);
+				
+				
 			}
 		});
 		// Get TabHost Refference

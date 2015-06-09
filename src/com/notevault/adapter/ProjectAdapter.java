@@ -77,7 +77,7 @@ public class ProjectAdapter extends BaseAdapter {
 		if (singleton.isEnableTasks()) {
 			
 			Log.d("position","--->"+position);
-			if (Utilities.pdata.get(position).getHasActivities() == 1) {
+			if (Utilities.pdata.get(position).getHasData() == 1) {
 				holder.orangeArrow.setVisibility(View.VISIBLE);
 				holder.greyArrow.setVisibility(View.INVISIBLE);
 			}

@@ -6,13 +6,24 @@ public class TaskData implements Comparable<TaskData> {
 	int TID;
 	String TName;
 	int hasData;
+	int TIdentity;
 	
-	public static class OrderByPid implements Comparator<TaskData> {
+	
+	public int getTIdentity() {
+		return TIdentity;
+	}
 
-		@Override
-		public int compare(TaskData o1, TaskData o2) {
-			return o1.TID > o2.TID ? 1 : (o1.TID < o2.TID ? -1 : 0);
-		}
+	public void setTIdentity(int tIdentity) {
+		TIdentity = tIdentity;
+	}
+
+	public static class OrderByTName implements Comparator<TaskData> {
+
+		
+			@Override
+			 public int compare(TaskData o1, TaskData o2) {
+	            return o1.TName.compareTo(o2.TName);
+	        }
 	}
 	
 
@@ -21,10 +32,11 @@ public class TaskData implements Comparable<TaskData> {
 	 * object based upon customer name.
 	 */
 
-	public TaskData(int tid2, String tName2, int hasData2) {
+	public TaskData(int tid2, String tName2, int hasData2, int Tidentty) {
 		this.TID = tid2;
 		this.TName = tName2;
 		this.hasData = hasData;
+		this.TIdentity=Tidentty;
 	}
 
 

@@ -2,6 +2,8 @@ package com.notevault.activities;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -14,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.notevault.arraylistsupportclasses.EName;
+import com.notevault.arraylistsupportclasses.EStatus;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
@@ -23,6 +27,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -177,17 +182,20 @@ public class EquipmentStatusList extends Activity{
     }
 
     private void readGlossaryFromDB() {
-        Cursor c = dbAdapter.queryGlossary(singleton.getESCID());
-        if (c != null ) {
-            status.clear();
-            if  (c.moveToFirst()) {
-                do {
-                    status.add(c.getString(c.getColumnIndex("GName")).replace("\\", ""));
-                }while (c.moveToNext());
-            }else{
-                //System.out.println("No Glossary items found in DB for this user account.");
-            }
-        }
+    	status.clear();
+    	
+		List<EStatus> data = dbAdapter.getAllCStatusRecords(singleton.getESCID());
+
+		for (EStatus val : data) {
+
+			status.add(val.getEstatus());
+
+		}
+		Collections.sort(status);
+		for (int i = 0; i < status.size(); i++) {
+			Log.d("data", "---->" + status.get(i));
+		}
+
         dbAdapter.Close();
         setAdapter();
     }

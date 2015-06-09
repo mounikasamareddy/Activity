@@ -15,22 +15,23 @@ import javax.net.ssl.X509TrustManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.notevault.datastorage.DBAdapter;
-import com.notevault.pojo.Singleton;
-import com.notevault.support.ServerUtilities;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.notevault.datastorage.DBAdapter;
+import com.notevault.pojo.Singleton;
+import com.notevault.support.ServerUtilities;
 
 public class AddActivity extends Activity{
 
@@ -69,8 +70,34 @@ public class AddActivity extends Activity{
 					});
 					alertDialog.show();
 				}else{
-					AddActivityProject addActivity = new AddActivityProject();
-					addActivity.execute();
+					if(singleton.isOnline())
+					{
+						AddActivityProject addActivity = new AddActivityProject();
+						addActivity.execute();
+					}
+					else{
+						
+						//Log.d("taskdata","---->"+singleton.getSelectedTaskID());
+						
+						Log.d("checking","-->"+singleton.getSelectedTaskID()+"  "+singleton.getSelectedTaskIdentityoffline());
+						if(singleton.getSelectedTaskID()==0)
+						{
+							long act=dbAdapter.inserActivityoffline(0,newActivityName,singleton.getSelectedTaskIdentityoffline()
+									,0,singleton.getSelectedTaskIdentityoffline()+"");
+							Log.d("activity created with task id=0","--->"+act);
+						}
+						else{
+							long act1=dbAdapter.inserActivityoffline(0,newActivityName,singleton.getSelectedTaskID()
+									,0,"offline");
+							Log.d("activity created with task offline status","--->"+act1);
+						}
+						dbAdapter.updateTask(singleton.getSelectedProjectID(), singleton.getSelectedTaskID(), singleton.getCurrentSelectedDate());
+						Intent intent = new Intent(AddActivity.this, EntriesListActivity.class);
+						startActivity(intent);
+						finish();
+						
+					}
+					
 				}
 			}
 		});
@@ -153,7 +180,7 @@ public class AddActivity extends Activity{
                 JSONObject json = new JSONObject(param);
                 int Status = json.getInt("Status");
 				if(Status == 0 || Status == 200){
-					singleton.setSelectedActivityID(json.getString("AI"));
+					singleton.setSelectedActivityID(Integer.parseInt(json.getString("AI")));
 					singleton.getActivitiesList().put(json.getString("AI"), Singleton.toTitleCase(newActivityName));
 					System.out.println("...data......"+newActivityName+"..........activityid........." +singleton.getSelectedActivityID());								
 					singleton.setSelectedActivityName(Singleton.toTitleCase(newActivityName));

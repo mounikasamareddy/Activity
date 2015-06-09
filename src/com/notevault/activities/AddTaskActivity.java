@@ -91,7 +91,7 @@ public class AddTaskActivity extends Activity{
 						alertDialog.show();
 					}else{
 						Log.d("new task","---->"+Singleton.toTitleCase(newTaskName)+"   "+singleton.getSelectedProjectID());
-						dbAdapter.insertTask(0, newTaskName, singleton.getSelectedProjectID(), 0);
+						dbAdapter.insertTaskOffline(0, newTaskName, singleton.getSelectedProjectID(),0,"offline");
 						dbAdapter.updateProject(singleton.getSelectedProjectID(),1,0);
 						singleton.setReloadPage(true);
 						onBackPressed();

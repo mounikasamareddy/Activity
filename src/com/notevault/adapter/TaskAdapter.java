@@ -6,6 +6,7 @@ import java.util.Date;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import com.notevault.activities.ActivitiesListActivity;
 import com.notevault.activities.R;
-import com.notevault.activities.TasksListActivity;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.Utilities;
 
@@ -75,48 +75,54 @@ public class TaskAdapter extends BaseAdapter{
 				holder.orangeArrow.setVisibility(View.VISIBLE);
 				holder.greyArrow.setVisibility(View.INVISIBLE);
 			}
+			else{
+				holder.orangeArrow.setVisibility(View.INVISIBLE);
+				holder.greyArrow.setVisibility(View.VISIBLE);
+			}
 
 		}
-		else{
-			holder.orangeArrow.setVisibility(View.VISIBLE);
-			holder.greyArrow.setVisibility(View.INVISIBLE);
-		}
-//		holder.tv.setOnClickListener(new View.OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View arg0) {
-//				// TODO Auto-generated method stub
-//				singleton.setSelectedProjectName(Utilities.pdata.get(position).getPName());
-//				singleton.setSelectedProjectID(Utilities.pdata.get(position).getPID());
-//				
-//				
-//
-//				Date curDate = new Date();
-//				// System.out.println("Cur Date : ##################################### : "+
-//				// curDate);
-//				SimpleDateFormat format1 = new SimpleDateFormat(
-//						"dd-MM-yyyy");
-//				try {
-//					singleton.setCurrentSelectedDateFormatted(format1
-//							.parse(format1.format(curDate)).toString()
-//							.replace(" 00:00:00 GMT+05:30", ","));
-//				} catch (ParseException e) {
-//					e.printStackTrace();
-//				}
-//				singleton.setCurrentSelectedDate(new SimpleDateFormat(
-//						"yyyyMMdd").format(curDate));
-//				Intent intent;
-//				if (singleton.isEnableTasks()) {
-//					intent = new Intent(context,
-//							TasksListActivity.class);
-//				} else {
-//					intent = new Intent(context,
-//							ActivitiesListActivity.class);
-//
-//				}
-//				context.startActivity(intent);
-//			}
-//		});
+		
+		holder.tv.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				
+				
+				singleton.setSelectedTaskID(Utilities.tdata.get(position).getTID());
+
+				singleton.setSelectedTaskName(Utilities.tdata.get(position).getTName());
+				singleton.setselectedTaskIdentityoffline(Utilities.tdata.get(position).getTIdentity());
+				
+				
+
+				Date curDate = new Date();
+				// System.out.println("Cur Date : ##################################### : "+
+				// curDate);
+				SimpleDateFormat format1 = new SimpleDateFormat(
+						"dd-MM-yyyy");
+				try {
+					singleton.setCurrentSelectedDateFormatted(format1
+							.parse(format1.format(curDate)).toString()
+							.replace(" 00:00:00 GMT+05:30", ","));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				singleton.setCurrentSelectedDate(new SimpleDateFormat(
+						"yyyyMMdd").format(curDate));
+				
+				
+				Intent intent = new Intent(context,
+						ActivitiesListActivity.class);
+				singleton.setSelectedTaskName(Utilities.tdata.get(position).getTName());
+				singleton.setSelectedTaskID(Utilities.tdata.get(position).getTID());
+				System.err.println("TaskName: "
+						+ singleton.getSelectedTaskName());
+				System.err.println("TaskID: "
+						+ singleton.getSelectedTaskID());
+				context.startActivity(intent);
+			}
+		});
 
 		return convertView;
 	}

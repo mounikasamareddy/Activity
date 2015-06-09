@@ -30,6 +30,7 @@ import com.notevault.adapter.ProjectAdapter;
 import com.notevault.arraylistsupportclasses.ProjectDB;
 import com.notevault.arraylistsupportclasses.ProjectData;
 
+
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
@@ -123,7 +124,7 @@ public class ProjectListActivity extends Activity {
 				//Log.d("arraylist", "---->" + Utilities.pdata.get(i).getHasData());
 				//Log.d("arraylist", "---->" + Utilities.pdata.get(i).getHasActivities());
 			}
-			// Collections.sort(Utilities.pdata, new ProjectData.OrderByPid());
+			 Collections.sort(Utilities.pdata, new ProjectData.OrderByPName());
 			
 			 
 			 

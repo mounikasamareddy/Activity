@@ -2,6 +2,8 @@ package com.notevault.activities;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -14,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.notevault.arraylistsupportclasses.ClassDb;
+import com.notevault.arraylistsupportclasses.TradeDb;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
@@ -23,6 +27,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -181,17 +186,21 @@ public class ClassificationList extends Activity{
     }
 
     private void readGlossaryFromDB() {
-        Cursor c = dbAdapter.queryGlossary(singleton.getLCCID());
-        if (c != null ) {
-            lbclassific.clear();
-            if  (c.moveToFirst()) {
-                do {
-                    lbclassific.add(c.getString(c.getColumnIndex("GName")).replace("\\", ""));
-                }while (c.moveToNext());
-            }else{
-                //System.out.println("No Glossary items found in DB for this user account.");
-            }
-        }
+    	lbclassific.clear();
+    	 Log.d("data","--->"+singleton.getLCCID());
+		List<ClassDb> data = dbAdapter.getAllnClassRecords(singleton.getLCCID());
+
+		for (ClassDb val : data) {
+			
+			lbclassific.add(val.getCName());
+			
+
+		}
+		Collections.sort(lbclassific);
+		for(int i=0;i<lbclassific.size();i++)
+		{
+			Log.d("data","---->"+lbclassific.get(i));
+		}
         dbAdapter.Close();
         setAdapter();
     }

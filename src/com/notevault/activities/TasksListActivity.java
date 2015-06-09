@@ -43,6 +43,7 @@ import com.notevault.adapter.ProjectAdapter;
 import com.notevault.adapter.TaskAdapter;
 import com.notevault.arraylistsupportclasses.ProjectData;
 import com.notevault.arraylistsupportclasses.TaskData;
+
 import com.notevault.arraylistsupportclasses.TasksDB;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
@@ -60,7 +61,7 @@ public class TasksListActivity extends Activity {
 	DBAdapter dbAdapter;
 	private ProgressDialog mProgressDialog;
 	TaskAdapter tAdapter;
-	int pid ;
+	int pid;
 	String date1;
 
 	@Override
@@ -84,40 +85,10 @@ public class TasksListActivity extends Activity {
 			mProgressDialog.show();
 			projectTask.execute();
 		} else {
-			tAdapter = new TaskAdapter(TasksListActivity.this);
-			Log.d("here","---->"+singleton.getSelectedProjectID());
-			pid = singleton.getSelectedProjectID();
-			date1 = singleton.getCurrentSelectedDate();
-			
-			Utilities.tdata.clear();
-			List<TasksDB> data = dbAdapter.getAllTaskRecords(pid, date1);
+			Toast.makeText(getApplicationContext(), "Ur in offline",
+					Toast.LENGTH_LONG).show();
+			readDBData();
 
-			for (TasksDB val : data) {
-				TaskData details = new TaskData(val.getTID(),val.getTName(),val.getHasData());
-				details.setTID(val.getTID());
-				details.setTName(val.getTName());
-				details.setHasData(val.getHasData());
-
-				Utilities.tdata.add(details);
-
-			}
-			Log.d("arraylength","---->"+Utilities.tdata.size());
-			dbAdapter.Close();
-			for (int i = 0; i < Utilities.tdata.size(); i++) {
-				Log.d("taskdata", "---->" + Utilities.tdata.get(i).getTID());
-				Log.d("taskdata", "---->" + Utilities.tdata.get(i).getTName());
-
-			}
-			Collections.sort(Utilities.tdata, new TaskData.OrderByPid());
-			Log.d("taskdata", "---->" + Utilities.tdata);
-			for (int i = 0; i < Utilities.tdata.size(); i++) {
-				Log.d("taskdata", "---->" + Utilities.tdata.get(i).getTID());
-				Log.d("taskdata", "---->" + Utilities.tdata.get(i).getTName());
-
-			}
-			taskListView.setAdapter(tAdapter);
-
-		
 		}
 
 		LinearLayout addImageLayout = (LinearLayout) findViewById(R.id.image_layout);
@@ -150,54 +121,77 @@ public class TasksListActivity extends Activity {
 
 	}
 
+	private void readDBData() {
+		tAdapter = new TaskAdapter(TasksListActivity.this);
+		Log.d("here", "---->" + singleton.getSelectedProjectID());
+		pid = singleton.getSelectedProjectID();
+		date1 = singleton.getCurrentSelectedDate();
+
+		Utilities.tdata.clear();
+		Log.d("length", "--->" + Utilities.tdata.size());
+		List<TasksDB> data = dbAdapter.getAllTaskRecords(pid, date1);
+		Log.d("length", "--->" + data.size());
+		for (TasksDB val : data) {
+			TaskData details = new TaskData(val.getTID(), val.getTName(),
+					val.getHasData(), val.getTIdentity());
+			details.setTID(val.getTID());
+			details.setTIdentity(val.getTIdentity());
+			details.setTName(val.getTName());
+			details.setHasData(val.getHasData());
+			details.setTIdentity(val.getTIdentity());
+			Utilities.tdata.add(details);
+
+		}
+		Log.d("arraylength", "---->" + Utilities.tdata.size());
+		dbAdapter.Close();
+		for (int i = 0; i < Utilities.tdata.size(); i++) {
+			Log.d("taskdataid", "---->" + Utilities.tdata.get(i).getTID());
+			Log.d("taskdataname", "---->"
+					+ Utilities.tdata.get(i).getTIdentity());
+
+		}
+		Collections.sort(Utilities.tdata, new TaskData.OrderByTName());
+		Log.d("taskdata", "---->" + Utilities.tdata);
+
+		taskListView.setAdapter(tAdapter);
+
+	}
+
 	@Override
 	protected void onResume() {
 		System.out.println("Task activity onResume called.");
 		super.onResume();
-		if(singleton.isOnline())
-		{
-			
-		
-		if (singleton.isReloadPage()) {
+		if (singleton.isOnline()) {
 
-			int size = singleton.getTaskList().size();
-			keys = new int[size];
-			values = new String[size];
-			int i = 0;
-			// System.out.println("getTaskList(): "+singleton.getTaskList());
-			for (Integer key : singleton.getTaskList().keySet()) {
-				keys[i] = key;
-				values[i++] = singleton.getTaskList().get(key);
+			if (singleton.isReloadPage()) {
+
+				int size = singleton.getTaskList().size();
+				keys = new int[size];
+				values = new String[size];
+				int i = 0;
+				// System.out.println("getTaskList(): "+singleton.getTaskList());
+				for (Integer key : singleton.getTaskList().keySet()) {
+					keys[i] = key;
+					values[i++] = singleton.getTaskList().get(key);
+				}
+				singleton.setReloadPage(false);
+				processListAndSetAdapter();
+
 			}
-			singleton.setReloadPage(false);
-			processListAndSetAdapter();
-			/*
-			 * keys = singleton.getTaskList().keySet().toArray(new
-			 * int[singleton.getTaskList().size()]); values =
-			 * singleton.getTaskList().values().toArray(new
-			 * String[singleton.getTaskList().size()]);
-			 * System.err.println("Values on resume :"+
-			 * Arrays.toString(values)); Arrays.sort(values); taskListView =
-			 * (ListView) findViewById(R.id.list); Myadapter myad = new
-			 * Myadapter(); taskListView.setAdapter(myad);
-			 * taskListView.invalidate();
-			 * //((Myadapter)taskListView.getAdapter()).notifyDataSetChanged();
-			 */
-		}
-	}
-		else{
-			
-			
-			
-				if (singleton.isReloadPage()) {
+		} else {
+
+			if (singleton.isReloadPage()) {
 				System.out.println("Offline");
 				taskListView = (ListView) findViewById(R.id.list);
-				
+
 				Utilities.tdata.clear();
 				List<TasksDB> data = dbAdapter.getAllTaskRecords(pid, date1);
 
 				for (TasksDB val : data) {
-					TaskData details = new TaskData(val.getTID(),val.getTName(),val.getHasData());
+					TaskData details = new TaskData(val.getTID(),
+							val.getTName(), val.getHasData(),
+							val.getTIdentity());
+					details.setTIdentity(val.getTIdentity());
 					details.setTID(val.getTID());
 					details.setTName(val.getTName());
 					details.setHasData(val.getHasData());
@@ -205,15 +199,20 @@ public class TasksListActivity extends Activity {
 					Utilities.tdata.add(details);
 
 				}
-				tAdapter= new TaskAdapter(this);
-				
+				Log.d("arraylength", "---->" + Utilities.tdata.size());
+				dbAdapter.Close();
+
+				Collections.sort(Utilities.tdata, new TaskData.OrderByTName());
+				tAdapter = new TaskAdapter(this);
+
 				taskListView.setAdapter(tAdapter);
-				
+
 				singleton.setReloadPage(false);
-				}
 			}
-		
+		}
+
 	}
+
 	class MyAdapter extends BaseAdapter {
 
 		@Override
@@ -348,9 +347,9 @@ public class TasksListActivity extends Activity {
 		protected void onPostExecute(final String response) {
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
-				Toast.makeText(getApplicationContext(),
-						"Sorry! Server could not be reached.",
+				Toast.makeText(getApplicationContext(), "Ur in offline",
 						Toast.LENGTH_LONG).show();
+
 			} else {
 				String taskResponse = response;
 				if (taskResponse != null) {
@@ -389,7 +388,7 @@ public class TasksListActivity extends Activity {
 
 							int delResponse = dbAdapter.deleteTasks(singleton
 									.getSelectedProjectID());
-							System.out.println("Tasks deletion response: "
+							Log.d("Tasks deletion response: ", "---->"
 									+ delResponse);
 							if (singleton.getTaskList().size() > 0) {
 								writeTasksToDb();
@@ -460,5 +459,6 @@ public class TasksListActivity extends Activity {
 		System.out.println("Tasks insertion response: " + insertResponse);
 	}
 
-	public void readTasksFromDb() {}
+	public void readTasksFromDb() {
+	}
 }

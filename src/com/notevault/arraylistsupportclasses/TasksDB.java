@@ -4,6 +4,16 @@ public class TasksDB {
 	int TID;
 	String TName;
 	int hasData;
+	int TIdentity;
+	 
+	
+	
+	public int getTIdentity() {
+		return TIdentity;
+	}
+	public void setTIdentity(int tIdentity) {
+		TIdentity = tIdentity;
+	}
 	public int getTID() {
 		return TID;
 	}
@@ -22,4 +32,5 @@ public class TasksDB {
 	public void setHasData(int hasData) {
 		this.hasData = hasData;
 	}
+	
 }

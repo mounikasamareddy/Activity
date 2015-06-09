@@ -18,18 +18,18 @@ public class DBHelper extends SQLiteOpenHelper {
             "   CompanyID   INT(10),    UserID	INT(10),    AccountID	INT(10),    SubID   INT(10), " +
             "   hasData INT(1), hasActivities INT(1));";
     public final String TASKS_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Tasks "   +
-            "(  TID         INT(10),    TName   VARCHAR(20)," +
+            "(TIdentity INTEGER PRIMARY KEY AUTOINCREMENT, TID         INT(10),    TName   VARCHAR(20)," +
             "   ProjectID   INT(10),    ProjectDay  VARCHAR(8),        hasData INT(1),status VARCHAR(8));";
     public final String ACTIVITIES_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Activities "  +
-            "(  ActID   VARCHAR(10),    ActName     VARCHAR(20), " +
+            "( AIdentity INTEGER PRIMARY KEY AUTOINCREMENT, ActID   VARCHAR(10),    ActName     VARCHAR(20), " +
             "   TaskID  INT(10),    TaskName    VARCHAR(20), " +
-            "   PID     INT(10),    ProjectDay  VARCHAR(8),     hasData	INT(1),  UserID INT(10));";
+            "   PID     INT(10),    ProjectDay  VARCHAR(8),     hasData	INT(1),  UserID INT(10),status INT(10));";
     public final String ENTRIES_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Entries "  +
-            "(  NAME    VARCHAR(20),    TRD_COMP    VARCHAR(20),    CLASSI_STAT VARCHAR(20)," +
+            "( EIdentity INT(10) PRIMARY KEY, NAME    VARCHAR(20),    TRD_COMP    VARCHAR(20),    CLASSI_STAT VARCHAR(20)," +
             "   HR_QTY  DOUBLE(10),     TYPE        VARCHAR(1), " +
             "   ACTION  VARCHAR(1),     ID          VARCHAR(10),    PID         INT(10),        TID         INT(10), " +
             "   UserID  INT(10),        SubID       INT(10),        AID         INT(10),        AccountID   INT(10), " +
-            "   DATE        VARCHAR(8));";
+            "   DATE        VARCHAR(8),status INT(10));";
     public final String LOGIN_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Login " +
             "(  username    VARCHAR(20),    password    VARCHAR(20), " +
             "   UserID      INT(10),        AccountID   INT(10),        SubID   INT(10), " +
@@ -38,7 +38,7 @@ public class DBHelper extends SQLiteOpenHelper {
             "   ENCID       INT(10),        CCID        INT(10),        MNCID   INT(10));";
 
     public final String GLOSSARY_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Glossary " +
-            "(  GCID         INT(10),        GName       VARCHAR(20),    PID    INT(10),    CompanyID   INT(10));";
+            "( GIdentity INT(10) PRIMARY KEY, GCID         INT(10),        GName       VARCHAR(20),    PID    INT(10),    CompanyID   INT(10),status INT(10));";
 
     public static DBHelper dbHelper = null;
 

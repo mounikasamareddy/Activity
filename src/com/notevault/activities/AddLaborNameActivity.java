@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
 
@@ -23,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -52,6 +54,7 @@ public class AddLaborNameActivity extends Activity{
     String genderString, minorityString, localString;
     char selectGender;
     int selectMinority, selectLocal;
+    DBAdapter DbAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,7 @@ public class AddLaborNameActivity extends Activity{
         setContentView(R.layout.addpersonnel);
 
         singleton = Singleton.getInstance();
-
+        DbAdapter=DbAdapter.get_dbAdapter(this);
         yes = (RadioButton)findViewById(R.id.compliance_yesradio);
         no = (RadioButton)findViewById(R.id.compliance_noradio);
 
@@ -105,9 +108,12 @@ public class AddLaborNameActivity extends Activity{
                     personnelTask.execute();
                 }
             	}else{
-    				Toast.makeText(getApplicationContext(), "Cannot add name while offline!", Toast.LENGTH_LONG).show();
+    				Toast.makeText(getApplicationContext(), "UR in  offline!", Toast.LENGTH_LONG).show();
+    				readDbData();
     			}
             }
+
+			
         });
 
         cancel = (TextView)findViewById(R.id.cancel);
@@ -379,4 +385,13 @@ public class AddLaborNameActivity extends Activity{
             classificationSpinner.setAdapter(tradeListadp);
         }
     }
+    private void readDbData() {
+    	
+    	
+    	long laborrecords=DbAdapter.insertGlossaryoffline(singleton.getLNCID(),newLaborNameText);
+    	Log.d("labor","--->"+laborrecords);
+    	
+		
+		
+	}
 }

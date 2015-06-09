@@ -22,7 +22,7 @@ public class Singleton {
     private String selectedProjectName;
     private int selectedTaskID;
     private String selectedTaskName;
-    private String selectedActivityID;
+    private int selectedActivityID;
     private String selectedActivityName;
     private String currentSelectedDate;				//(real date for api calls)
     private String currentSelectedDateFormatted;	//(formatted date for displaying in activity.)
@@ -36,6 +36,8 @@ public class Singleton {
     private boolean reloadPage;
 
     private boolean newEntryFlag;
+    int selectedTaskIdentityoffline;
+    int selectedActivityIdentityoffline;
 
     public boolean isSyncingToServer() {
         return syncingToServer;
@@ -381,11 +383,11 @@ public class Singleton {
         this.selectedTaskName = selectedTaskName;
     }
 
-    public String getSelectedActivityID() {
+    public int getSelectedActivityID() {
         return selectedActivityID;
     }
 
-    public void setSelectedActivityID(String selectedActivityID) {
+    public void setSelectedActivityID(int selectedActivityID) {
         this.selectedActivityID = selectedActivityID;
     }
 
@@ -512,4 +514,29 @@ public class Singleton {
     	}
     	return tCasedWord;
     }
+
+	
+
+	public int getSelectedTaskIdentityoffline() {
+		return selectedTaskIdentityoffline;
+	}
+
+
+
+	public void setselectedTaskIdentityoffline(int tIdentity) {
+		this.selectedTaskIdentityoffline = tIdentity;
+		
+	}
+
+	public void setselectedActivityIdentityoffline(int aIdentity) {
+		
+		this.selectedActivityIdentityoffline = aIdentity;
+	}
+
+	public int getselectedActivityIdentityoffline() {
+		
+		return selectedActivityIdentityoffline;
+	}
+
+	
 }

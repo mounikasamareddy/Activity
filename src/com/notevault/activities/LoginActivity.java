@@ -58,7 +58,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.notevault.arraylistsupportclasses.LoginData;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
@@ -145,12 +144,11 @@ public class LoginActivity extends Activity {
 						"submit Button clicked", Toast.LENGTH_LONG).show();
 				Dialog clickHereDialog = new Dialog(LoginActivity.this);
 
-				clickHereDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-				
-				
+				clickHereDialog.getWindow().requestFeature(
+						Window.FEATURE_NO_TITLE);
 
 				clickHereDialog.setCancelable(true);
-				
+
 				clickHereDialog.setContentView(R.layout.forgotpassword);
 				userName = (EditText) clickHereDialog.findViewById(R.id.uname);
 				phoneNumber = (EditText) clickHereDialog.findViewById(R.id.pno);
@@ -168,7 +166,7 @@ public class LoginActivity extends Activity {
 							}
 						});
 				clickHereDialog.show();
-				
+
 			}
 		});
 
@@ -224,53 +222,85 @@ public class LoginActivity extends Activity {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
-				
+
 				username = userEditText.getText().toString();
 				password = passwordEditText.getText().toString();
 				if (!username.equals("") && !password.equals("")) {
 
-					
 					if (singleton.isOnline()) {
 						mProgressDialog.show();
 						sign = new LoginTask();
 						sign.execute();
 					} else {
-						
-						//offline
+
+						// offline
 						Toast.makeText(getApplicationContext(),
-								"Ur in Offline.",
-								Toast.LENGTH_SHORT).show();
+								"Ur in Offline.", Toast.LENGTH_SHORT).show();
 						Cursor c = dbAdapter.queryCredentials(username,
 								password);
-						
-						if (c != null) {
-							Log.d("curfdsfdf", "--->"+c.getCount());
-							if(c.moveToFirst())
-							{
-								LoginData data= new LoginData();
-								data.setUserID(c.getInt(c.getColumnIndex("UserID")));
-								data.setAccountID(c.getInt(c.getColumnIndex("AccountID")));
-								data.setSubID(c.getInt(c.getColumnIndex("SubID")));
-								data.setCompanyID(c.getInt(c.getColumnIndex("CompanyID")));
-								data.setCompany(c.getString(c.getColumnIndex("Company")));
-								data.setLNPCID(c.getInt(c.getColumnIndex("LNPCID")));
-								data.setLTCID(c.getInt(c.getColumnIndex("LTCID")));
-								data.setLCCID(c.getInt(c.getColumnIndex("LCCID")));
-								data.setENCID(c.getInt(c.getColumnIndex("ENCID")));
+						if (c.getCount() != 0) {
+
+							Log.d("curfdsfdf", "--->" + c.getCount());
+
+							if (c.moveToFirst()) {
+								LoginData data = new LoginData();
+								data.setUserID(c.getInt(c
+										.getColumnIndex("UserID")));
+
+								data.setAccountID(c.getInt(c
+										.getColumnIndex("AccountID")));
+								data.setSubID(c.getInt(c
+										.getColumnIndex("SubID")));
+								data.setCompanyID(c.getInt(c
+										.getColumnIndex("CompanyID")));
+								data.setCompany(c.getString(c
+										.getColumnIndex("Company")));
+								data.setLNPCID(c.getInt(c
+										.getColumnIndex("LNPCID")));
+								data.setLTCID(c.getInt(c
+										.getColumnIndex("LTCID")));
+								data.setLCCID(c.getInt(c
+										.getColumnIndex("LCCID")));
+								data.setENCID(c.getInt(c
+										.getColumnIndex("ENCID")));
 								data.setCCID(c.getInt(c.getColumnIndex("CCID")));
-								data.setMNCID(c.getInt(c.getColumnIndex("MNCID")));
+								data.setMNCID(c.getInt(c
+										.getColumnIndex("MNCID")));
+
+								singleton.setUserId(c.getInt(c
+										.getColumnIndex("UserID")));
+								singleton.setAccountId(c.getInt(c
+										.getColumnIndex("AccountID")));
+								singleton.setCompanyId(c.getInt(c
+										.getColumnIndex("CompanyID")));
+								singleton.setLNCID(c.getInt(c
+										.getColumnIndex("LNPCID")));
+								singleton.setLTCID(c.getInt(c
+										.getColumnIndex("LTCID")));
+								singleton.setLCCID(c.getInt(c
+										.getColumnIndex("LCCID")));
+								singleton.setENCID(c.getInt(c
+										.getColumnIndex("ENCID")));
+								singleton.setCCID(c.getInt(c
+										.getColumnIndex("CCID")));
+								singleton.setMNCID(c.getInt(c
+										.getColumnIndex("MNCID")));
+								singleton.setSubscriberId(c.getInt(c
+										.getColumnIndex("SubID")));
+								singleton.setCompanyName(c.getString(c
+										.getColumnIndex("Company")));
 								Utilities.lData.add(data);
 							}
-							
-							
-						startActivity(new Intent(getApplicationContext(),ProjectListActivity.class));
-						}
-						else{
-							Toast.makeText(getApplicationContext(),
+
+							startActivity(new Intent(getApplicationContext(),
+									ProjectListActivity.class));
+						} else {
+							Toast.makeText(
+									getApplicationContext(),
 									"Ur the fresh user, need internet at first time",
 									Toast.LENGTH_SHORT).show();
 						}
-						
+
 					}
 				} else if (username.equals("")) {
 					Toast.makeText(getApplicationContext(),
@@ -368,7 +398,6 @@ public class LoginActivity extends Activity {
 
 		protected void onPostExecute(final String response) {
 			// System.out.println();
-			
 
 			mProgressDialog.dismiss();
 			if (ServerUtilities.unknownHostException) {
@@ -384,7 +413,7 @@ public class LoginActivity extends Activity {
 				else {
 					try {
 						JSONObject obj = new JSONObject(response);
-						
+
 						String statusMessage = obj.getJSONObject("id")
 								.get("StatusMessage").toString();
 
@@ -469,7 +498,7 @@ public class LoginActivity extends Activity {
 
 							Cursor c = dbAdapter.queryCredentials(username,
 									password);
-							
+
 							if (c != null) {
 								if (c.moveToFirst()) {
 									dbAdapter.deleteCredentials(username,
@@ -494,9 +523,11 @@ public class LoginActivity extends Activity {
 								projectsListActivityStatus.put(Integer
 										.valueOf(curProject.getString("PI")),
 										curProject.getString("MF"));
-								
-								Log.d("data","---->"+curProject
-												.getString("PI")+"---->"+curProject.getString("MF"));
+
+								Log.d("data",
+										"---->" + curProject.getString("PI")
+												+ "---->"
+												+ curProject.getString("MF"));
 							}
 
 							int delResponse = dbAdapter.deleteProjects();
@@ -558,30 +589,30 @@ public class LoginActivity extends Activity {
 		System.out.println("Projects insertion response: " + insertResponse);
 	}
 
-//	public void readProjectsFromDb() {
-//		Cursor c = dbAdapter.queryProjects();
-//		if (c != null) {
-//			if (c.moveToFirst()) {
-//				do {
-//					String projectName = c.getString(c.getColumnIndex("PName"));
-//					int projectID = c.getInt(c.getColumnIndex("PID"));
-//					String hasData = c.getInt(c.getColumnIndex("hasData")) == 1 ? "T"
-//							: "F";
-//					String hasActivities = c.getInt(c
-//							.getColumnIndex("hasActivities")) == 1 ? "T" : "F";
-//					singleton.getProjectsList().put(projectID, projectName);
-//					projectsListStatus.put(projectID, hasData);
-//					projectsListActivityStatus.put(projectID, hasActivities);
-//					// System.out.println("Name: " + projectName + ", ID: " +
-//					// projectID + " hasData: " + hasData);
-//				} while (c.moveToNext());
-//			} else {
-//				// System.out.println("No Projects found in DB for this user account.");
-//			}
-//		}
-//		dbAdapter.Close();
-//	}
-	public class GetData extends AsyncTask<Void,Void,String>{
+	// public void readProjectsFromDb() {
+	// Cursor c = dbAdapter.queryProjects();
+	// if (c != null) {
+	// if (c.moveToFirst()) {
+	// do {
+	// String projectName = c.getString(c.getColumnIndex("PName"));
+	// int projectID = c.getInt(c.getColumnIndex("PID"));
+	// String hasData = c.getInt(c.getColumnIndex("hasData")) == 1 ? "T"
+	// : "F";
+	// String hasActivities = c.getInt(c
+	// .getColumnIndex("hasActivities")) == 1 ? "T" : "F";
+	// singleton.getProjectsList().put(projectID, projectName);
+	// projectsListStatus.put(projectID, hasData);
+	// projectsListActivityStatus.put(projectID, hasActivities);
+	// // System.out.println("Name: " + projectName + ", ID: " +
+	// // projectID + " hasData: " + hasData);
+	// } while (c.moveToNext());
+	// } else {
+	// // System.out.println("No Projects found in DB for this user account.");
+	// }
+	// }
+	// dbAdapter.Close();
+	// }
+	public class GetData extends AsyncTask<Void, Void, String> {
 
 		@Override
 		protected String doInBackground(Void... arg0) {
@@ -624,8 +655,9 @@ public class LoginActivity extends Activity {
 					JSONObject json = new JSONObject();
 					json.put("Phones", "1234567890");
 					json.put("username", "vishu.ghanakota");
-					Log.d("values", "--->"+phoneNumber.getText().toString()+"   "+userName.getText().toString());
-					
+					Log.d("values", "--->" + phoneNumber.getText().toString()
+							+ "   " + userName.getText().toString());
+
 					return jsonDataPost.passwordRecovery(json);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -635,32 +667,27 @@ public class LoginActivity extends Activity {
 			}
 			return null;
 		}
-		
+
 		@Override
 		protected void onPostExecute(final String response) {
-			Log.d("string","--->"+response);
-			
+			Log.d("string", "--->" + response);
+
 			try {
 				JSONObject obj = new JSONObject(response);
-				Log.d("response","--->"+obj.toString());
+				Log.d("response", "--->" + obj.toString());
 				String str = obj.getString("Message");
 				System.out.println("Server Response : " + str);
-				Log.d("final result","---->"+str);
-				
+				Log.d("final result", "---->" + str);
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-			
-			
+
 		}
-		
-		
+
 	}
 
+	//
 
-
-
-//		
-		
-	//}
+	// }
 }

@@ -2,19 +2,21 @@ package com.notevault.arraylistsupportclasses;
 
 import java.util.Comparator;
 
-public class ProjectData implements Comparable<ProjectData> {
+
+
+public  class ProjectData implements Comparable<ProjectData> {
 
 	int PID;
 	String PName;
 	int hasData;
 	int hasActivities;
 
-	public static class OrderByPid implements Comparator<ProjectData> {
+	public static class OrderByPName implements Comparator<ProjectData> {
 
 		@Override
-		public int compare(ProjectData o1, ProjectData o2) {
-			return o1.PID > o2.PID ? 1 : (o1.PID < o2.PID ? -1 : 0);
-		}
+		 public int compare(ProjectData o1, ProjectData o2) {
+            return o1.PName.compareTo(o2.PName);
+        }
 	}
 	
 
@@ -65,7 +67,7 @@ public class ProjectData implements Comparable<ProjectData> {
 
 	@Override
 	public int compareTo(ProjectData o) {
-		return this.PID > o.PID ? 1 : (this.PID < o.PID ? -1 : 0);
+		 return this.PID > o.PID ? 1 : (this.PID < o.PID ? -1 : 0);
 	}
 
 	/*
@@ -73,7 +75,7 @@ public class ProjectData implements Comparable<ProjectData> {
 	 */
 	@Override
 	public String toString() {
-		return String.valueOf(PID);
+		return String.valueOf(PName);
 	}
 
 }
