@@ -167,7 +167,7 @@ public class MaterialStatusList extends Activity{
     public  void readGlossaryFromDB(){
     	status.clear();
     	Log.d("data", "--->" + singleton.getMSCID());
-		List<EStatus> data = dbAdapter.getAllCStatusRecords(singleton.getESCID());
+		List<EStatus> data = dbAdapter.getAllCStatusRecords(singleton.getMSCID());
 
 		for (EStatus val : data) {
 

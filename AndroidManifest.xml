@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -30,7 +31,7 @@
             android:name="com.notevault.activities.SplashscreenActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-           android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,12 +42,12 @@
             android:name="GettingStarted"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
-        </activity> 
+        </activity>
         <activity
             android:name="GettingStartedActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
-        </activity> 
+        </activity>
         <activity
             android:name="LoginActivity"
             android:screenOrientation="portrait"
@@ -206,6 +207,18 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
         </activity>
+
+         
+        
+        <receiver android:name="com.notevault.broadcastreceiverwifi.NetworkStateChange" 
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.STATE_CHANGE"/>
+                 <action android:name="android.intent.action.PHONE_STATE"></action>
+                 <action android:name="commentpost"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

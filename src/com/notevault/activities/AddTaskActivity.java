@@ -1,6 +1,8 @@
 package com.notevault.activities;
 
+import java.lang.reflect.Method;
 import java.security.SecureRandom;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -14,7 +16,13 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,9 +33,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.notevault.arraylistsupportclasses.TNetworkData;
+import com.notevault.arraylistsupportclasses.TaskNetworkDB;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
+import com.notevault.support.Utilities;
 
 public class AddTaskActivity extends Activity{
 
@@ -38,7 +50,7 @@ public class AddTaskActivity extends Activity{
 	String newTaskName;
 	Bundle bundle;
 	DBAdapter dbAdapter;
-
+	int i,j;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -80,23 +92,15 @@ public class AddTaskActivity extends Activity{
 					Toast.makeText(getApplicationContext(), "ur in offline!", Toast.LENGTH_LONG).show();
 					newTaskName = editText.getText().toString().trim();
 					System.out.println("new task name......." + newTaskName);
-					if(newTaskName.equals("")){
-						AlertDialog alertDialog = new AlertDialog.Builder(AddTaskActivity.this).create();
-						alertDialog.setMessage("Please enter task name");
-						alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-
-							}
-						});
-						alertDialog.show();
-					}else{
+					
+					
 						Log.d("new task","---->"+Singleton.toTitleCase(newTaskName)+"   "+singleton.getSelectedProjectID());
 						dbAdapter.insertTaskOffline(0, newTaskName, singleton.getSelectedProjectID(),0,"offline");
 						dbAdapter.updateProject(singleton.getSelectedProjectID(),1,0);
 						singleton.setReloadPage(true);
 						onBackPressed();
 						
-					}}
+					}
 				}
 			}
 		});
@@ -145,6 +149,7 @@ public class AddTaskActivity extends Activity{
 				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 				HttpsURLConnection.setDefaultHostnameVerifier(hv);
 
+				
 				try {
 					JSONObject jsonAddTask = new JSONObject();
 					jsonAddTask.put("ProjectId", singleton.getSelectedProjectID());
@@ -193,4 +198,8 @@ public class AddTaskActivity extends Activity{
 			onBackPressed();		
 		}
 	}
+	
+	
+			
+	
 }

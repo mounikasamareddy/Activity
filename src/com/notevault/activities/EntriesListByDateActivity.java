@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.notevault.activities.ActivitiesListActivity.SwipeListAdapter;
+import com.notevault.adapter.TaskAdapter;
 import com.notevault.arraylistsupportclasses.EntityAlign;
 import com.notevault.arraylistsupportclasses.EntityDB;
 import com.notevault.arraylistsupportclasses.EntityData;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -164,7 +166,7 @@ public class EntriesListByDateActivity extends Activity {
 						@Override
 						public void onClick(View v) {
 
-							singleton.setOfflineEntry(false);
+							//singleton.setOfflineEntry(false);
 							if (val[5].startsWith("OF")) {
 								singleton.setOfflineEntry(true);
 								val[5] = val[5].substring(2);
@@ -215,15 +217,60 @@ public class EntriesListByDateActivity extends Activity {
 				tv.setText(Utilities.eAligndata.get(position).getNAME());
 				tv1.setText(Utilities.eAligndata.get(position).getTRD_COMP());
 				tv2.setText(Utilities.eAligndata.get(position).getCLASSI_STAT());
-				tv3.setText(Utilities.eAligndata.get(position).getHR_QTY() + "");
+				tv3.setText(Utilities.eAligndata.get(position).getHR_QTY()+"");
 				if (Utilities.eAligndata.get(position).getTYPE().equals("L")) {
 					roundTv.setBackgroundResource(R.drawable.circleyellow);
-				} else if (Utilities.eAligndata.get(position).getTYPE().equals("E")) {
+				} else if (Utilities.eAligndata.get(position).getTYPE()
+						.equals("E")) {
 					roundTv.setBackgroundResource(R.drawable.circleblack);
-				} else if (Utilities.eAligndata.get(position).getTYPE().equals("M")) {
+				} else if (Utilities.eAligndata.get(position).getTYPE()
+						.equals("M")) {
 					roundTv.setBackgroundResource(R.drawable.circleblue);
 				}
+				convertView.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
 
+					
+						singleton.setCurrentSelectedEntryID(Utilities.eAligndata.get(position).getID());
+						singleton.setNewEntryFlag(false);
+						singleton.setSelectedEntityIdentity(Utilities.eAligndata.get(position).getEIdentity());
+						
+						if (Utilities.eAligndata.get(position).getTYPE().equals("L")) {
+							singleton.setSelectedLaborName(Utilities.eAligndata.get(position).getNAME());
+							singleton.setSelectedLaborTrade(Utilities.eAligndata.get(position).getTRD_COMP());
+							singleton
+									.setSelectedLaborClassification(Utilities.eAligndata.get(position).getCLASSI_STAT());
+							
+							singleton.setSelectedLaborHours(Utilities.eAligndata.get(position).getHR_QTY()+"");
+							// singleton.setSelectedLaborDescription(val[6]);
+							Intent intent = new Intent(
+									EntriesListByDateActivity.this,
+									AddLabor.class);
+							startActivity(intent);
+						} else if (Utilities.eAligndata.get(position).getTYPE().equals("E")) {
+							singleton.setSelectedEquipmentName(Utilities.eAligndata.get(position).getNAME());
+							singleton.setSelectedEquipmentCompany(Utilities.eAligndata.get(position).getTRD_COMP());
+							singleton.setSelectedEquipmentStatus(Utilities.eAligndata.get(position).getCLASSI_STAT());
+							singleton.setSelectedEquipmentQty(Utilities.eAligndata.get(position).getHR_QTY()+"");
+							// singleton.setSelectedEquipmentDescription(val[6]);
+							Intent intent = new Intent(
+									EntriesListByDateActivity.this,
+									AddEquipment.class);
+							startActivity(intent);
+						} else if (Utilities.eAligndata.get(position).getTYPE().equals("M")) {
+							singleton.setSelectedMaterialName(Utilities.eAligndata.get(position).getNAME());
+							singleton.setSelectedMaterialCompany(Utilities.eAligndata.get(position).getTRD_COMP());
+							singleton.setSelectedMaterialStatus(Utilities.eAligndata.get(position).getCLASSI_STAT());
+							singleton.setSelectedMaterialQty(Utilities.eAligndata.get(position).getHR_QTY()+"");
+							// singleton.setSelectedMaterialDescription(val[6]);
+							Intent intent = new Intent(
+									EntriesListByDateActivity.this,
+									AddMaterial.class);
+							startActivity(intent);
+						}
+					}
+				});
 			}
 			return convertView;
 		}
@@ -247,12 +294,25 @@ public class EntriesListByDateActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		System.out.println("Entries By Date On resume called.");
-		if (singleton.isReloadPage()) {
-			System.out.println("Reloading the page.");
+		Log.d("onresume","--->"+singleton.isReloadPage());
+		if (singleton.isOnline()) {
+			if (singleton.isReloadPage()) {
+				System.out.println("Reloading the page.");
 
-			EntriesListByTypeActivity.reload = 1;
-			singleton.setReloadPage(false);
-			this.onCreate(null);
+				EntriesListByTypeActivity.reload = 1;
+				singleton.setReloadPage(false);
+				this.onCreate(null);
+			}
+		} else {
+
+			if (singleton.isReloadPage()) {
+				System.out.println("dffdgfOffline");
+				readEntriesFromDB();
+
+				
+				singleton.setReloadPage(false);
+			}
+
 		}
 	}
 
@@ -646,12 +706,12 @@ public class EntriesListByDateActivity extends Activity {
 										.println("No material entries found.");
 							}
 						}
-						// int delResponse = dbAdapter.deleteEntries();
+						
 						int delrecords = dbAdapter.deleteEntries();
 						Log.d("deleted", "--->" + delrecords);
 
 						if (collectiveConcatenatedEntryList.size() > 0) {
-							readEntriesFromDB();
+							writeEntriesToDB();
 						}
 						processDataAndSetAdapter();
 
@@ -664,6 +724,26 @@ public class EntriesListByDateActivity extends Activity {
 							.println("An error occurred! Could not fetch material entries.");
 				}
 			}
+		}
+
+		private void writeEntriesToDB() {
+			long insertResponse = 0;
+			for (String value : collectiveConcatenatedEntryList) {
+				if (value.endsWith(glue))
+					value = value + "null";
+				String[] entry = value.split(glue);
+				// if (entry[6].equals("null"))
+				// entry[6] = "";
+				// insertResponse =
+				// dbAdapter.insertEntry(entry[1],entry[2],entry[3],
+				// Double.parseDouble(entry[4]),entry[6],entry[0],"N",entry[5]);
+				insertResponse = dbAdapter.insertEntry(entry[1], entry[2],
+						entry[3], entry[4], entry[0], "N", entry[5]);
+				Log.d("insert", "--->" + insertResponse);
+				System.out.println(value);
+			}
+			System.out.println("Entry insertion response: " + insertResponse);
+			
 		}
 	}
 
@@ -729,39 +809,46 @@ public class EntriesListByDateActivity extends Activity {
 		entriesListAdapter.notifyDataSetInvalidated();
 	}
 
-	
-
 	public void readEntriesFromDB() {
 
 		int Aid = singleton.getSelectedActivityID();
 		Utilities.edata.clear();
 		Utilities.eAligndata.clear();
+		List<EntityDB> data = null;
+		if (Aid == 0) {
 
-		
-		List<EntityDB> data = dbAdapter.getAllEntityRecords(Aid);
-		
+			data = dbAdapter.getAllEntityRecords(singleton
+					.getselectedActivityIdentityoffline());
+		} else {
+			data = dbAdapter.getAllEntityRecords(Aid);
+		}
 		Log.d("length", "--->" + data.size());
 		for (EntityDB val : data) {
 			EntityData details = new EntityData();
+			details.setEIDentity(val.getEIdentity());
+			details.setID(val.getID());
 			details.setNAME(val.getNAME());
 			details.setTRD_COMP(val.getTRD_COMP());
 			details.setCLASSI_STAT(val.getCLASSI_STAT());
 			details.setHR_QTY(val.getHR_QTY());
 			details.setTYPE(val.getType());
+			details.setAction(val.getAction());
 			Utilities.edata.add(details);
-
 		}
 
 		dbAdapter.Close();
 		for (int i = 0; i < Utilities.edata.size(); i++) {
-			
+
 			if (Utilities.edata.get(i).getTYPE().equals("L")) {
 				EntityAlign align = new EntityAlign();
+				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
+				align.setID(Utilities.edata.get(i).getID());
 				align.setTYPE(Utilities.edata.get(i).getTYPE());
 				align.setNAME(Utilities.edata.get(i).getNAME());
 				align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
+				align.setAction(Utilities.edata.get(i).getAction());
 				Utilities.eAligndata.add(align);
 			}
 
@@ -771,11 +858,14 @@ public class EntriesListByDateActivity extends Activity {
 
 			if (Utilities.edata.get(i).getTYPE().equals("E")) {
 				EntityAlign align = new EntityAlign();
+				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
+				align.setID(Utilities.edata.get(i).getID());
 				align.setTYPE(Utilities.edata.get(i).getTYPE());
 				align.setNAME(Utilities.edata.get(i).getNAME());
 				align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
+				align.setAction(Utilities.edata.get(i).getAction());
 				Utilities.eAligndata.add(align);
 			}
 
@@ -784,11 +874,14 @@ public class EntriesListByDateActivity extends Activity {
 
 			if (Utilities.edata.get(i).getTYPE().equals("M")) {
 				EntityAlign align = new EntityAlign();
+				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
+				align.setID(Utilities.edata.get(i).getID());
 				align.setTYPE(Utilities.edata.get(i).getTYPE());
 				align.setNAME(Utilities.edata.get(i).getNAME());
 				align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
+				align.setAction(Utilities.edata.get(i).getAction());
 				Utilities.eAligndata.add(align);
 			}
 
@@ -796,8 +889,16 @@ public class EntriesListByDateActivity extends Activity {
 		Log.d("ealigndata arraylength", "---->" + Utilities.eAligndata.size());
 
 		for (int i = 0; i < Utilities.eAligndata.size(); i++) {
-			Log.d("alighdata", "---->" + Utilities.eAligndata.get(i).getTYPE());
-			
+			Log.d("alighdata", "---->" + Utilities.eAligndata.get(i).getID()+" "+
+			 Utilities.eAligndata.get(i).getTYPE()+" "
+			 + Utilities.eAligndata.get(i).getEIdentity()+" "
+			+ Utilities.eAligndata.get(i).getNAME()+" "
+			+ Utilities.eAligndata.get(i).getTRD_COMP()+" "
+			+ Utilities.eAligndata.get(i).getCLASSI_STAT()+" "
+			 + Utilities.eAligndata.get(i).getHR_QTY()+" "
+			 + Utilities.eAligndata.get(i).getTYPE()+" "
+			 + Utilities.eAligndata.get(i).getAction());
+
 		}
 
 		entriesListView = (ListView) findViewById(R.id.list);
@@ -805,6 +906,13 @@ public class EntriesListByDateActivity extends Activity {
 		entriesListView.setAdapter(entriesListAdapter);
 		entriesListAdapter.notifyDataSetChanged();
 		entriesListAdapter.notifyDataSetInvalidated();
+		singleton.setReloadPage(true);
+		
+		//if zero records in Perticular Activity Id... change hasdata 0 in Activity table
+//		if(data.size()==0)
+//		{
+//			int record= dbAdapter.updateActivity(TaskID, ActID)
+//		}
 
 	}
 }

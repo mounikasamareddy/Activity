@@ -157,6 +157,7 @@ public class EquipmentStatusList extends Activity{
                     status.clear();
                     for(int i=0; i < equipmentStatusArray.length(); i++) {
                         status.add(equipmentStatusArray.getString(i).replace("\\", ""));
+                        singleton.setESCID(1);
                         dbAdapter.insertGlossary(singleton.getESCID(), equipmentStatusArray.getString(i));
                     }
                     setAdapter();
@@ -184,6 +185,7 @@ public class EquipmentStatusList extends Activity{
     private void readGlossaryFromDB() {
     	status.clear();
     	
+    	Log.d("val","--->"+singleton.getESCID()+" "+singleton.getMSCID());
 		List<EStatus> data = dbAdapter.getAllCStatusRecords(singleton.getESCID());
 
 		for (EStatus val : data) {

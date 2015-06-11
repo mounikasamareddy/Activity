@@ -66,6 +66,7 @@ import javax.net.ssl.X509TrustManager;
 public class ActivitiesListActivity extends Activity {
 
 	Singleton singleton;
+	String Projectday;
 	public static String values[];
 	public static String keys[];
 	public static String dates[];
@@ -455,9 +456,10 @@ public class ActivitiesListActivity extends Activity {
 
 					System.out.println("TaskId: "
 							+ singleton.getSelectedTaskID());
+					
 					System.out.println("ProjectDay: "
 							+ singleton.getCurrentSelectedDate());
-
+							Projectday=singleton.getCurrentSelectedDate();
 					System.out.println("get activities for taskid Request: "
 							+ jsonActivitiesRequest);
 					return jsonDataPost
@@ -526,7 +528,9 @@ public class ActivitiesListActivity extends Activity {
 									singleton.getCurrentSelectedDate());
 							System.out.println("Activities deletion response: "
 									+ delResponse);
+							Log.d("activity delected","--->"+delResponse+ "  "+singleton.getActivitiesList().size());
 							if (singleton.getActivitiesList().size() > 0) {
+								
 								writeActivitiesToDB();
 							}
 							processListsAndSetAdapter();
@@ -897,8 +901,7 @@ public class ActivitiesListActivity extends Activity {
 			// Set the Day GridCell
 			gridcell.setText(theday);
 			gridcell.setTag(theyear + "-" + themonth + "-" + theday);
-			Log.d("Setting GridCell ", "---->" + theday + "-" + themonth + "-"
-					+ theyear);
+			
 
 			if (day_color[1].equals("GREY")) {
 				gridcell.setTextColor(getResources()
@@ -985,7 +988,7 @@ public class ActivitiesListActivity extends Activity {
 				String date1 = date_month_year.replace("-", "");
 				date1 = date1.substring(0, 6) + "0"
 						+ date1.substring(6, date1.length());
-			//	Log.d("date1", "---->" + date1);
+				Log.d("date1", "---->" + date1);
 				readDbData(date1);
 
 			}
@@ -1256,13 +1259,17 @@ public class ActivitiesListActivity extends Activity {
 		// String[singleton.getActivitiesList().size()]);
 		long insertResponse = 0;
 		for (int i = 0; i < values.length; i++) {
+			
+			Log.d("insert val","--->"+keys[i]+"  "+values[i]+" "+Projectday);
 			insertResponse = dbAdapter.insertActivity(keys[i], values[i],
 					singleton.getSelectedTaskID(),
-					singleton.getCurrentSelectedDate(),
+					Projectday,
 					activityListStatus.get(keys[i]).equals("T") ? 1 : 0,
 					singleton.getUserId());
+			Log.d("Activities insertion response: " ,"--->"+ insertResponse);
 		}
 		System.out.println("Activities insertion response: " + insertResponse);
+		
 	}
 
 	public void filterActivitiesByDates() {
@@ -1338,6 +1345,7 @@ public class ActivitiesListActivity extends Activity {
 		int Tid = singleton.getSelectedTaskID();
 		Utilities.adata.clear();
 		List<ActivityDB> data;
+		Log.d("tid","--->"+Tid);
 		if(Tid==0){
 			
 			 data = dbAdapter.getAllActivityRecords(singleton.getSelectedTaskIdentityoffline(), date);
@@ -1356,7 +1364,7 @@ public class ActivitiesListActivity extends Activity {
 			details.setAId(val.getAId());
 			details.setAName(val.getAName());
 			details.setHasdata(val.getHasdata());
-
+			details.setTid(val.getTid());
 			Utilities.adata.add(details);
 
 		}
@@ -1368,7 +1376,7 @@ public class ActivitiesListActivity extends Activity {
 			dateFilteredKeys[i] = Utilities.adata.get(i).getAId() + "";
 			Log.d("taskdata", "---->" + Utilities.adata.get(i).getAId());
 			Log.d("taskdata", "---->" + Utilities.adata.get(i).getAIdentity());
-
+			Log.d("taskdata", "---->" + Utilities.adata.get(i).getTid());
 		}
 		//Log.d("oflineId", "---->" + Arrays.toString(dateFilteredKeys));
 		//Log.d("oflineName", "---->" + Arrays.toString(dateFilteredValues));
