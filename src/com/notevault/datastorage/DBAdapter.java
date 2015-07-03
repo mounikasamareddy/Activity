@@ -1,28 +1,32 @@
 package com.notevault.datastorage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.notevault.arraylistsupportclasses.ActivityDB;
+import com.notevault.arraylistsupportclasses.ActivityNetworkDB;
 import com.notevault.arraylistsupportclasses.ClassDb;
 import com.notevault.arraylistsupportclasses.ECmpany;
 import com.notevault.arraylistsupportclasses.EName;
 import com.notevault.arraylistsupportclasses.EStatus;
 import com.notevault.arraylistsupportclasses.EntityDB;
+import com.notevault.arraylistsupportclasses.EntriesNetworkDB;
 import com.notevault.arraylistsupportclasses.MNameDb;
 import com.notevault.arraylistsupportclasses.NAmeDb;
 import com.notevault.arraylistsupportclasses.ProjectDB;
-import com.notevault.arraylistsupportclasses.ProjectData;
+import com.notevault.arraylistsupportclasses.TaskNetworkDB;
 import com.notevault.arraylistsupportclasses.TasksDB;
 import com.notevault.arraylistsupportclasses.TradeDb;
+import com.notevault.arraysupportclasses.CalenderActivity;
+
 import com.notevault.pojo.Singleton;
-import com.notevault.support.Utilities;
 
 /**
  * Created by HP on 1/26/2015.
@@ -114,7 +118,7 @@ public class DBAdapter {
 
 	public long insertTaskOffline(int TID, String TName, int ProjectID,
 			int hasData, String status) {
-		String offTname = TName + " @";
+		String offTname = TName + "@";
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("TID", TID);
 		contentValues.put("TName", offTname);
@@ -159,6 +163,7 @@ public class DBAdapter {
 		contentValues.put("UserID", singleton.getUserId());
 		contentValues.put("status", status);
 		opnToWrite();
+		Log.d("db", "--->" + status);
 		long val = SQLObj.insert("Activities", null, contentValues);
 		Close();
 		return val;
@@ -227,6 +232,7 @@ public class DBAdapter {
 		Close();
 		return val;
 	}
+
 	public long insertGlossaryoffline(int GCID, String GName) {
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("GCID", GCID);
@@ -314,12 +320,13 @@ public class DBAdapter {
 		return c;
 	}
 
-	public List<TasksDB> getAllTaskRecords(int pid, String date1) {
+	public List<TasksDB> getAllTaskRecords(int pid) {
 
 		// Select All Query
 		opnToWrite();
-		List<TasksDB> dataList = new ArrayList<TasksDB>();
 
+		List<TasksDB> dataList = new ArrayList<TasksDB>();
+		dataList.clear();
 		String selectQuery = "SELECT  * FROM Tasks where ProjectId=" + pid;
 
 		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
@@ -332,7 +339,69 @@ public class DBAdapter {
 				data.setTID(cursor.getInt(1));
 				data.setTName(cursor.getString(2));
 				data.setHasData(cursor.getInt(5));
+				data.setStatus(cursor.getString(6));
+				dataList.add(data);
 
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		// return contact list
+		return dataList;
+	}
+
+	public List<TasksDB> getAllTaskexRecords() {
+
+		// Select All Query
+		opnToWrite();
+		List<TasksDB> dataList = new ArrayList<TasksDB>();
+		dataList.clear();
+		String selectQuery = "SELECT  * FROM Tasks ";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				TasksDB data = new TasksDB();
+				data.setTIdentity(cursor.getInt(0));
+				data.setTID(cursor.getInt(1));
+				data.setTName(cursor.getString(2));
+				data.setHasData(cursor.getInt(5));
+				data.setStatus(cursor.getString(6));
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		// return contact list
+		return dataList;
+	}
+
+	public List<TaskNetworkDB> getAllOfflineTaskRecords() {
+
+		// Select All Query
+		opnToWrite();
+		List<TaskNetworkDB> dataList = new ArrayList<TaskNetworkDB>();
+
+		String selectQuery = "SELECT  * FROM Tasks where status='offline'";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				TaskNetworkDB data = new TaskNetworkDB();
+				data.setTIdentity(cursor.getInt(0));
+				data.setTID(cursor.getInt(1));
+				data.setTName(cursor.getString(2));
+				data.setProjectId(cursor.getInt(3));
+				data.setProjectDate(cursor.getString(4));
+				data.setHasData(cursor.getInt(5));
+				data.setStatus(cursor.getString(6));
 				dataList.add(data);
 
 				// Adding contact to list
@@ -357,8 +426,9 @@ public class DBAdapter {
 		// Select All Query
 		opnToWrite();
 		List<ActivityDB> dataList = new ArrayList<ActivityDB>();
-		String selectQuery = "SELECT  * FROM Activities where hasdata=1 and TaskID="
-				+ tid + " and ProjectDay='" + ProjectDay + "'";
+		dataList.clear();
+		String selectQuery = "SELECT  * FROM Activities where TaskID=" + tid
+				+ " and ProjectDay='" + ProjectDay + "' and hasData=1";
 
 		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
 
@@ -369,7 +439,8 @@ public class DBAdapter {
 				data.setAIdentity(cursor.getInt(0));
 				data.setAId(cursor.getInt(1));
 				data.setAName(cursor.getString(2));
-
+				data.setTid(cursor.getInt(3));
+				data.setTDate(cursor.getString(6));
 				data.setHasdata(cursor.getInt(7));
 
 				dataList.add(data);
@@ -382,6 +453,167 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 
+	}
+	public List<ActivityDB> getAllActivityRecords() {
+		// Select All Query
+		opnToWrite();
+		List<ActivityDB> dataList = new ArrayList<ActivityDB>();
+		dataList.clear();
+		String selectQuery = "SELECT  * FROM Activities";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				ActivityDB data = new ActivityDB();
+				data.setAIdentity(cursor.getInt(0));
+				data.setAId(cursor.getInt(1));
+				data.setAName(cursor.getString(2));
+				data.setTid(cursor.getInt(3));
+				data.setTDate(cursor.getString(6));
+				data.setHasdata(cursor.getInt(7));
+
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		// return contact list
+		return dataList;
+
+	}
+	public List<CalenderActivity> getAllActivityRecordsForCalender(int tid) {
+		// Select All Query
+		opnToWrite();
+		List<CalenderActivity> dataList = new ArrayList<CalenderActivity>();
+		String selectQuery = "SELECT  * FROM Activities where TaskID=" + tid;
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		dataList.clear();
+		if (cursor.moveToFirst()) {
+			do {
+				CalenderActivity data = new CalenderActivity();
+
+				data.setAIdentity(cursor.getInt(0));
+				data.setAId(cursor.getInt(1));
+				data.setAName(cursor.getString(2));
+				data.setTid(cursor.getInt(3));
+
+				data.setHasdata(cursor.getInt(7));
+				data.setDate(cursor.getString(6));
+
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		// return contact list
+		return dataList;
+
+	}
+
+	public List<ActivityNetworkDB> getAllOfflineActivityRecords() {
+		opnToWrite();
+		List<ActivityNetworkDB> dataList = new ArrayList<ActivityNetworkDB>();
+		String selectQuery = "SELECT  * FROM Activities where status IN('offline')";
+		dataList.clear();
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				ActivityNetworkDB data = new ActivityNetworkDB();
+				data.setAIdentity(cursor.getInt(0));
+				data.setAId(cursor.getInt(1));
+				data.setAName(cursor.getString(2));
+				data.setTid(cursor.getInt(3));
+				data.setADate(cursor.getString(6));
+				data.setHasdata(cursor.getInt(7));
+				data.setAstatus(cursor.getString(9));
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		return dataList;
+	}
+
+	public List<EntriesNetworkDB> getAllOfflineEntriesRecords(String type) {
+		opnToWrite();
+		List<EntriesNetworkDB> dataList = new ArrayList<EntriesNetworkDB>();
+		String selectQuery = "SELECT  * FROM Entries where status IN('offline')and TYPE='"
+				+ type + "'";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				EntriesNetworkDB data = new EntriesNetworkDB();
+				data.setEIdenty(cursor.getInt(0));
+				data.setEname(cursor.getString(1));
+				data.setTRD_C(cursor.getString(2));
+				data.setClassesI(cursor.getString(3));
+				data.setHR_QTY(cursor.getString(4));
+				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setEId(cursor.getInt(7));
+				data.setPID(cursor.getInt(8));
+				data.setTid(cursor.getInt(9));
+				data.setAid(cursor.getInt(12));
+				data.setEdate(cursor.getString(14));
+				data.setStatus(cursor.getString(15));
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		return dataList;
+	}
+
+	public List<EntriesNetworkDB> getAllOfflineEntriesRecords() {
+		opnToWrite();
+		List<EntriesNetworkDB> dataList = new ArrayList<EntriesNetworkDB>();
+		String selectQuery = "SELECT  * FROM Entries where status IN('offline')";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				EntriesNetworkDB data = new EntriesNetworkDB();
+				data.setEIdenty(cursor.getInt(0));
+				data.setEname(cursor.getString(1));
+				data.setTRD_C(cursor.getString(2));
+				data.setClassesI(cursor.getString(3));
+				data.setHR_QTY(cursor.getString(4));
+				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setEId(cursor.getInt(7));
+				data.setPID(cursor.getInt(8));
+				data.setTid(cursor.getInt(9));
+				data.setAid(cursor.getInt(12));
+				data.setEdate(cursor.getString(14));
+				data.setStatus(cursor.getString(15));
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		return dataList;
 	}
 
 	public Cursor queryMyTaskActivities(int TaskID, String ProjectDay,
@@ -413,7 +645,8 @@ public class DBAdapter {
 	public List<EntityDB> getAllEntityRecords(int aid) {
 		opnToWrite();
 		List<EntityDB> dataList = new ArrayList<EntityDB>();
-		String selectQuery = "SELECT  * FROM Entries where AID=" + aid;
+		String selectQuery = "SELECT  * FROM Entries where ACTION IN('N','U') and AID="
+				+ aid;
 
 		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
 
@@ -421,11 +654,46 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				EntityDB data = new EntityDB();
+				data.setEIdentity(cursor.getInt(0));
 				data.setNAME(cursor.getString(1));
 				data.setTRD_COMP(cursor.getString(2));
 				data.setCLASSI_STAT(cursor.getString(3));
 				data.setHR_QTY(cursor.getShort(4));
 				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setID(cursor.getInt(7));
+
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		// return contact list
+		return dataList;
+	}
+
+	public List<EntityDB> getAllEntityRecordsByLName(String Lname) {
+		opnToWrite();
+		List<EntityDB> dataList = new ArrayList<EntityDB>();
+		String selectQuery = "SELECT  * FROM Entries where ACTION IN('N','U') and NAME='"
+				+ Lname + "'";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				EntityDB data = new EntityDB();
+				data.setEIdentity(cursor.getInt(0));
+				data.setNAME(cursor.getString(1));
+				data.setTRD_COMP(cursor.getString(2));
+				data.setCLASSI_STAT(cursor.getString(3));
+				data.setHR_QTY(cursor.getShort(4));
+				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setID(cursor.getInt(7));
 
 				dataList.add(data);
 
@@ -478,6 +746,7 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 	}
+
 	public List<TradeDb> getAllnTradeRecords(int ltcid) {
 		opnToWrite();
 		List<TradeDb> dataList = new ArrayList<TradeDb>();
@@ -489,7 +758,7 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				TradeDb data = new TradeDb();
-				
+
 				data.setTname(cursor.getString(2));
 
 				dataList.add(data);
@@ -514,7 +783,7 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				ClassDb data = new ClassDb();
-				
+
 				data.setCName(cursor.getString(2));
 
 				dataList.add(data);
@@ -527,6 +796,7 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 	}
+
 	public List<EName> getAllEnameRecords(int Encid) {
 		opnToWrite();
 		List<EName> dataList = new ArrayList<EName>();
@@ -538,7 +808,7 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				EName data = new EName();
-				
+
 				data.setEName(cursor.getString(2));
 
 				dataList.add(data);
@@ -551,7 +821,7 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 	}
-	
+
 	public List<ECmpany> getAllCCompanyRecords(int ccid) {
 		opnToWrite();
 		List<ECmpany> dataList = new ArrayList<ECmpany>();
@@ -563,7 +833,7 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				ECmpany data = new ECmpany();
-				
+
 				data.setECmpany(cursor.getString(2));
 
 				dataList.add(data);
@@ -576,6 +846,7 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 	}
+
 	public List<EStatus> getAllCStatusRecords(int Escid) {
 		opnToWrite();
 		List<EStatus> dataList = new ArrayList<EStatus>();
@@ -587,7 +858,7 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				EStatus data = new EStatus();
-				
+
 				data.setEstatus(cursor.getString(2));
 
 				dataList.add(data);
@@ -600,6 +871,7 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 	}
+
 	public List<MNameDb> getAllMNameRecords(int mncid) {
 		opnToWrite();
 		List<MNameDb> dataList = new ArrayList<MNameDb>();
@@ -611,7 +883,7 @@ public class DBAdapter {
 		if (cursor.moveToFirst()) {
 			do {
 				MNameDb data = new MNameDb();
-				
+
 				data.setMName(cursor.getString(2));
 
 				dataList.add(data);
@@ -624,7 +896,7 @@ public class DBAdapter {
 		// return contact list
 		return dataList;
 	}
-	
+
 	public String generateOfflineEntryID() {
 		opnToWrite();
 		String newId = "";
@@ -661,14 +933,96 @@ public class DBAdapter {
 		return val;
 	}
 
-	public long updateActivity(int TaskID, String ProjectDay, int ActID) {
+	public long updateActivity(int Aidentity) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("hasData", 0);
+		opnToWrite();
+		long val = SQLObj.update("Activities", contentValues, "AIdentity = "
+				+ Aidentity, null);
+		Close();
+		return val;
+	}
+
+	public long updateTaskOnBC(int TIdentity, int TID, String Tname) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("TID", TID);
+		contentValues.put("TName", Tname);
+		contentValues.put("status", "");
+		opnToWrite();
+
+		long val = SQLObj.update("Tasks", contentValues, "TIdentity = "
+				+ TIdentity, null);
+		Close();
+		return val;
+	}
+
+	public long updateActivityTaskIdOnBC(int TIdentity, int TID) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("TaskID", TID);
+		contentValues.put("status", "offline");
+		opnToWrite();
+		long val = SQLObj.update("Activities", contentValues, "TaskID = "
+				+ TIdentity + " and status='offline'", null);
+		Close();
+		return val;
+	}
+
+	public long updateEntityTaskIdOnBC(int TIdentity, int TID) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("TID", TID);
+		contentValues.put("status", "offline");
+		opnToWrite();
+		long val = SQLObj.update("Entries", contentValues, "TID = " + TIdentity
+				+ " and status='offline'", null);
+		Close();
+		return val;
+	}
+
+	public long updateActivityActivityIdOnBC(int AIdentity, int AID,
+			String Aname) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("ActID", AID);
+		contentValues.put("ActNAme", Aname);
+		contentValues.put("status", "");
+		opnToWrite();
+		long val = SQLObj.update("Activities", contentValues, "AIdentity = "
+				+ AIdentity, null);
+		Close();
+		return val;
+	}
+
+	public long updateEntityActivityIdOnBC(int AIdentity, int AID) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("AID", AID);
+		contentValues.put("status", "offline");
+		opnToWrite();
+		long val = SQLObj.update("Entries", contentValues, "AID = " + AIdentity
+				+ " and status='offline'", null);
+		Close();
+		return val;
+	}
+
+	public long updateEntriesEid(int EIdentity, String EID) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("ID", EID);
+		contentValues.put("status", "");
+		opnToWrite();
+		long val = SQLObj.update("Entries", contentValues, "EIdentity = "
+				+ EIdentity + " and status='offline'", null);
+		Close();
+		return val;
+	}
+
+	public long updateActivity(int TaskID, int ActID) {
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("hasData", 1);
 		opnToWrite();
-		long val = SQLObj.update("Activities", contentValues, "TaskID = "
-				+ TaskID + " and ProjectDay = '" + ProjectDay
-				+ "' and UserID = " + singleton.getUserId() + "and ActID = "
-				+ ActID, null);
+		long val = SQLObj.update(
+				"Activities",
+				contentValues,
+				"TaskID = " + TaskID + " and ProjectDay = '"
+						+ singleton.getCurrentSelectedDate()
+						+ "' and  ActID = " + ActID, null);
 		Close();
 		return val;
 	}
@@ -677,10 +1031,11 @@ public class DBAdapter {
 			String classification_status, String hr_qty, String type,
 			String action, String ID) {
 		ContentValues contentValues = new ContentValues();
+		contentValues.put("EIdentity", singleton.getSelectedEntityIdentity());
 		contentValues.put("NAME", name);
 		contentValues.put("TRD_COMP", trade_company);
 		contentValues.put("CLASSI_STAT", classification_status);
-		contentValues.put("HR_QTY", Double.parseDouble(hr_qty));
+		contentValues.put("HR_QTY", hr_qty);
 		contentValues.put("ACTION", action);
 		contentValues.put("TYPE", type);
 
@@ -691,6 +1046,19 @@ public class DBAdapter {
 						+ singleton.getSelectedActivityID() + " and DATE = '"
 						+ singleton.getCurrentSelectedDate() + "' and ID = '"
 						+ ID + "'", null);
+		Close();
+		return val;
+	}
+
+	public int updateEntryOffline(int Eidentity, String action) {
+
+		ContentValues contentValues = new ContentValues();
+
+		contentValues.put("ACTION", action);
+
+		opnToWrite();
+		int val = SQLObj.update("Entries", contentValues, "EIdentity= "
+				+ Eidentity, null);
 		Close();
 		return val;
 	}
@@ -764,6 +1132,13 @@ public class DBAdapter {
 		return val;
 	}
 
+	public int deleteEntryByIDOffline(int ID) {
+		opnToWrite();
+		int val = SQLObj.delete("Entries", "EIdentity = " + ID, null);
+		Close();
+		return val;
+	}
+
 	public int deleteGlossary(int GCID) {
 		opnToWrite();
 		int val = SQLObj.delete("Glossary",
@@ -774,8 +1149,4 @@ public class DBAdapter {
 		return val;
 	}
 
-	
-	
-
-	
 }

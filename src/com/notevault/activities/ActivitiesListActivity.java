@@ -1,18 +1,40 @@
 package com.notevault.activities;
 
+import java.security.SecureRandom;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Layout;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -28,40 +50,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.notevault.adapter.TaskAdapter;
 import com.notevault.arraylistsupportclasses.ActivityDB;
 import com.notevault.arraylistsupportclasses.ActivityData;
-import com.notevault.arraylistsupportclasses.TaskData;
-import com.notevault.arraylistsupportclasses.TasksDB;
+import com.notevault.arraysupportclasses.CalenderActivity;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
 import com.notevault.support.Utilities;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.security.SecureRandom;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 public class ActivitiesListActivity extends Activity {
 
@@ -73,6 +68,7 @@ public class ActivitiesListActivity extends Activity {
 	String dateFilteredValues[];
 	String dateFilteredKeys[];
 	ImageView calendarImageView;
+	ImageView orangeDot;
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	TextView dateTextView;
 	Dialog calendarDialog;
@@ -93,10 +89,13 @@ public class ActivitiesListActivity extends Activity {
 	public static HashMap<String, String> activityListStatus = new HashMap<String, String>();
 	public String yearMonthdate;
 	DBAdapter dbAdapter;
+	List<CalenderActivity> data1;
 	private TextView backTask;
 	boolean newName = false;
 	LinearLayout messageDefaultHint;
-	
+	String datevalues[];
+	int k = 0;
+	String runningYMDdata;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -108,7 +107,7 @@ public class ActivitiesListActivity extends Activity {
 		singleton = Singleton.getInstance();
 		TextView projectName = (TextView) findViewById(R.id.projectname_text);
 
-		//Log.d("projectname", "---->" + singleton.getSelectedProjectName());
+		// Log.d("projectname", "---->" + singleton.getSelectedProjectName());
 		projectName.setText(singleton.getSelectedProjectName());
 		ImageView breadcrumb_separator = (ImageView) findViewById(R.id.breadcrumb_separator);
 		TextView taskName = (TextView) findViewById(R.id.task_text);
@@ -132,11 +131,36 @@ public class ActivitiesListActivity extends Activity {
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		if (singleton.isOnline()) {
 
+			
+			
+			
 			Log.d("online", "---->");
 			if (singleton.isEnableTasks()) {
+				Log.d("mapval", "--->"+ singleton
+						.getSelectedTaskID());
+				
+				data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
+						.getSelectedTaskID());
+				Log.d("mapval", "--->"+ data1.size());
+				datevalues = new String[data1.size()];
+				if(data1.size()>0){
+
+					for (CalenderActivity val : data1) {
+						datevalues[k] = val.getDate();
+						Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
+						k++;
+					}
+					for(int i=0;i<datevalues.length;i++)
+					{
+						Log.d("dataval", "--->" + datevalues[i]);
+					}
+
+				}
 				GetTaskActivities taskActivities = new GetTaskActivities();
 				taskActivities.execute();
 			} else {
+				
+				new ProjectData().execute();
 				GetMyTaskActivities getMyTaskActivities = new GetMyTaskActivities();
 				getMyTaskActivities.execute();
 			}
@@ -273,7 +297,6 @@ public class ActivitiesListActivity extends Activity {
 
 	}
 
-	
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
@@ -285,7 +308,6 @@ public class ActivitiesListActivity extends Activity {
 		@Override
 		public void FullSwipeListView(int position) {
 
-			
 			System.out.println("Current selected Activity ID: "
 					+ dateFilteredKeys[position]);
 			System.out.println("Current selected Activity Name: "
@@ -306,15 +328,16 @@ public class ActivitiesListActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "copy to today",
 						Toast.LENGTH_SHORT).show();
 				singleton.setSelectedActivityName(dateFilteredValues[position]);
-				singleton.setSelectedActivityID(Integer.parseInt(dateFilteredKeys[position]));
+				singleton.setSelectedActivityID(Integer
+						.parseInt(dateFilteredKeys[position]));
 				System.out.println("copy to today");
-				
+
 				namePopupWindow();
 			}
 		}
 
 		private void namePopupWindow() {
-			
+
 			final Dialog dialog = new Dialog(ActivitiesListActivity.this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			dialog.setContentView(R.layout.popup);
@@ -362,7 +385,8 @@ public class ActivitiesListActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "copy to yesterday",
 						Toast.LENGTH_SHORT).show();
 				singleton.setSelectedActivityName(dateFilteredValues[position]);
-				singleton.setSelectedActivityID(Integer.parseInt(dateFilteredKeys[position]));
+				singleton.setSelectedActivityID(Integer
+						.parseInt(dateFilteredKeys[position]));
 
 				System.err.println("toDate : " + singleton.getToDate());
 				System.out.println("copy to yesterday");
@@ -381,28 +405,33 @@ public class ActivitiesListActivity extends Activity {
 			for (int i : reverseSortedPositions) {
 				if (singleton.isOnline()) {
 					listAdapter.notifyDataSetChanged();
-				} 
+				}
 			}
 		}
 
 		@Override
 		public void OnClickListView(int position) {
-		
+
 			singleton.setSelectedActivityName(dateFilteredValues[position]);
-			singleton.setSelectedActivityID(Integer.parseInt(dateFilteredKeys[position]));
-			if(Utilities.adata.size()!=0)
-			{
-				singleton.setselectedActivityIdentityoffline(Utilities.adata.get(position).getAIdentity());
+			singleton.setSelectedActivityID(Integer
+					.parseInt(dateFilteredKeys[position]));
+			if (Utilities.adata.size() != 0) {
+				singleton.setselectedActivityIdentityoffline(Utilities.adata
+						.get(position).getAIdentity());
 			}
-			
-			
-			
+
+			Log.d("Aidentity","-->"+singleton.getselectedActivityIdentityoffline());
 			System.err.println("activity name :"
 					+ singleton.getSelectedActivityName());
 			System.err.println("activity id :"
 					+ singleton.getSelectedActivityID());
-			startActivity(new Intent(getApplicationContext(),
-					EntriesListActivity.class));
+			Intent intent=new Intent(getApplicationContext(),
+					EntriesListActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putInt("index", 2);
+
+			intent.putExtras(bundle);
+			startActivity(intent);
 		}
 	};
 
@@ -456,10 +485,10 @@ public class ActivitiesListActivity extends Activity {
 
 					System.out.println("TaskId: "
 							+ singleton.getSelectedTaskID());
-					
+
 					System.out.println("ProjectDay: "
 							+ singleton.getCurrentSelectedDate());
-							Projectday=singleton.getCurrentSelectedDate();
+					Projectday = singleton.getCurrentSelectedDate();
 					System.out.println("get activities for taskid Request: "
 							+ jsonActivitiesRequest);
 					return jsonDataPost
@@ -521,6 +550,8 @@ public class ActivitiesListActivity extends Activity {
 								// activity.getInt("Id"));
 								singleton.getActivitiesList().put(keys[i],
 										values[i]);
+								
+								
 							}
 
 							int delResponse = dbAdapter.deleteActivities(
@@ -528,10 +559,12 @@ public class ActivitiesListActivity extends Activity {
 									singleton.getCurrentSelectedDate());
 							System.out.println("Activities deletion response: "
 									+ delResponse);
-							Log.d("activity delected","--->"+delResponse+ "  "+singleton.getActivitiesList().size());
+							Log.d("activity delected", "--->" + delResponse
+									+ "  "
+									+ singleton.getActivitiesList().size());
 							if (singleton.getActivitiesList().size() > 0) {
-								
-								writeActivitiesToDB();
+
+								writeActivitiesToDB(Projectday);
 							}
 							processListsAndSetAdapter();
 
@@ -596,16 +629,24 @@ public class ActivitiesListActivity extends Activity {
 
 				try {
 					JSONObject jsonMyTaskActivitiesRequest = new JSONObject();
-					jsonMyTaskActivitiesRequest.put("ProjectId",
-							singleton.getSelectedProjectID());
-					jsonMyTaskActivitiesRequest.put("UserId",
-							singleton.getUserId());
+					
+					jsonMyTaskActivitiesRequest.put("TaskId",
+							singleton.getSelectedTaskID());
 					jsonMyTaskActivitiesRequest.put("ProjectDay",
 							singleton.getCurrentSelectedDate());
-					System.out.println("My Task Activities Request: "
+					jsonMyTaskActivitiesRequest.put("UserId", singleton.getUserId());
+//					jsonMyTaskActivitiesRequest.put("ProjectId",
+//							singleton.getSelectedProjectID());
+//					jsonMyTaskActivitiesRequest.put("UserId",
+//							singleton.getUserId());
+//					jsonMyTaskActivitiesRequest.put("ProjectDay",
+//							singleton.getCurrentSelectedDate());
+//					System.out.println("My Task Activities Request: "
+//							+ jsonMyTaskActivitiesRequest);
+					System.out.println("get activities for taskid Request: "
 							+ jsonMyTaskActivitiesRequest);
 					return jsonDataPost
-							.getMyTaskActivities(jsonMyTaskActivitiesRequest);
+							.getActivitiesByTask(jsonMyTaskActivitiesRequest);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -639,18 +680,22 @@ public class ActivitiesListActivity extends Activity {
 
 							LoginActivity.projectsListActivityStatus.put(
 									singleton.getSelectedProjectID(), "T");
-							singleton
-									.setSelectedTaskID(myTaskActivitiesJSONResponse
-											.getInt("TI"));
-							singleton
-									.setSelectedTaskName(myTaskActivitiesJSONResponse
-											.getString("TN"));
+							
+//							singleton
+//									.setSelectedTaskID(myTaskActivitiesJSONResponse
+//											.getInt("TI"));
+//							singleton
+//									.setSelectedTaskName(myTaskActivitiesJSONResponse
+//											.getString("TN"));
+							
 							JSONArray myTaskActivitiesArray = new JSONArray(
 									myTaskActivitiesJSONResponse
 											.getString("Activities"));// myTaskActivitiesJSONResponse.getJSONArray("tasks");
 
 							int myTaskActivitiesArrayLength = myTaskActivitiesArray
 									.length();
+							
+							Log.d("arraylength","--->"+myTaskActivitiesArrayLength);
 							keys = new String[myTaskActivitiesArrayLength];
 							values = new String[myTaskActivitiesArrayLength];
 							dates = new String[myTaskActivitiesArrayLength];
@@ -664,7 +709,9 @@ public class ActivitiesListActivity extends Activity {
 										values[i]);
 								activityListStatus.put(keys[i],
 										activity.getString("F"));
-							}
+								
+								Log.d("datajson","--->"+keys[i]+" "+values[i]+dates[i]);
+							} 
 							int delResponse = dbAdapter.deleteMyTaskActivities(
 									singleton.getSelectedTaskID(),
 									singleton.getCurrentSelectedDate());
@@ -672,7 +719,8 @@ public class ActivitiesListActivity extends Activity {
 									.println("MyTaskActivities deletion response: "
 											+ delResponse);
 							if (singleton.getActivitiesList().size() > 0) {
-								writeActivitiesToDB();
+								for(int i=0;i<dates.length;i++)
+								writeActivitiesToDB(dates[i]);
 							}
 							processListsAndSetAdapter();
 						} else {
@@ -716,11 +764,11 @@ public class ActivitiesListActivity extends Activity {
 				int month, int year) {
 			this._context = context;
 			this.list = new ArrayList<String>();
-			
+
 			Calendar calendar = Calendar.getInstance();
 			setCurrentDayOfMonth(calendar.get(Calendar.DAY_OF_MONTH));
 			setCurrentWeekDay(calendar.get(Calendar.DAY_OF_WEEK));
-			
+
 			calendarClick = (RelativeLayout) v;
 			// Print Month
 			printMonth(month, year);
@@ -734,7 +782,6 @@ public class ActivitiesListActivity extends Activity {
 			Calendar calendar = Calendar.getInstance();
 			setCurrentDayOfMonth(calendar.get(Calendar.DAY_OF_MONTH));
 			setCurrentWeekDay(calendar.get(Calendar.DAY_OF_WEEK));
-			
 
 			// Print Month
 			printMonth(month, year);
@@ -762,7 +809,7 @@ public class ActivitiesListActivity extends Activity {
 		}
 
 		private void printMonth(int mm, int yy) {
-		
+
 			int trailingSpaces = 0;
 			int daysInPrevMonth = 0;
 			int prevMonth = 0;
@@ -860,7 +907,7 @@ public class ActivitiesListActivity extends Activity {
 
 			for (int i = 0; i < list.size(); i++) {
 
-				//Log.d("listdata", "--->" + list.get(i));
+				// Log.d("listdata", "--->" + list.get(i));
 
 			}
 			// Leading Month days
@@ -887,6 +934,8 @@ public class ActivitiesListActivity extends Activity {
 
 			// Get a reference to the Day gridcell
 			gridcell = (Button) row.findViewById(R.id.calendar_day_gridcell);
+			orangeDot = (ImageView) row.findViewById(R.id.orangedot);
+
 			gridcell.setOnClickListener(this);
 
 			// ACCOUNT FOR SPACING
@@ -901,18 +950,48 @@ public class ActivitiesListActivity extends Activity {
 			// Set the Day GridCell
 			gridcell.setText(theday);
 			gridcell.setTag(theyear + "-" + themonth + "-" + theday);
-			
-
+			//Log.d("year month day", "--->" + theyear + "-" + themonth + "-"
+				//	+ theday.length());
+			if (theday.length() == 1) {
+				runningYMDdata = theyear + "" + themonth + "0" + theday;
+			} else {
+				runningYMDdata = theyear + "" + themonth + "" + theday;
+			}
 			if (day_color[1].equals("GREY")) {
 				gridcell.setTextColor(getResources()
 						.getColor(R.color.lightgray));
 			}
 			if (day_color[1].equals("WHITE")) {
+
+				
+
+					for (int i = 0; i < datevalues.length; i++) {
+						Log.d("present date", "--->" + datevalues[i] + "  "
+								+ runningYMDdata);
+						if (datevalues[i].equals(runningYMDdata)) {
+							orangeDot.setVisibility(View.VISIBLE);
+						}
+					
+				}
 				gridcell.setTextColor(getResources().getColor(
 						R.color.lightgray02));
 
 			}
 			if (day_color[1].equals("BLUE")) {
+
+				//Log.d("present date", "--->" + yearMonthdate.substring(4, 6)
+					//	+ " " + yearMonthdate.substring(0, 4));
+
+				
+
+					for (int i = 0; i < datevalues.length; i++) {
+						//Log.d("present date", "--->" + datevalues[i] + "  "
+							//	+ runningYMDdata);
+						if (datevalues[i].equals(runningYMDdata)) {
+							orangeDot.setVisibility(View.VISIBLE);
+						}
+					
+				}
 				if (themonth.equals(yearMonthdate.substring(4, 6))
 						&& theyear.equals(yearMonthdate.substring(0, 4))) {
 					gridcell.setTextColor(getResources().getColor(
@@ -952,7 +1031,7 @@ public class ActivitiesListActivity extends Activity {
 		@Override
 		public void onClick(View view) {
 			String date_month_year = (String) view.getTag();
-		//	Log.d("clickdate", "---->" + date_month_year);
+			// Log.d("clickdate", "---->" + date_month_year);
 			SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 			try {
 				singleton.setCurrentSelectedDate(new SimpleDateFormat(
@@ -967,7 +1046,7 @@ public class ActivitiesListActivity extends Activity {
 			// date_month_year.replace("-", ""));
 			// System.out.println(singleton.getCurrentSelectedDate());
 			// filterActivitiesByDates();
-			
+
 			dateTextView.setText(singleton.getCurrentSelectedDateFormatted());
 			dateTextView.setTextSize(16);
 			// tv.setTextColor(getResources().getColor(R.color.blue));
@@ -984,13 +1063,22 @@ public class ActivitiesListActivity extends Activity {
 
 			} else {
 				// sqlite data
-				//Log.d("offline", "--->");
-				String date1 = date_month_year.replace("-", "");
-				date1 = date1.substring(0, 6) + "0"
-						+ date1.substring(6, date1.length());
-				Log.d("date1", "---->" + date1);
-				readDbData(date1);
-
+				// Log.d("offline", "--->");
+				String dateupdate = date_month_year.replace("-", "");
+				Log.d("check","--->"+dateupdate.length());
+				if(dateupdate.length()==8)
+				{
+					dateupdate = dateupdate.substring(0, 6) + ""
+							+ dateupdate.substring(6, dateupdate.length());
+					Log.d("date1", "---->" + dateupdate);
+				}
+				else{
+				dateupdate = dateupdate.substring(0, 6) + "0"
+						+ dateupdate.substring(6, dateupdate.length());
+				Log.d("date1", "---->" + dateupdate);
+				
+				}
+				readDbData(dateupdate);
 			}
 		}
 
@@ -1014,25 +1102,13 @@ public class ActivitiesListActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		if (singleton.isReloadPage()) {
 			singleton.setReloadPage(false);
 			listAdapter.notifyDataSetChanged();
 			this.onCreate(null);
 		}
-		// Bundle savedInstanceState = null;
-		// onCreate(savedInstanceState);
-		/*
-		 * if(listAdapter != null){ values = new
-		 * String[singleton.getActivitiesList().size()]; values =
-		 * singleton.getActivitiesList().keySet().toArray(values); cmn_list_view
-		 * = (ListView)findViewById(R.id.list); //cmn_list_view.invalidate();
-		 * ((ListAdapterSwipe
-		 * )cmn_list_view.getAdapter()).notifyDataSetInvalidated(); listAdapter
-		 * = new ListAdapterSwipe(ActivitiesListActivity.this,
-		 * singleton.getActivitiesList(), values);
-		 * listAdapter.notifyDataSetChanged(); }
-		 */
+		
 	}
 
 	// copy to today and copy to yesterday api calls.
@@ -1141,8 +1217,8 @@ public class ActivitiesListActivity extends Activity {
 							}
 							singleton.setCurrentSelectedDate(singleton
 									.getToDate());
-							singleton.setSelectedActivityID(Integer.parseInt(jsonObject
-									.getString("AI")));// Integer.parseInt();
+							singleton.setSelectedActivityID(Integer
+									.parseInt(jsonObject.getString("AI")));// Integer.parseInt();
 							Intent intent = new Intent(
 									ActivitiesListActivity.this,
 									EntriesListActivity.class);
@@ -1254,22 +1330,23 @@ public class ActivitiesListActivity extends Activity {
 		}
 	}
 
-	public void writeActivitiesToDB() {
+	public void writeActivitiesToDB(String Projectday) {
 		// String[] values = singleton.getActivitiesList().keySet().toArray(new
 		// String[singleton.getActivitiesList().size()]);
 		long insertResponse = 0;
 		for (int i = 0; i < values.length; i++) {
-			
-			Log.d("insert val","--->"+keys[i]+"  "+values[i]+" "+Projectday);
+
+			Log.d("insert val", "--->" + keys[i] + "  " + values[i] + " "
+					+ Projectday);
 			insertResponse = dbAdapter.insertActivity(keys[i], values[i],
-					singleton.getSelectedTaskID(),
-					Projectday,
+					singleton.getSelectedTaskID(), Projectday,
 					activityListStatus.get(keys[i]).equals("T") ? 1 : 0,
 					singleton.getUserId());
-			Log.d("Activities insertion response: " ,"--->"+ insertResponse);
+			
+			Log.d("Activities insertion response: ", "--->" + insertResponse);
 		}
 		System.out.println("Activities insertion response: " + insertResponse);
-		
+
 	}
 
 	public void filterActivitiesByDates() {
@@ -1277,6 +1354,9 @@ public class ActivitiesListActivity extends Activity {
 		System.out.println("keys: " + Arrays.toString(keys));
 		System.out.println("values: " + Arrays.toString(values));
 		System.out.println(Arrays.toString(dates));
+		Log.d("keys","--->"+Arrays.toString(keys));
+		Log.d("values","--->"+Arrays.toString(values));
+		Log.d("dates","--->"+Arrays.toString(dates));
 		int size = 0;
 
 		String date = null;
@@ -1298,7 +1378,7 @@ public class ActivitiesListActivity extends Activity {
 		// System.out.println("Size of dateFileteredArrays: " + size);
 		dateFilteredValues = new String[size];
 
-		//Log.d("hashmap size", "--->" + size);
+		// Log.d("hashmap size", "--->" + size);
 		dateFilteredKeys = new String[size];
 		int j = 0;
 		for (int i = 0; i < values.length; i++) {
@@ -1316,8 +1396,8 @@ public class ActivitiesListActivity extends Activity {
 				+ Arrays.toString(dateFilteredKeys));
 		System.out.println("dateFilteredValues: "
 				+ Arrays.toString(dateFilteredValues));
-		//Log.d("Id", "---->" + Arrays.toString(dateFilteredKeys));
-		//Log.d("Name", "---->" + Arrays.toString(dateFilteredValues));
+		// Log.d("Id", "---->" + Arrays.toString(dateFilteredKeys));
+		// Log.d("Name", "---->" + Arrays.toString(dateFilteredValues));
 
 		Log.d("swipe values", "--->" + dateFilteredValues);
 		listAdapter = new SwipeListAdapter(ActivitiesListActivity.this,
@@ -1330,6 +1410,7 @@ public class ActivitiesListActivity extends Activity {
 																// background of
 																// list item
 		customListView.setOnTouchListener(touchListener);
+		
 		customListView.setAdapter(listAdapter);
 
 		/*
@@ -1337,27 +1418,203 @@ public class ActivitiesListActivity extends Activity {
 		 */
 		// ((ListAdapterSwipe)cmn_list_view.getAdapter()).notifyDataSetInvalidated();
 	}
+
+	public class ProjectData extends AsyncTask<Void,Void,String>{
+
+		@Override
+		protected String doInBackground(Void... arg0) {
+			try {
+				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+					@Override
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					@Override
+					public void checkClientTrusted(
+							java.security.cert.X509Certificate[] arg0,
+							String arg1) {
+					}
+
+					@Override
+					public void checkServerTrusted(
+							java.security.cert.X509Certificate[] chain,
+							String authType) {
+					}
+				} };
+
+				HostnameVerifier hv = new HostnameVerifier() {
+
+					@Override
+					public boolean verify(String hostname, SSLSession session) {
+						return false;
+					}
+				};
+				SSLContext sc = SSLContext.getInstance("SSL");
+				sc.init(null, trustAllCerts, new SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(sc
+						.getSocketFactory());
+				HttpsURLConnection.setDefaultHostnameVerifier(hv);
+				
+				try {
+					JSONObject jsonTaskRequest = new JSONObject();
+					jsonTaskRequest.put("ProjectId",
+							singleton.getSelectedProjectID());
+					// jsonTaskRequest.put("UserId", singleton.getUserId());
+					jsonTaskRequest.put("ProjectDay",
+							singleton.getCurrentSelectedDate());
+					System.out.println("request"+jsonTaskRequest);
+					return jsonDataPost.getAllProjectTasks(jsonTaskRequest);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+				
+				
+		}
+		@Override
+		protected void onPostExecute(String response) {
+			Log.d("result","-->"+response);
+			if (ServerUtilities.unknownHostException) {
+				ServerUtilities.unknownHostException = false;
+				Toast.makeText(getApplicationContext(), "Ur in offline",
+						Toast.LENGTH_LONG).show();
+
+			} else {
+				String taskResponse = response;
+				if (taskResponse != null) {
+					try {
+						
+						
+						Object json = new JSONTokener(taskResponse).nextValue();
+						if (json instanceof JSONObject) {
+							System.out.println("Response is an object.");
+						} else if (json instanceof JSONArray) {
+							System.out.println("Response is an array.");
+						}
+
+						JSONObject taskJSONResponse = new JSONObject(
+								taskResponse);
+						if ((taskJSONResponse.getInt("Status") == 0)
+								|| (taskJSONResponse.getInt("Status") == 200)) {
+
+							JSONArray responseTasksArray = taskJSONResponse
+									.getJSONArray("tasks");
+							int responseTasksArrayLength = responseTasksArray
+									.length();
+							
+							for (int i = 0; i < responseTasksArrayLength; i++) {
+								JSONObject task = responseTasksArray
+										.getJSONObject(i);// JSONObject
+								String requiredTaskName = task.getString("TN");
+								Log.d("test","--->"+requiredTaskName);
+								if(requiredTaskName.equals("My Task"))
+								{
+									Log.d("tasktest","--->"+task.getInt("TI"));
+									singleton.setSelectedTaskID(task.getInt("TI"));
+									Log.d("tasktest","--->"+singleton.getSelectedTaskID());
+									Log.d("mapval", "--->"+ singleton
+											.getSelectedTaskID());
+									
+									data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
+											.getSelectedTaskID());
+									Log.d("mapval", "--->"+ data1.size());
+									datevalues = new String[data1.size()];
+									if(data1.size()>0){
+
+										for (CalenderActivity val : data1) {
+											datevalues[k] = val.getDate();
+											Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
+											k++;
+										}
+										for(int j=0;j<datevalues.length;j++)
+										{
+											Log.d("dataval", "--->" + datevalues[j]);
+										}
+
+									}
+								}
+							}
+						}
+						
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+					} else {
+						System.out
+								.println("An error occurred! Could not fetch tasks");
+					}
+				}
+
+					}
+		
+			
+		}
+		
+
+	
+	
+	
+	
 	private void readDbData(String date) {
 		customListView = (ListView) findViewById(R.id.list2);
 
-		//Tid table identity value stored in Tid in Activity table
+		// Tid table identity value stored in Tid in Activity table
 
 		int Tid = singleton.getSelectedTaskID();
 		Utilities.adata.clear();
 		List<ActivityDB> data;
-		Log.d("tid","--->"+Tid);
-		if(Tid==0){
+		Log.d("tid", "--->" + Tid);
+		if (Tid == 0) {   
+			data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
+					.getSelectedTaskIdentityoffline());
+		datevalues = new String[data1.size()];
+		if(data1.size()>0){
+
+			for (CalenderActivity val : data1) {
+				datevalues[k] = val.getDate();
+				Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
+				k++;
+			}
+			for(int i=0;i<datevalues.length;i++)
+			{
+				Log.d("dataval", "--->" + datevalues[i]);
+			}
+
+		}
 			
-			 data = dbAdapter.getAllActivityRecords(singleton.getSelectedTaskIdentityoffline(), date);
-			 Log.d("tid","--->"+singleton.getSelectedTaskIdentityoffline()+"   "+date+" "+data.size());
+			data = dbAdapter.getAllActivityRecords(
+					singleton.getSelectedTaskIdentityoffline(), date);
+			Log.d("tid", "--->" + singleton.getSelectedTaskIdentityoffline()
+					+ "   " + date + " " + data.size());
+		} else {
+			data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
+					.getSelectedTaskID());
+		datevalues = new String[data1.size()];
+		if(data1.size()>0){
+			Log.d("length","--->"+data1.size());
+			datevalues= new String[data1.size()];
+			k=0;
+			for (CalenderActivity val : data1) {
+				
+				Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
+				datevalues[k] = val.getDate();
+				k++;
+			}
+			for(int i=0;i<datevalues.length;i++)
+			{
+				Log.d("dataval", "--->" + datevalues[i]);
+			}
+
 		}
-		else{
-		
-			 data = dbAdapter.getAllActivityRecords(Tid, date);
-				Log.d("tid","--->"+Tid+"   "+date+" "+data.size());
+			data = dbAdapter.getAllActivityRecords(Tid, date);
+			Log.d("tid", "--->" + Tid + "   " + date + " " + data.size());
 		}
-		
-		
+
 		for (ActivityDB val : data) {
 			ActivityData details = new ActivityData();
 			details.setAIdentity(val.getAIdentity());
@@ -1368,18 +1625,18 @@ public class ActivitiesListActivity extends Activity {
 			Utilities.adata.add(details);
 
 		}
-		//Log.d("arraylength", "---->" + Utilities.tdata.size());
+		// Log.d("arraylength", "---->" + Utilities.tdata.size());
 		dateFilteredValues = new String[Utilities.adata.size()];
 		dateFilteredKeys = new String[Utilities.adata.size()];
 		for (int i = 0; i < Utilities.adata.size(); i++) {
 			dateFilteredValues[i] = Utilities.adata.get(i).getAName();
 			dateFilteredKeys[i] = Utilities.adata.get(i).getAId() + "";
-			Log.d("taskdata", "---->" + Utilities.adata.get(i).getAId());
-			Log.d("taskdata", "---->" + Utilities.adata.get(i).getAIdentity());
-			Log.d("taskdata", "---->" + Utilities.adata.get(i).getTid());
+			//Log.d("taskdata", "---->" + Utilities.adata.get(i).getAId());
+			//Log.d("taskdata", "---->" + Utilities.adata.get(i).getAIdentity());
+			Log.d("taskdata", "---->" + Utilities.adata.get(i).getTDate());
 		}
-		//Log.d("oflineId", "---->" + Arrays.toString(dateFilteredKeys));
-		//Log.d("oflineName", "---->" + Arrays.toString(dateFilteredValues));
+		// Log.d("oflineId", "---->" + Arrays.toString(dateFilteredKeys));
+		// Log.d("oflineName", "---->" + Arrays.toString(dateFilteredValues));
 		dbAdapter.Close();
 		listAdapter = new SwipeListAdapter(ActivitiesListActivity.this,
 				dateFilteredValues);// values);

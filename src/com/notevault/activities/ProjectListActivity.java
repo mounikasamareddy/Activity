@@ -13,24 +13,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.notevault.adapter.ProjectAdapter;
 import com.notevault.arraylistsupportclasses.ProjectDB;
 import com.notevault.arraylistsupportclasses.ProjectData;
-
-
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
@@ -40,15 +35,16 @@ public class ProjectListActivity extends Activity {
 
 	Singleton singleton;
 	SharedPreferences settingPreferences;
-	ListView projectListView;
-	int keys[];
+	NumberPicker projects;
+	int keys[], selectedpickerindex;
 	public SQLiteDatabase DB;
-	String values[];
+	String values[], projectsValues[];
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	Toast toast;
 	private static long back_pressed;
 	DBAdapter DbAdapter;
-	ProjectAdapter pAdapter;
+	Button chooseProject;
+	int k = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +57,8 @@ public class ProjectListActivity extends Activity {
 
 		companyName = (TextView) findViewById(R.id.companyName_text);
 		LinearLayout settingLayout = (LinearLayout) findViewById(R.id.image_layout);
-		projectListView = (ListView) findViewById(R.id.list);
+		chooseProject = (Button) findViewById(R.id.chooseproject);
+		projects = (NumberPicker) findViewById(R.id.numberpicker);
 		settingLayout.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -98,39 +95,182 @@ public class ProjectListActivity extends Activity {
 				}
 			}
 			System.out.println("List of Projects: " + Arrays.toString(values));
-			MyAdapter myAdapter = new MyAdapter();
-			projectListView.setAdapter(myAdapter);
+			Log.d("projectdata", "--->" + Arrays.toString(values));
+			projectsValues = new String[values.length];
+			for (int j = 0; j < values.length; j++) {
+				Log.d("data", "--->" + values[j]);
+				projectsValues[j] = values[j];
+			}
+
+			projects.setMaxValue(4);
+			projects.setMinValue(0);
+			projects.setDisplayedValues(projectsValues);
+
+			projects.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+			projects.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+				@Override
+				public void onValueChange(NumberPicker picker, int oldVal,
+						int newVal) {
+					selectedpickerindex = newVal;
+
+					Log.d("newval", "-->" + selectedpickerindex);
+				}
+			});
+
+			chooseProject.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+
+					singleton
+							.setSelectedProjectName(values[selectedpickerindex]);
+					singleton.setSelectedProjectID(keys[selectedpickerindex]);
+					LoginActivity.projectsListActivityStatus.put(
+							keys[selectedpickerindex], "T");
+					System.out.println("id : "
+							+ singleton.getSelectedProjectID());
+					System.out.println(singleton.getSelectedProjectName());
+
+					Date curDate = new Date();
+					// System.out.println("Cur Date : ##################################### : "+
+					// curDate);
+					SimpleDateFormat format1 = new SimpleDateFormat(
+							"dd-MM-yyyy");
+					try {
+						singleton.setCurrentSelectedDateFormatted(format1
+								.parse(format1.format(curDate)).toString()
+								.replace(" 00:00:00 GMT+05:30", ","));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					singleton.setCurrentSelectedDate(new SimpleDateFormat(
+							"yyyyMMdd").format(curDate));
+					Intent intent;
+
+					if (singleton.isEnableTasks()) {
+						if (k == 0) {
+							intent = new Intent(ProjectListActivity.this,
+									TasksListActivity.class);
+							startActivity(intent);
+							k++;
+						}
+					} else {
+						if (k == 0) {
+							intent = new Intent(ProjectListActivity.this,
+									ActivitiesListActivity.class);
+							startActivity(intent);
+							k++;
+						}
+
+					}
+
+				}
+			});
+
 		}
 		// offline ls size
 		else {
 			companyName.setText(Utilities.lData.get(0).getCompany());
-			pAdapter = new ProjectAdapter(ProjectListActivity.this);
+
 			Log.d("arraylist", "---->" + Utilities.pdata.size());
 
 			List<ProjectDB> data = DbAdapter.getAllProjectRecords();
 			Utilities.pdata.clear();
 			for (ProjectDB val : data) {
-				ProjectData details = new ProjectData(val.getPID(),val.getPName(),val.getHasData(),val.getHasActivities());
+				ProjectData details = new ProjectData(val.getPID(),
+						val.getPName(), val.getHasData(),
+						val.getHasActivities());
 				details.setPID(val.getPID());
 				details.setPName(val.getPName());
 				details.setHasData(val.getHasData());
 				details.setHasActivities(val.getHasActivities());
-				 
+
 				Utilities.pdata.add(details);
 
 			}
-			
+
+			Collections.sort(Utilities.pdata, new ProjectData.OrderByPName());
+			Log.d("offline", "--->" + Utilities.pdata.size());
+			projectsValues = new String[Utilities.pdata.size()];
 			for (int i = 0; i < Utilities.pdata.size(); i++) {
-				//Log.d("arraylist", "---->" + Utilities.pdata.get(i).getHasData());
-				//Log.d("arraylist", "---->" + Utilities.pdata.get(i).getHasActivities());
+				Log.d("offline", "--->" + Utilities.pdata.get(i).getPName());
+				projectsValues[i] = Utilities.pdata.get(i).getPName();
 			}
-			 Collections.sort(Utilities.pdata, new ProjectData.OrderByPName());
-			
-			 
-			 
-		       
+
 			DbAdapter.Close();
-			projectListView.setAdapter(pAdapter);
+
+			projects.setMaxValue(4);
+			projects.setMinValue(0);
+			projects.setDisplayedValues(projectsValues);
+			projects.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+			projects.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+				@Override
+				public void onValueChange(NumberPicker picker, int oldVal,
+						int newVal) {
+
+					selectedpickerindex = newVal;
+					
+							Log.d("newval", "-->" + selectedpickerindex);
+
+							}
+			});
+			chooseProject.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					
+					singleton.setSelectedProjectName(Utilities.pdata
+							.get(selectedpickerindex).getPName());
+
+					singleton.setSelectedProjectID(Utilities.pdata.get(
+							selectedpickerindex).getPID());
+
+					Date curDate = new Date();
+					// System.out.println("Cur Date : ##################################### : "+
+					// curDate);
+					SimpleDateFormat format1 = new SimpleDateFormat(
+							"dd-MM-yyyy");
+					try {
+						singleton
+								.setCurrentSelectedDateFormatted(format1
+										.parse(format1.format(curDate))
+										.toString()
+										.replace(" 00:00:00 GMT+05:30",
+												","));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					singleton
+							.setCurrentSelectedDate(new SimpleDateFormat(
+									"yyyyMMdd").format(curDate));
+
+					Intent intent;
+
+					if (singleton.isEnableTasks()) {
+						if (k == 0) {
+							intent = new Intent(
+									ProjectListActivity.this,
+									TasksListActivity.class);
+							startActivity(intent);
+							k++;
+						}
+					} else {
+						if (k == 0) {
+							intent = new Intent(
+									ProjectListActivity.this,
+									ActivitiesListActivity.class);
+							startActivity(intent);
+							k++;
+						}
+
+					}
+				
+
+		
+				}
+			});
 		}
 
 		settingPreferences = getSharedPreferences(
@@ -167,136 +307,14 @@ public class ProjectListActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		k = 0;
+		System.out.println("INSIDE ON-RESUME");
 
-		 System.out.println("INSIDE ON-RESUME");
-		if(singleton.isOnline()){
-			if (singleton.isReloadPage()) {
-				// System.out.println("RELOADING VIEW.");
-				projectListView = (ListView) findViewById(R.id.list);
-				MyAdapter myAdapter = new MyAdapter();
-				projectListView.setAdapter(myAdapter);
-				projectListView.invalidate();
-				myAdapter.notifyDataSetChanged();
-				myAdapter.notifyDataSetInvalidated();
-				singleton.setReloadPage(false);
-			}
-			else{
-				if (singleton.isReloadPage()) {
-				System.out.println("Offline");
-				projectListView = (ListView) findViewById(R.id.list);
-				List<ProjectDB> data = DbAdapter.getAllProjectRecords();
-				Utilities.pdata.clear();
-				for (ProjectDB val : data) {
-					ProjectData details = new ProjectData(val.getPID(),val.getPName(),val.getHasData(),val.getHasActivities());
-					details.setPID(val.getPID());
-					details.setPName(val.getPName());
-					details.setHasData(val.getHasData());
-					details.setHasActivities(val.getHasActivities());
-					 
-					Utilities.pdata.add(details);
+		if (singleton.isReloadPage()) {
 
-				}
-				pAdapter= new ProjectAdapter(this);
-				projectListView.setAdapter(pAdapter);
-				projectListView.invalidate();
-				pAdapter.notifyDataSetChanged();
-				pAdapter.notifyDataSetInvalidated();
-				singleton.setReloadPage(false);
-				}
-			}
-		}
-		
-	}
+			singleton.setReloadPage(false);
 
-	class MyAdapter extends BaseAdapter {
-
-		@Override
-		public int getCount() {
-			return values.length;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return position;
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(final int position, View convertView,
-				ViewGroup parent) {
-
-			// System.out.println("GET VIEW CALLED AGAIN!");
-
-			LayoutInflater li = getLayoutInflater();
-			convertView = li.inflate(R.layout.customlist, null);
-			TextView tv = (TextView) convertView.findViewById(R.id.textView1);
-			// System.err.println("value"+" @"+position+" : "+values[position]);
-
-			ImageView orangeArrow = (ImageView) convertView
-					.findViewById(R.id.name_imageView2);
-			ImageView greyArrow = (ImageView) convertView
-					.findViewById(R.id.name_imageView1);
-
-			tv.setText(values[position]);
-			if (singleton.isEnableTasks()) {
-
-				if (LoginActivity.projectsListStatus.get(keys[position])
-						.equalsIgnoreCase("T")) {
-
-					orangeArrow.setVisibility(View.VISIBLE);
-					greyArrow.setVisibility(View.INVISIBLE);
-				}
-			} else {
-				if (LoginActivity.projectsListActivityStatus
-						.get(keys[position]).equalsIgnoreCase("T")) {
-					orangeArrow.setVisibility(View.VISIBLE);
-					greyArrow.setVisibility(View.INVISIBLE);
-				}
-			}
-
-			convertView.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-
-					singleton.setSelectedProjectName(values[position]);
-					singleton.setSelectedProjectID(keys[position]);
-					LoginActivity.projectsListActivityStatus.put(
-							keys[position], "T");
-					System.out.println("id : "
-							+ singleton.getSelectedProjectID());
-					System.out.println(singleton.getSelectedProjectName());
-
-					Date curDate = new Date();
-					// System.out.println("Cur Date : ##################################### : "+
-					// curDate);
-					SimpleDateFormat format1 = new SimpleDateFormat(
-							"dd-MM-yyyy");
-					try {
-						singleton.setCurrentSelectedDateFormatted(format1
-								.parse(format1.format(curDate)).toString()
-								.replace(" 00:00:00 GMT+05:30", ","));
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-					singleton.setCurrentSelectedDate(new SimpleDateFormat(
-							"yyyyMMdd").format(curDate));
-					Intent intent;
-					if (singleton.isEnableTasks()) {
-						intent = new Intent(ProjectListActivity.this,
-								TasksListActivity.class);
-					} else {
-						intent = new Intent(ProjectListActivity.this,
-								ActivitiesListActivity.class);
-
-					}
-					startActivity(intent);
-				}
-			});
-			return convertView;
 		}
 	}
+
 }

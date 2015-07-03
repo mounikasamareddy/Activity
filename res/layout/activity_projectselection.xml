@@ -13,7 +13,7 @@
         android:orientation="horizontal"
         android:padding="0.0dip" >
 
- 		<LinearLayout
+        <LinearLayout
             android:id="@+id/image_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
                 android:padding="10dip"
                 android:src="@drawable/settings" >
             </ImageView>
-		</LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textv"
@@ -56,20 +56,75 @@
         android:textColor="#FFFFFF"
         android:textSize="15sp" >
     </TextView>
-  
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal" >
 
-        <ListView
-            android:id="@+id/list"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fastScrollEnabled="true" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/textv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dip"
+        android:layout_marginTop="10dip"
+        android:text="Select a Project"
+        android:textColor="#000000"
+        android:textSize="18sp" >
+    </TextView>
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:fillViewport="true"
+        android:gravity="top" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <NumberPicker
+                android:id="@+id/numberpicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:divider="@color/black" />
+        </LinearLayout>
+        <!-- <LinearLayout -->
+        <!-- android:layout_width="fill_parent" -->
+        <!-- android:layout_height="0dp" -->
+        <!-- android:layout_weight="1" -->
+        <!-- android:orientation="horizontal" > -->
+
+
+        <!-- <ListView -->
+        <!-- android:id="@+id/list" -->
+        <!-- android:layout_width="0dp" -->
+        <!-- android:layout_height="wrap_content" -->
+        <!-- android:layout_weight="1" -->
+        <!-- android:fastScrollEnabled="true" /> -->
+        <!-- </LinearLayout> -->
+    </ScrollView>
+ <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+     android:gravity="center"
+        android:orientation="horizontal" >
+    <Button
+        android:id="@+id/chooseproject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="#f49800"
+        android:layout_gravity="center"
+        android:lines="1"
+        android:paddingRight="10dip"
+        android:paddingLeft="10dip"
+        android:paddingTop="2dip"
+        android:paddingBottom="2dip"
+        android:text="Select Project"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"/>
+</LinearLayout>
+   
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -112,11 +167,11 @@
             android:id="@+id/Name_text4"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
             android:text="at www.notevault.com"
             android:textColor="#999999"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp" >
+            android:textSize="18sp" >
         </TextView>
     </LinearLayout>
 

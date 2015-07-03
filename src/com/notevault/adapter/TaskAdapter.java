@@ -93,7 +93,7 @@ public class TaskAdapter extends BaseAdapter{
 
 				singleton.setSelectedTaskName(Utilities.tdata.get(position).getTName());
 				singleton.setselectedTaskIdentityoffline(Utilities.tdata.get(position).getTIdentity());
-				
+				notifyDataSetChanged();
 				
 
 				Date curDate = new Date();

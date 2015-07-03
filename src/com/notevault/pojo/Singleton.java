@@ -34,8 +34,43 @@ public class Singleton {
     private boolean loggedOut = true;
     private boolean online;
     private boolean reloadPage;
+    private boolean EnableShiftTracking;
+    private boolean EnableOvertimeTracking;
+    private String ResentShiftItem;
+private int selectedEntriesIdentityoffline;
+    public int getSelectedEntriesIdentityoffline() {
+	return selectedEntriesIdentityoffline;
+}
 
-    private boolean newEntryFlag;
+public void setSelectedEntriesIdentityoffline(int selectedEntriesIdentityoffline) {
+	this.selectedEntriesIdentityoffline = selectedEntriesIdentityoffline;
+}
+
+	public String getResentShiftItem() {
+		return ResentShiftItem;
+	}
+
+	public void setResentShiftItem(String resentShiftItem) {
+		ResentShiftItem = resentShiftItem;
+	}
+
+	public boolean isEnableOvertimeTracking() {
+		return EnableOvertimeTracking;
+	}
+
+	public void setEnableOvertimeTracking(boolean enableOvertimeTracking) {
+		EnableOvertimeTracking = enableOvertimeTracking;
+	}
+
+	public boolean isEnableShiftTracking() {
+		return EnableShiftTracking;
+	}
+
+	public void setEnableShiftTracking(boolean enableShiftTracking) {
+		EnableShiftTracking = enableShiftTracking;
+	}
+
+	private boolean newEntryFlag;
     int selectedTaskIdentityoffline;
     int selectedActivityIdentityoffline;
 
@@ -68,6 +103,7 @@ public class Singleton {
     private String selectedMaterialStatus;
     private String selectedMaterialQty;
     private String selectedMaterialDescription;
+    private int selectedEntityIdentity;
 
     private HashMap<Integer, String> projectsList = new HashMap<Integer, String>();
     private HashMap<String, String> activitiesList = new HashMap<String, String>();
@@ -537,6 +573,16 @@ public class Singleton {
 		
 		return selectedActivityIdentityoffline;
 	}
+
+	public void setSelectedEntityIdentity(int eIdentity) {
+		this.selectedEntityIdentity=eIdentity;
+		
+	}
+public int getSelectedEntityIdentity() {
+		
+		return selectedEntityIdentity;
+	}
+
 
 	
 }

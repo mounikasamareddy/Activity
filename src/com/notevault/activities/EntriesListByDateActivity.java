@@ -71,6 +71,7 @@ public class EntriesListByDateActivity extends Activity {
 
 		singleton = Singleton.getInstance();
 		collectiveConcatenatedEntryList.clear();
+	
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		if (singleton.isOnline()) {
 			getEntries();
@@ -166,7 +167,7 @@ public class EntriesListByDateActivity extends Activity {
 						@Override
 						public void onClick(View v) {
 
-							//singleton.setOfflineEntry(false);
+							// singleton.setOfflineEntry(false);
 							if (val[5].startsWith("OF")) {
 								singleton.setOfflineEntry(true);
 								val[5] = val[5].substring(2);
@@ -217,7 +218,7 @@ public class EntriesListByDateActivity extends Activity {
 				tv.setText(Utilities.eAligndata.get(position).getNAME());
 				tv1.setText(Utilities.eAligndata.get(position).getTRD_COMP());
 				tv2.setText(Utilities.eAligndata.get(position).getCLASSI_STAT());
-				tv3.setText(Utilities.eAligndata.get(position).getHR_QTY()+"");
+				tv3.setText(Utilities.eAligndata.get(position).getHR_QTY() + "");
 				if (Utilities.eAligndata.get(position).getTYPE().equals("L")) {
 					roundTv.setBackgroundResource(R.drawable.circleyellow);
 				} else if (Utilities.eAligndata.get(position).getTYPE()
@@ -231,38 +232,66 @@ public class EntriesListByDateActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 
-					
-						singleton.setCurrentSelectedEntryID(Utilities.eAligndata.get(position).getID());
+						singleton
+								.setCurrentSelectedEntryID(Utilities.eAligndata
+										.get(position).getID());
 						singleton.setNewEntryFlag(false);
-						singleton.setSelectedEntityIdentity(Utilities.eAligndata.get(position).getEIdentity());
-						
-						if (Utilities.eAligndata.get(position).getTYPE().equals("L")) {
-							singleton.setSelectedLaborName(Utilities.eAligndata.get(position).getNAME());
-							singleton.setSelectedLaborTrade(Utilities.eAligndata.get(position).getTRD_COMP());
+						singleton
+								.setSelectedEntityIdentity(Utilities.eAligndata
+										.get(position).getEIdentity());
+
+						if (Utilities.eAligndata.get(position).getTYPE()
+								.equals("L")) {
+							singleton.setSelectedLaborName(Utilities.eAligndata
+									.get(position).getNAME());
 							singleton
-									.setSelectedLaborClassification(Utilities.eAligndata.get(position).getCLASSI_STAT());
-							
-							singleton.setSelectedLaborHours(Utilities.eAligndata.get(position).getHR_QTY()+"");
+									.setSelectedLaborTrade(Utilities.eAligndata
+											.get(position).getTRD_COMP());
+							singleton
+									.setSelectedLaborClassification(Utilities.eAligndata
+											.get(position).getCLASSI_STAT());
+
+							singleton
+									.setSelectedLaborHours(Utilities.eAligndata
+											.get(position).getHR_QTY() + "");
 							// singleton.setSelectedLaborDescription(val[6]);
 							Intent intent = new Intent(
 									EntriesListByDateActivity.this,
 									AddLabor.class);
 							startActivity(intent);
-						} else if (Utilities.eAligndata.get(position).getTYPE().equals("E")) {
-							singleton.setSelectedEquipmentName(Utilities.eAligndata.get(position).getNAME());
-							singleton.setSelectedEquipmentCompany(Utilities.eAligndata.get(position).getTRD_COMP());
-							singleton.setSelectedEquipmentStatus(Utilities.eAligndata.get(position).getCLASSI_STAT());
-							singleton.setSelectedEquipmentQty(Utilities.eAligndata.get(position).getHR_QTY()+"");
+						} else if (Utilities.eAligndata.get(position).getTYPE()
+								.equals("E")) {
+							singleton
+									.setSelectedEquipmentName(Utilities.eAligndata
+											.get(position).getNAME());
+							singleton
+									.setSelectedEquipmentCompany(Utilities.eAligndata
+											.get(position).getTRD_COMP());
+							singleton
+									.setSelectedEquipmentStatus(Utilities.eAligndata
+											.get(position).getCLASSI_STAT());
+							singleton
+									.setSelectedEquipmentQty(Utilities.eAligndata
+											.get(position).getHR_QTY() + "");
 							// singleton.setSelectedEquipmentDescription(val[6]);
 							Intent intent = new Intent(
 									EntriesListByDateActivity.this,
 									AddEquipment.class);
 							startActivity(intent);
-						} else if (Utilities.eAligndata.get(position).getTYPE().equals("M")) {
-							singleton.setSelectedMaterialName(Utilities.eAligndata.get(position).getNAME());
-							singleton.setSelectedMaterialCompany(Utilities.eAligndata.get(position).getTRD_COMP());
-							singleton.setSelectedMaterialStatus(Utilities.eAligndata.get(position).getCLASSI_STAT());
-							singleton.setSelectedMaterialQty(Utilities.eAligndata.get(position).getHR_QTY()+"");
+						} else if (Utilities.eAligndata.get(position).getTYPE()
+								.equals("M")) {
+							singleton
+									.setSelectedMaterialName(Utilities.eAligndata
+											.get(position).getNAME());
+							singleton
+									.setSelectedMaterialCompany(Utilities.eAligndata
+											.get(position).getTRD_COMP());
+							singleton
+									.setSelectedMaterialStatus(Utilities.eAligndata
+											.get(position).getCLASSI_STAT());
+							singleton
+									.setSelectedMaterialQty(Utilities.eAligndata
+											.get(position).getHR_QTY() + "");
 							// singleton.setSelectedMaterialDescription(val[6]);
 							Intent intent = new Intent(
 									EntriesListByDateActivity.this,
@@ -294,7 +323,8 @@ public class EntriesListByDateActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		System.out.println("Entries By Date On resume called.");
-		Log.d("onresume","--->"+singleton.isReloadPage());
+		Log.d(" enteredonresume", "--->" + singleton.isReloadPage());
+		
 		if (singleton.isOnline()) {
 			if (singleton.isReloadPage()) {
 				System.out.println("Reloading the page.");
@@ -309,7 +339,6 @@ public class EntriesListByDateActivity extends Activity {
 				System.out.println("dffdgfOffline");
 				readEntriesFromDB();
 
-				
 				singleton.setReloadPage(false);
 			}
 
@@ -426,8 +455,13 @@ public class EntriesListByDateActivity extends Activity {
 											+ glue + name + glue + trade + glue
 											+ classification + glue + hour
 											+ glue + id + glue + dateCreated);
+									
+									
 								}
-
+//								for(int i=0;i<collectiveConcatenatedEntryList.size();i++)
+//								{
+//									Log.d("collectiveConcatenatedEntryList","--->"+collectiveConcatenatedEntryList.get(i));
+//								}
 								System.out
 										.println("Debugging SortedListByDate : ..... "
 												+ collectiveConcatenatedEntryList);
@@ -698,6 +732,10 @@ public class EntriesListByDateActivity extends Activity {
 											+ glue + name + glue + company
 											+ glue + status + glue + qty + glue
 											+ id + glue + dateCreated);
+									for(int j=0;j<collectiveConcatenatedEntryList.size();j++)
+									{
+										Log.d("collectives","--->"+collectiveConcatenatedEntryList.get(j));
+									}
 								}
 								// allEntriesID.addAll(mid);
 
@@ -706,7 +744,7 @@ public class EntriesListByDateActivity extends Activity {
 										.println("No material entries found.");
 							}
 						}
-						
+
 						int delrecords = dbAdapter.deleteEntries();
 						Log.d("deleted", "--->" + delrecords);
 
@@ -743,7 +781,7 @@ public class EntriesListByDateActivity extends Activity {
 				System.out.println(value);
 			}
 			System.out.println("Entry insertion response: " + insertResponse);
-			
+
 		}
 	}
 
@@ -812,30 +850,47 @@ public class EntriesListByDateActivity extends Activity {
 	public void readEntriesFromDB() {
 
 		int Aid = singleton.getSelectedActivityID();
+		int Tid = singleton.getSelectedTaskID();
 		Utilities.edata.clear();
 		Utilities.eAligndata.clear();
 		List<EntityDB> data = null;
-		if (Aid == 0) {
 
+		if (Tid == 0 && Aid == 0) {
+			Log.d("both", "-->" + singleton.getSelectedTaskIdentityoffline());
 			data = dbAdapter.getAllEntityRecords(singleton
-					.getselectedActivityIdentityoffline());
+					.getSelectedTaskIdentityoffline());
+			Log.d("activity id=0",
+					"--->" + singleton.getSelectedTaskIdentityoffline() + " "
+							+ data.size());
+		} else if (Aid == 0) {
+			Log.d("activity id=0",
+					"--->" + singleton.getselectedActivityIdentityoffline());
+			if (singleton.getselectedActivityIdentityoffline() != 0) {
+				data = dbAdapter.getAllEntityRecords(singleton
+						.getselectedActivityIdentityoffline());
+				Log.d("activity id=0",
+						"--->" + singleton.getselectedActivityIdentityoffline()
+								+ " " + data.size());
+			}
 		} else {
 			data = dbAdapter.getAllEntityRecords(Aid);
+			Log.d("activity id not 0", "--->" + Aid + " " + data.size());
 		}
-		Log.d("length", "--->" + data.size());
-		for (EntityDB val : data) {
-			EntityData details = new EntityData();
-			details.setEIDentity(val.getEIdentity());
-			details.setID(val.getID());
-			details.setNAME(val.getNAME());
-			details.setTRD_COMP(val.getTRD_COMP());
-			details.setCLASSI_STAT(val.getCLASSI_STAT());
-			details.setHR_QTY(val.getHR_QTY());
-			details.setTYPE(val.getType());
-			details.setAction(val.getAction());
-			Utilities.edata.add(details);
-		}
+		if (data.size() > 0) {
+			for (EntityDB val : data) {
+				EntityData details = new EntityData();
+				details.setEIDentity(val.getEIdentity());
+				details.setID(val.getID());
+				details.setNAME(val.getNAME());
+				details.setTRD_COMP(val.getTRD_COMP());
+				details.setCLASSI_STAT(val.getCLASSI_STAT());
+				details.setHR_QTY(val.getHR_QTY());
+				details.setTYPE(val.getType());
+				details.setAction(val.getAction());
+				Utilities.edata.add(details);
 
+			}
+		}
 		dbAdapter.Close();
 		for (int i = 0; i < Utilities.edata.size(); i++) {
 
@@ -887,32 +942,39 @@ public class EntriesListByDateActivity extends Activity {
 
 		}
 		Log.d("ealigndata arraylength", "---->" + Utilities.eAligndata.size());
+		if (Utilities.eAligndata.size() > 0) {
+			for (int i = 0; i < Utilities.eAligndata.size(); i++) {
+				Log.d("alighdata", "---->"
+						+ Utilities.eAligndata.get(i).getID() + " "
+						+ Utilities.eAligndata.get(i).getTYPE() + " "
+						+ Utilities.eAligndata.get(i).getEIdentity() + " "
+						+ Utilities.eAligndata.get(i).getNAME() + " "
+						+ Utilities.eAligndata.get(i).getTRD_COMP() + " "
+						+ Utilities.eAligndata.get(i).getCLASSI_STAT() + " "
+						+ Utilities.eAligndata.get(i).getHR_QTY() + " "
+						+ Utilities.eAligndata.get(i).getTYPE() + " "
+						+ Utilities.eAligndata.get(i).getAction());
 
-		for (int i = 0; i < Utilities.eAligndata.size(); i++) {
-			Log.d("alighdata", "---->" + Utilities.eAligndata.get(i).getID()+" "+
-			 Utilities.eAligndata.get(i).getTYPE()+" "
-			 + Utilities.eAligndata.get(i).getEIdentity()+" "
-			+ Utilities.eAligndata.get(i).getNAME()+" "
-			+ Utilities.eAligndata.get(i).getTRD_COMP()+" "
-			+ Utilities.eAligndata.get(i).getCLASSI_STAT()+" "
-			 + Utilities.eAligndata.get(i).getHR_QTY()+" "
-			 + Utilities.eAligndata.get(i).getTYPE()+" "
-			 + Utilities.eAligndata.get(i).getAction());
-
+			}
+		} else {
+			if (singleton.getselectedActivityIdentityoffline() != 0) {
+				dbAdapter.updateActivity(singleton
+						.getselectedActivityIdentityoffline());
+			}
 		}
-
 		entriesListView = (ListView) findViewById(R.id.list);
 		EntriesListAdapter entriesListAdapter = new EntriesListAdapter();
 		entriesListView.setAdapter(entriesListAdapter);
 		entriesListAdapter.notifyDataSetChanged();
 		entriesListAdapter.notifyDataSetInvalidated();
 		singleton.setReloadPage(true);
-		
-		//if zero records in Perticular Activity Id... change hasdata 0 in Activity table
-//		if(data.size()==0)
-//		{
-//			int record= dbAdapter.updateActivity(TaskID, ActID)
-//		}
+
+		// if zero records in Perticular Activity Id... change hasdata 0 in
+		// Activity table
+		// if(data.size()==0)
+		// {
+		// int record= dbAdapter.updateActivity(TaskID, ActID)
+		// }
 
 	}
 }

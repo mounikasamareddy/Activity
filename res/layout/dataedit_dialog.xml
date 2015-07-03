@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F5F5" >
+    android:background="#F5F5F5"
+    android:orientation="vertical" >
+
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -39,7 +40,6 @@
             android:text="@string/addname_text"
             android:textColor="#000000"
             android:textSize="18sp" >
-
         </TextView>
 
         <TextView
@@ -53,38 +53,65 @@
             android:textSize="15sp" >
         </TextView>
     </FrameLayout>
- 
+
     <EditText
         android:id="@+id/editText1"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:ems="10"
         android:layout_marginTop="20dp"
         android:background="#FFFFFF"
+        android:ellipsize="end"
+        android:ems="10"
         android:hint="@string/addname_text"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLines="1"
         android:paddingLeft="10dp"
-        android:singleLine="true"
-    	android:lines="1"
-   	 	android:maxLines="1"
-    	android:scrollHorizontally="true"
-    	android:ellipsize="end"
-    	android:inputType="text">
-   
+        android:scrollHorizontally="true"
+        android:singleLine="true" >
     </EditText>
-    
+
     <EditText
         android:id="@+id/editText2"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:ems="10"
-        android:layout_marginTop="30dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/frameborder"
-        android:hint="Unity" 
+        android:ems="10"
+        android:hint="Unity"
         android:paddingLeft="10dp"
-        android:visibility="gone">
-   
+        android:visibility="gone" >
     </EditText>
+
+    <LinearLayout
+        android:id="@+id/shift"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/frameborder"
+        android:orientation="horizontal" 
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/shifttxt"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:text="Shift"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/shiftspinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dip"
+            android:layout_marginRight="10dp" />
+
+    </LinearLayout>
 
 </LinearLayout>

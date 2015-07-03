@@ -162,7 +162,44 @@
             android:textSize="18sp"
             android:imeOptions="actionDone" />
   
-
+ <EditText
+            android:id="@+id/timeandhalf"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/frameborder"
+            android:ellipsize="end"
+            android:focusableInTouchMode="true"
+            android:gravity="center|left"
+            android:hint="Time and half"
+            android:inputType="numberDecimal"
+            android:lines="1"
+            android:maxLines="1"
+            android:paddingLeft="20dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textColor="#999999"
+            android:textSize="18sp"
+            android:imeOptions="actionDone"
+            android:visibility="gone" />
+  <EditText
+            android:id="@+id/doubletime"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/frameborder"
+            android:ellipsize="end"
+            android:focusableInTouchMode="true"
+            android:gravity="center|left"
+            android:hint="Double time"
+            android:inputType="numberDecimal"
+            android:lines="1"
+            android:maxLines="1"
+            android:paddingLeft="20dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textColor="#999999"
+            android:textSize="18sp"
+            android:imeOptions="actionDone" 
+            android:visibility="gone"/>
   <!--   <EditText
         android:id="@+id/desc_textView6"
         android:layout_width="fill_parent"

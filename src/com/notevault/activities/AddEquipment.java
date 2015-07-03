@@ -247,84 +247,8 @@ public class AddEquipment extends Activity {
 
 							Toast.makeText(getApplicationContext(), "Offline",
 									Toast.LENGTH_LONG).show();
-							if (singleton.getSelectedActivityID() == 0) {
-								if (singleton.getSelectedTaskID() == 0) {
-									long insertEntities = dbAdapter.insertEntryOffline(
-											singleton
-													.getSelectedEquipmentName(),
-											singleton
-													.getSelectedEquipmentCompany(),
-											singleton
-													.getSelectedEquipmentStatus(),
-											singleton.getSelectedEquipmentQty(),
-											"E",
-											"N",
-											"0",
-											singleton
-													.getSelectedTaskIdentityoffline(),
-											singleton
-													.getselectedActivityIdentityoffline(),
-											singleton
-													.getSelectedTaskIdentityoffline()
-													+ ","
-													+ singleton
-															.getselectedActivityIdentityoffline());
-									Log.d("en_insert labour 0 id", "----->"
-											+ insertEntities);
-									long updateEntity = dbAdapter.updateActivity(
-											singleton
-													.getSelectedTaskIdentityoffline(),
-											singleton.getSelectedActivityID());
-									Log.d("en_insert labour 0 id", "----->"
-											+ insertEntities + " "
-											+ updateEntity);
-								} else {
-									long insertEntities = dbAdapter.insertEntryOffline(
-											singleton.getSelectedEquipmentName(),
-											singleton.getSelectedEquipmentCompany(),
-											singleton
-													.getSelectedEquipmentStatus(),
-											singleton.getSelectedEquipmentQty(),
-											"E",
-											"N",
-											"0",
-											singleton.getSelectedTaskID(),
-											singleton
-													.getselectedActivityIdentityoffline(),
-											singleton
-													.getSelectedTaskIdentityoffline()
-													+ ","
-													+ singleton
-															.getselectedActivityIdentityoffline());
-									long updateEntity = dbAdapter.updateActivity(
-											singleton.getSelectedTaskID(),
-											singleton.getSelectedActivityID());
-									Log.d("en_insert labour 0 id", "----->"
-											+ insertEntities + " "
-											+ updateEntity);
-								}
-
-							} else {
-								long insertEntities = dbAdapter.insertEntryOffline(
-										singleton.getSelectedEquipmentName(),
-										singleton.getSelectedEquipmentCompany(),
-										singleton
-												.getSelectedEquipmentStatus(),
-										singleton.getSelectedEquipmentQty(), "E",
-										"N", "0",
-										singleton.getSelectedTaskID(),
-										singleton.getSelectedActivityID(),
-										"offline");
-								long updateEntity = dbAdapter.updateActivity(
-										singleton.getSelectedTaskID(),
-										singleton.getSelectedActivityID());
-								Log.d("en_insert with offline ", "----->"
-										+ insertEntities + " " + updateEntity);
-
-							}
-							singleton.setReloadPage(true);
-							onBackPressed();
-
+							readDbData();
+							
 						}
 					} else {
 						mProgressDialog = new ProgressDialog(AddEquipment.this);
@@ -343,6 +267,8 @@ public class AddEquipment extends Activity {
 			}
 		});
 	}
+
+	
 
 	class Myadapter extends BaseAdapter {
 
@@ -899,5 +825,78 @@ public class AddEquipment extends Activity {
 	protected void onResume() {
 		super.onResume();
 		this.onCreate(null);
+	}
+	protected void readDbData() {
+		if (singleton.getSelectedActivityID() == 0) {
+			if (singleton.getSelectedTaskID() == 0) {
+				long insertEntities = dbAdapter.insertEntryOffline(
+						singleton
+								.getSelectedEquipmentName(),
+						singleton
+								.getSelectedEquipmentCompany(),
+						singleton
+								.getSelectedEquipmentStatus(),
+						singleton.getSelectedEquipmentQty(),
+						"E",
+						"N",
+						"0",
+						singleton
+								.getSelectedTaskIdentityoffline(),
+						singleton
+								.getselectedActivityIdentityoffline(),
+						"offline");
+				Log.d("en_insert labour 0 id", "----->"
+						+ insertEntities);
+				long updateEntity = dbAdapter.updateActivity(
+						singleton
+								.getSelectedTaskIdentityoffline(),
+						singleton.getSelectedActivityID());
+				Log.d("en_insert labour 0 id", "----->"
+						+ insertEntities + " "
+						+ updateEntity);
+			} else {
+				long insertEntities = dbAdapter.insertEntryOffline(
+						singleton.getSelectedEquipmentName(),
+						singleton.getSelectedEquipmentCompany(),
+						singleton
+								.getSelectedEquipmentStatus(),
+						singleton.getSelectedEquipmentQty(),
+						"E",
+						"N",
+						"0",
+						singleton.getSelectedTaskID(),
+						singleton
+								.getselectedActivityIdentityoffline(),
+						"offline");
+				long updateEntity = dbAdapter.updateActivity(
+						singleton.getSelectedTaskID(),
+						singleton.getSelectedActivityID());
+				Log.d("en_insert labour 0 id", "----->"
+						+ insertEntities + " "
+						+ updateEntity);
+			}
+
+		} else {
+			long insertEntities = dbAdapter.insertEntryOffline(
+					singleton.getSelectedEquipmentName(),
+					singleton.getSelectedEquipmentCompany(),
+					singleton
+							.getSelectedEquipmentStatus(),
+					singleton.getSelectedEquipmentQty(), "E",
+					"N", "0",
+					singleton.getSelectedTaskID(),
+					singleton.getSelectedActivityID(),
+					"offline");
+			long updateEntity = dbAdapter.updateActivity(
+					singleton.getSelectedTaskID(),
+					singleton.getSelectedActivityID());
+			Log.d("en_insert with offline ", "----->"
+					+ insertEntities + " " + updateEntity);
+
+		}
+		singleton.setReloadPage(true);
+		onBackPressed();
+
+		
 	}
 }

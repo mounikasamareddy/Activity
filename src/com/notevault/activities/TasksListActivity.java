@@ -127,8 +127,9 @@ public class TasksListActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		System.out.println("Task activity onResume called.");
+		
 		super.onResume();
+		System.out.println("Task activity onResume called.");
 		if (singleton.isOnline()) {
 
 			if (singleton.isReloadPage()) {
@@ -163,6 +164,7 @@ public class TasksListActivity extends Activity {
 					details.setTID(val.getTID());
 					details.setTName(val.getTName());
 					details.setHasData(val.getHasData());
+					
 
 					Utilities.tdata.add(details);
 
@@ -300,7 +302,15 @@ public class TasksListActivity extends Activity {
 					// jsonTaskRequest.put("UserId", singleton.getUserId());
 					jsonTaskRequest.put("ProjectDay",
 							singleton.getCurrentSelectedDate());
+					
+					if(singleton.isOnline())
+					{
+						System.out.println("request"+jsonTaskRequest);
 					return jsonDataPost.getAllProjectTasks(jsonTaskRequest);
+					}
+					else{
+						readTasksFromDb();
+					}
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -457,12 +467,12 @@ public class TasksListActivity extends Activity {
 			Log.d("taskdataid", "---->" + Utilities.tdata.get(i).getTID());
 			Log.d("taskdataname", "---->"
 					+ Utilities.tdata.get(i).getTIdentity());
-			Log.d("taskdataname", "---->" + Utilities.tdata.get(i).getStatus());
+			Log.d("statusa", "---->" + Utilities.tdata.get(i).getStatus());
 
 		}
 		Collections.sort(Utilities.tdata, new TaskData.OrderByTName());
 		Log.d("taskdata", "---->" + Utilities.tdata);
-
+		tAdapter = new TaskAdapter(TasksListActivity.this);
 		taskListView.setAdapter(tAdapter);
 
 	}

@@ -126,7 +126,8 @@ public class LoginActivity extends Activity {
 		TextView msgTextView2 = (TextView) findViewById(R.id.text_msg2);
 		TextView msgTextView3 = (TextView) findViewById(R.id.text_msg3);
 		TextView msgContact = (TextView) findViewById(R.id.text_msg4);
-		Typeface custom_font = Typeface.createFromAsset(getAssets(),
+		userEditText = (EditText) findViewById(R.id.username);
+	Typeface custom_font = Typeface.createFromAsset(getAssets(),
 				"fonts/ufonts.com_gotham-book.ttf");
 		forgotpasswordTextView.setTypeface(custom_font);
 		clickhereTextView.setTypeface(custom_font);
@@ -138,41 +139,45 @@ public class LoginActivity extends Activity {
 		clickhereTextView.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Toast.makeText(getApplicationContext(),
-						"submit Button clicked", Toast.LENGTH_LONG).show();
-				Dialog clickHereDialog = new Dialog(LoginActivity.this);
-
-				clickHereDialog.getWindow().requestFeature(
-						Window.FEATURE_NO_TITLE);
-
-				clickHereDialog.setCancelable(true);
-
-				clickHereDialog.setContentView(R.layout.forgotpassword);
-				userName = (EditText) clickHereDialog.findViewById(R.id.uname);
-				phoneNumber = (EditText) clickHereDialog.findViewById(R.id.pno);
-				Button forgotPasswordSubmit = (Button) clickHereDialog
-						.findViewById(R.id.submit);
-				forgotPasswordSubmit
-						.setOnClickListener(new View.OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								Toast.makeText(getApplicationContext(),
-										"Submit Button clicked",
-										Toast.LENGTH_LONG).show();
-								new GetData().execute();
-							}
-						});
-				clickHereDialog.show();
-
+		public void onClick(View v) {
+			
+				Log.d("username","--->"+userEditText.getText().toString());
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://support.notevault.com/forgot_password.php?u="+userEditText.getText().toString()));
+				startActivity(browserIntent);
+				//window display code
+//				Toast.makeText(getApplicationContext(),
+//						"submit Button clicked", Toast.LENGTH_LONG).show();
+//				Dialog clickHereDialog = new Dialog(LoginActivity.this);
+//
+//				clickHereDialog.getWindow().requestFeature(
+//						Window.FEATURE_NO_TITLE);
+//
+//				clickHereDialog.setCancelable(true);
+//
+//				clickHereDialog.setContentView(R.layout.forgotpassword);
+//				userName = (EditText) clickHereDialog.findViewById(R.id.uname);
+//				phoneNumber = (EditText) clickHereDialog.findViewById(R.id.pno);
+//				Button forgotPasswordSubmit = (Button) clickHereDialog
+//						.findViewById(R.id.submit);
+//				forgotPasswordSubmit
+//						.setOnClickListener(new View.OnClickListener() {
+//
+//							@Override
+//							public void onClick(View v) {
+//								Toast.makeText(getApplicationContext(),
+//										"Submit Button clicked",
+//										Toast.LENGTH_LONG).show();
+//								new GetData().execute();
+//							}
+//						});
+//				clickHereDialog.show();
+//
 			}
 		});
 
 		sharedPreferences = getSharedPreferences(MyPREFERENCES,
 				Context.MODE_PRIVATE);
-		userEditText = (EditText) findViewById(R.id.username);
+	
 		userEditText.setText("");
 		userEditText.setInputType(InputType.TYPE_CLASS_TEXT
 				| InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);

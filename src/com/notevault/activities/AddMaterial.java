@@ -255,90 +255,8 @@ public class AddMaterial extends Activity {
 
 							Toast.makeText(getApplicationContext(), "Offline",
 									Toast.LENGTH_LONG).show();
-							if (singleton.getSelectedActivityID() == 0) {
-								if (singleton.getSelectedTaskID() == 0) {
-									long insertEntities = dbAdapter.insertEntryOffline(
-											singleton.getSelectedMaterialName(),
-											singleton
-													.getSelectedMaterialCompany(),
-											singleton
-													.getSelectedMaterialStatus(),
-											singleton.getSelectedMaterialQty(),
-											"M",
-											"N",
-											"0",
-											singleton
-													.getSelectedTaskIdentityoffline(),
-											singleton
-													.getselectedActivityIdentityoffline(),
-											singleton
-													.getSelectedTaskIdentityoffline()
-													+ ","
-													+ singleton
-															.getselectedActivityIdentityoffline());
-									Log.d("en_insert labour 0 id",
-											"----->"
-													+ insertEntities
-													+ "  "
-													+ singleton
-															.getSelectedTaskIdentityoffline()
-													+ "  "
-													+ singleton
-															.getSelectedActivityID());
-									long updateEntity = dbAdapter.updateActivity(
-											singleton
-													.getSelectedTaskIdentityoffline(),
-											singleton.getSelectedActivityID());
-									Log.d("en_insert labour 0 id", "----->"
-											+ insertEntities + " "
-											+ updateEntity);
-								} else {
-									long insertEntities = dbAdapter.insertEntryOffline(
-											singleton.getSelectedMaterialName(),
-											singleton
-													.getSelectedMaterialCompany(),
-											singleton
-													.getSelectedMaterialStatus(),
-											singleton.getSelectedMaterialQty(),
-											"M",
-											"N",
-											"0",
-											singleton.getSelectedTaskID(),
-											singleton
-													.getselectedActivityIdentityoffline(),
-											singleton
-													.getSelectedTaskIdentityoffline()
-													+ ","
-													+ singleton
-															.getselectedActivityIdentityoffline());
-									long updateEntity = dbAdapter.updateActivity(
-											singleton.getSelectedTaskID(),
-											singleton.getSelectedActivityID());
-									Log.d("en_insert labour 0 id", "----->"
-											+ insertEntities + " "
-											+ updateEntity);
-								}
-
-							} else {
-								long insertEntities = dbAdapter.insertEntryOffline(
-										singleton.getSelectedMaterialName(),
-										singleton.getSelectedMaterialCompany(),
-										singleton.getSelectedMaterialStatus(),
-										singleton.getSelectedMaterialQty(),
-										"M", "N", "0",
-										singleton.getSelectedTaskID(),
-										singleton.getSelectedActivityID(),
-										"offline");
-								long updateEntity = dbAdapter.updateActivity(
-										singleton.getSelectedTaskID(),
-										singleton.getSelectedActivityID());
-								Log.d("en_insert with offline ", "----->"
-										+ insertEntities + " " + updateEntity);
-
-							}
-							singleton.setReloadPage(true);
-							onBackPressed();
-
+							readDBData();
+							
 						}
 
 					} else {
@@ -359,6 +277,7 @@ public class AddMaterial extends Activity {
 		});
 	}
 
+	
 	class Myadapter extends BaseAdapter {
 
 		@Override
@@ -879,4 +798,84 @@ public class AddMaterial extends Activity {
 			onBackPressed();
 		}
 	}
+	protected void readDBData() {
+		if (singleton.getSelectedActivityID() == 0) {
+			if (singleton.getSelectedTaskID() == 0) {
+				long insertEntities = dbAdapter.insertEntryOffline(
+						singleton.getSelectedMaterialName(),
+						singleton
+								.getSelectedMaterialCompany(),
+						singleton
+								.getSelectedMaterialStatus(),
+						singleton.getSelectedMaterialQty(),
+						"M",
+						"N",
+						"0",
+						singleton
+								.getSelectedTaskIdentityoffline(),
+						singleton
+								.getselectedActivityIdentityoffline(),
+						"offline");
+				Log.d("en_insert labour 0 id",
+						"----->"
+								+ insertEntities
+								+ "  "
+								+ singleton
+										.getSelectedTaskIdentityoffline()
+								+ "  "
+								+ singleton
+										.getSelectedActivityID());
+				long updateEntity = dbAdapter.updateActivity(
+						singleton
+								.getSelectedTaskIdentityoffline(),
+						singleton.getSelectedActivityID());
+				Log.d("en_insert labour 0 id", "----->"
+						+ insertEntities + " "
+						+ updateEntity);
+			} else {
+				long insertEntities = dbAdapter.insertEntryOffline(
+						singleton.getSelectedMaterialName(),
+						singleton
+								.getSelectedMaterialCompany(),
+						singleton
+								.getSelectedMaterialStatus(),
+						singleton.getSelectedMaterialQty(),
+						"M",
+						"N",
+						"0",
+						singleton.getSelectedTaskID(),
+						singleton
+								.getselectedActivityIdentityoffline(),
+						"offline");
+				long updateEntity = dbAdapter.updateActivity(
+						singleton.getSelectedTaskID(),
+						singleton.getSelectedActivityID());
+				Log.d("en_insert labour 0 id", "----->"
+						+ insertEntities + " "
+						+ updateEntity);
+			}
+
+		} else {
+			long insertEntities = dbAdapter.insertEntryOffline(
+					singleton.getSelectedMaterialName(),
+					singleton.getSelectedMaterialCompany(),
+					singleton.getSelectedMaterialStatus(),
+					singleton.getSelectedMaterialQty(),
+					"M", "N", "0",
+					singleton.getSelectedTaskID(),
+					singleton.getSelectedActivityID(),
+					"offline");
+			long updateEntity = dbAdapter.updateActivity(
+					singleton.getSelectedTaskID(),
+					singleton.getSelectedActivityID());
+			Log.d("en_insert with offline ", "----->"
+					+ insertEntities + " " + updateEntity);
+
+		}
+		singleton.setReloadPage(true);
+		onBackPressed();
+
+		
+	}
+
 }

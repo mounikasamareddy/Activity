@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="0.0dip"
+        android:background="#F5F5F5"
         android:orientation="horizontal"
-        android:padding="0.0dip" 
-        android:background="#F5F5F5">
+        android:padding="0.0dip" >
 
         <TextView
             android:id="@+id/logout"
@@ -28,26 +28,24 @@
             android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/backimage2"
-            android:layout_gravity="center|left" />
+            android:layout_gravity="center|left"
+            android:src="@drawable/backimage2" />
 
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BACK" 
-          	android:layout_gravity="center|left"
-          	android:layout_marginLeft="30dp" 
-          	android:textSize="15sp"
-          	android:textColor="#f49800"/>
-       
-
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="30dp"
+            android:text="BACK"
+            android:textColor="#f49800"
+            android:textSize="15sp" />
     </FrameLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="50dp" 
-        android:background="@drawable/frameborder">
+        android:layout_height="50dp"
+        android:background="@drawable/frameborder" >
 
         <TextView
             android:id="@+id/textView2"
@@ -55,10 +53,10 @@
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:text="Enable Tasks"
-            android:textSize="18sp"
+            android:layout_marginLeft="10dp"
             android:gravity="center"
-            android:layout_marginLeft="10dp" />
+            android:text="Enable Tasks"
+            android:textSize="16sp" />
 
         <Switch
             android:id="@+id/switch1"
@@ -66,13 +64,73 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:gravity="center"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/roundframe"
             android:checked="false"
-            android:background="@drawable/roundframe" 
-            android:layout_marginRight="10dp"/>
-
+            android:gravity="center" />
     </RelativeLayout>
-   <!--  <RelativeLayout
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/frameborder" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:text="Enable Shift Tracking"
+            android:textSize="16sp" />
+
+        <Switch
+            android:id="@+id/switch2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/roundframe"
+            android:checked="false"
+            android:gravity="center" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/frameborder" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="Enable Overtime Tracking"
+            android:textSize="16sp" 
+            />
+        
+
+        <Switch
+            android:id="@+id/switch3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/roundframe"
+            android:checked="false"
+            android:gravity="center" />
+    </RelativeLayout>
+    <!--
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:background="@drawable/frameborder" >
@@ -93,9 +151,12 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />
 
-    </RelativeLayout> -->
+    </RelativeLayout>
+    -->
 
-    <!-- <TextView
+
+    <!--
+         <TextView
         android:id="@+id/textView3"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -103,13 +164,16 @@
         android:textSize="13sp" 
         android:gravity="center"
         android:textColor="#777777"
-        android:layout_marginTop="15dp"/> -->
+        android:layout_marginTop="15dp"/>
+    -->
 
     <ListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:background="@drawable/frameborder">
+        android:layout_height="wrap_content"
+        android:background="@drawable/frameborder"
+        
+        >
     </ListView>
 
 </LinearLayout>

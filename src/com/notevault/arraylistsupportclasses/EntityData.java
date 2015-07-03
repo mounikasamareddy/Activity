@@ -6,8 +6,23 @@ public class EntityData {
 	String NAME;
 	String TRD_COMP;
 	String CLASSI_STAT;
-	double HR_QTY;
+	int HR_QTY;
 	int ID;
+	int EIDentity;
+	String Action;
+	
+	public String getAction() {
+		return Action;
+	}
+	public void setAction(String action) {
+		Action = action;
+	}
+	public int getEIDentity() {
+		return EIDentity;
+	}
+	public void setEIDentity(int eIDentity) {
+		EIDentity = eIDentity;
+	}
 	public String getTYPE() {
 		return TYPE;
 	}
@@ -32,10 +47,10 @@ public class EntityData {
 	public void setCLASSI_STAT(String cLASSI_STAT) {
 		CLASSI_STAT = cLASSI_STAT;
 	}
-	public double getHR_QTY() {
+	public int getHR_QTY() {
 		return HR_QTY;
 	}
-	public void setHR_QTY(double hR_QTY) {
+	public void setHR_QTY(int hR_QTY) {
 		HR_QTY = hR_QTY;
 	}
 	public int getID() {

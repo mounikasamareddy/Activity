@@ -71,4 +71,12 @@
    
     
     <string name="title_activity_test">TestActivity</string>
+    <style name="autoscroll">
+    <item name="android:singleLine">true</item>
+    <item name="android:ellipsize">marquee</item>
+    <item name="android:marqueeRepeatLimit">marquee_forever</item>
+    <item name="android:focusable">true</item>
+    <item name="android:focusableInTouchMode">true</item>
+    <item name="android:scrollHorizontally">true</item>
+</style>
 </resources>

@@ -6,7 +6,21 @@ public class ActivityDB {
 	int Hasdata;
 	int AId;
 	int AIdentity;
+	int Tid;
+	String TDate;
 	
+	public String getTDate() {
+		return TDate;
+	}
+	public void setTDate(String tDate) {
+		TDate = tDate;
+	}
+	public int getTid() {
+		return Tid;
+	}
+	public void setTid(int tid) {
+		Tid = tid;
+	}
 	public int getAIdentity() {
 		return AIdentity;
 	}

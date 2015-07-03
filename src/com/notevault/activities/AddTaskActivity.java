@@ -90,14 +90,14 @@ public class AddTaskActivity extends Activity{
 					
 				else{
 					Toast.makeText(getApplicationContext(), "ur in offline!", Toast.LENGTH_LONG).show();
-					newTaskName = editText.getText().toString().trim();
-					System.out.println("new task name......." + newTaskName);
-					
-					
-						Log.d("new task","---->"+Singleton.toTitleCase(newTaskName)+"   "+singleton.getSelectedProjectID());
-						dbAdapter.insertTaskOffline(0, newTaskName, singleton.getSelectedProjectID(),0,"offline");
-						dbAdapter.updateProject(singleton.getSelectedProjectID(),1,0);
-						singleton.setReloadPage(true);
+//					newTaskName = editText.getText().toString().trim();
+//					System.out.println("new task name......." + newTaskName);
+//					
+//					
+//						Log.d("new task","---->"+Singleton.toTitleCase(newTaskName)+"   "+singleton.getSelectedProjectID());
+//						dbAdapter.insertTaskOffline(0, newTaskName, singleton.getSelectedProjectID(),0,"offline");
+//						dbAdapter.updateProject(singleton.getSelectedProjectID(),1,0);
+//						singleton.setReloadPage(true);
 						onBackPressed();
 						
 					}

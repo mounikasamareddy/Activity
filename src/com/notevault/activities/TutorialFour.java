@@ -26,25 +26,25 @@ public class TutorialFour extends Fragment {//implements OnGestureListener
    ViewGroup rootView = (ViewGroup) inflater
                    .inflate(R.layout.splashscreen5, container, false);
    LinearLayout layout = (LinearLayout)rootView.findViewById(R.id.layout);// get your root  layout
-   layout.setOnTouchListener(new OnTouchListener() {
-
-           @Override
-           public boolean onTouch(View v, MotionEvent event) {
-               Log.v(null, "TOUCH EVENT"); // handle your fragment number here
-               Intent intent;
-               if (SettingActivity.navigatorFlag == false){
-            	  // intent = new Intent(getActivity(), GettingStarted.class);
-                  // startActivity(intent);
-               }else if (SettingActivity.navigatorFlag == true) {
-           		intent = new Intent(getActivity(), SettingActivity.class);
-           		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                   startActivity(intent);
-                   getActivity().finish();
-             
-               }
-               return false;
-           }
-       });
+//  layout.setOnTouchListener(new OnTouchListener() {
+//
+//           @Override
+//           public boolean onTouch(View v, MotionEvent event) {
+//               Log.v(null, "TOUCH EVENT"); // handle your fragment number here
+//               Intent intent;
+//               if (SettingActivity.navigatorFlag == false){
+//            	  // intent = new Intent(getActivity(), GettingStarted.class);
+//                  // startActivity(intent);
+//               }else if (SettingActivity.navigatorFlag == true) {
+//           		intent = new Intent(getActivity(), GettingStarted.class);
+//           		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                   startActivity(intent);
+//                   getActivity().finish();
+//             
+//               }
+//               return false;
+//           }
+//       });
          return rootView;
        }
     

@@ -7,8 +7,17 @@ public class TaskData implements Comparable<TaskData> {
 	String TName;
 	int hasData;
 	int TIdentity;
+	String Status;
 	
 	
+	public String getStatus() {
+		return Status;
+	}
+
+	public void setStatus(String status) {
+		Status = status;
+	}
+
 	public int getTIdentity() {
 		return TIdentity;
 	}

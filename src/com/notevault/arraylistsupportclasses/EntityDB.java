@@ -5,7 +5,31 @@ public class EntityDB {
 	String TRD_COMP;
 	String CLASSI_STAT;
 	String Type;
-	double HR_QTY;
+	int HR_QTY;
+	int EIdentity;
+	int ID;
+	String Action;
+	
+	
+	
+	public String getAction() {
+		return Action;
+	}
+	public void setAction(String action) {
+		Action = action;
+	}
+	public int getID() {
+		return ID;
+	}
+	public void setID(int iD) {
+		ID = iD;
+	}
+	public int getEIdentity() {
+		return EIdentity;
+	}
+	public void setEIdentity(int eIdentity) {
+		EIdentity = eIdentity;
+	}
 	public String getNAME() {
 		return NAME;
 	}
@@ -24,10 +48,10 @@ public class EntityDB {
 	public void setCLASSI_STAT(String cLASSI_STAT) {
 		CLASSI_STAT = cLASSI_STAT;
 	}
-	public double getHR_QTY() {
+	public int getHR_QTY() {
 		return HR_QTY;
 	}
-	public void setHR_QTY(double hR_QTY) {
+	public void setHR_QTY(int hR_QTY) {
 		HR_QTY = hR_QTY;
 	}
 	public String getType() {

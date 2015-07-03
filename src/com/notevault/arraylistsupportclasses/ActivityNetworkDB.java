@@ -1,19 +1,25 @@
 package com.notevault.arraylistsupportclasses;
 
-public class ActivityData {
-
+public class ActivityNetworkDB {
 	String AName;
 	int Hasdata;
 	int AId;
 	int AIdentity;
 	int Tid;
-	String TDate;
+	String ADate;
+	String Astatus;
 	
-	public String getTDate() {
-		return TDate;
+	public String getAstatus() {
+		return Astatus;
 	}
-	public void setTDate(String tDate) {
-		TDate = tDate;
+	public void setAstatus(String astatus) {
+		Astatus = astatus;
+	}
+	public String getADate() {
+		return ADate;
+	}
+	public void setADate(String aDate) {
+		ADate = aDate;
 	}
 	public int getTid() {
 		return Tid;

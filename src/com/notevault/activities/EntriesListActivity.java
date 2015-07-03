@@ -4,6 +4,7 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,7 +13,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+
 
 import com.notevault.pojo.Singleton;
 
@@ -26,7 +29,14 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activitydetails);
+		Bundle b = getIntent().getExtras();
+	    int index = b.getInt("index");
+	    Log.d("data","--->"+index);
+	   
 
+			
+			
+		
 		singleton = Singleton.getInstance();
 		TextView activityName = (TextView)findViewById(R.id.activity_txt);
 		activityName.setText(singleton.getSelectedActivityName());
@@ -53,7 +63,10 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 				onBackPressed();
 			}
 		});
-		
+		 if(index==1){
+		    	singleton.setNewEntryFlag(true);
+					showActionSheet();
+		    }
 		LinearLayout addImageLayout = (LinearLayout)findViewById(R.id.image_layout);
 		addImageLayout.setOnClickListener(new OnClickListener() {
 
@@ -61,33 +74,44 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 			public void onClick(View v) {
 				
 					singleton.setNewEntryFlag(true);
-					showActionSheet(v);
+					showActionSheet();
 				
 				
 			}
 		});
+		 
 		// Get TabHost Refference
 		tabHost = getTabHost();
 
 		// Set TabChangeListener called when tab changed
 		tabHost.setOnTabChangedListener(this);
 
-		TabHost.TabSpec spec;
-		Intent intent;
+		
+		
 
 		/************* TAB1 ************/
 		// Create  Intents to launch an Activity for the tab (to be reused)
-		intent = new Intent().setClass(this, EntriesListByDateActivity.class);
+		Intent intentApple = new Intent().setClass(this, EntriesListByTypeActivity.class);
+		TabSpec tabSpecApple = tabHost
+		  .newTabSpec("first")
+		  .setIndicator("Grouped")
+		  .setContent(intentApple);
+		
+ 
 
-		spec = tabHost.newTabSpec("First").setIndicator("Entered")
-				.setContent(intent);
-		//Add intent to tab
-		tabHost.addTab(spec);
+		
 
 		/************* TAB2 ************/
-		intent = new Intent().setClass(this, EntriesListByTypeActivity.class);
-		spec = tabHost.newTabSpec("Second").setIndicator("Grouped").setContent(intent);
-		tabHost.addTab(spec);
+		
+
+		Intent intentAndroid = new Intent().setClass(this, EntriesListByDateActivity.class);
+		TabSpec tabSpecAndroid = tabHost
+		  .newTabSpec("second")
+		  .setIndicator("Entered")
+		  .setContent(intentAndroid);
+		
+		tabHost.addTab(tabSpecAndroid);
+		tabHost.addTab(tabSpecApple);
 
 		for(int i=1; i<tabHost.getTabWidget().getChildCount(); i++) 
 		{
@@ -98,7 +122,7 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 		// Set Tab1 as Default tab and change image  
 		tabHost.getTabWidget().getChildTabViewAt(0).setBackgroundColor(Color.WHITE);
 		tabHost.getTabWidget().getChildTabViewAt(1).setBackgroundDrawable(null);
-		tabHost.getTabWidget().setCurrentTab(0);
+		tabHost.setCurrentTab(1);
 	}
 
     @Override
@@ -121,7 +145,7 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 		tv.setTextSize(15);
 	}
 
-	public void showActionSheet(View v) {
+	public void showActionSheet() {
 		final Dialog myDialog = new Dialog(EntriesListActivity.this);
 		myDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		myDialog.setContentView(R.layout.actionsheet);
