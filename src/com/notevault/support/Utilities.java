@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.notevault.arraylistsupportclasses.ANetworkData;
 import com.notevault.arraylistsupportclasses.ActivityData;
+import com.notevault.arraylistsupportclasses.EntitiAlignDate;
 import com.notevault.arraylistsupportclasses.EntityAlign;
 import com.notevault.arraylistsupportclasses.EntityData;
 import com.notevault.arraylistsupportclasses.GroupData;
@@ -26,6 +27,6 @@ public class Utilities {
 	public static ArrayList<TNetworkData> TaskNetworkdata=new ArrayList<TNetworkData>();
 	public static ArrayList<ANetworkData> ActivityNetworkData=new ArrayList<ANetworkData>();
 	public static ArrayList<GroupData> groupdata=new ArrayList<GroupData>();
-	
+	public static ArrayList<EntitiAlignDate> eAligndate=new ArrayList<EntitiAlignDate>();
 	
 }

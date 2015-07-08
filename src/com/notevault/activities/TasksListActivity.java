@@ -148,13 +148,13 @@ public class TasksListActivity extends Activity {
 
 			}
 		} else {
-
+			
 			if (singleton.isReloadPage()) {
 				System.out.println("Offline");
 				taskListView = (ListView) findViewById(R.id.list);
-
 				Utilities.tdata.clear();
-				List<TasksDB> data = dbAdapter.getAllTaskRecords(pid);
+				
+				List<TasksDB> data = dbAdapter.getAllTaskRecords(singleton.getSelectedProjectID());
 
 				for (TasksDB val : data) {
 					TaskData details = new TaskData(val.getTID(),
@@ -296,15 +296,15 @@ public class TasksListActivity extends Activity {
 				HttpsURLConnection.setDefaultHostnameVerifier(hv);
 
 				try {
-					JSONObject jsonTaskRequest = new JSONObject();
+					
+					
+					if(singleton.isOnline())
+					{JSONObject jsonTaskRequest = new JSONObject();
 					jsonTaskRequest.put("ProjectId",
 							singleton.getSelectedProjectID());
 					// jsonTaskRequest.put("UserId", singleton.getUserId());
 					jsonTaskRequest.put("ProjectDay",
 							singleton.getCurrentSelectedDate());
-					
-					if(singleton.isOnline())
-					{
 						System.out.println("request"+jsonTaskRequest);
 					return jsonDataPost.getAllProjectTasks(jsonTaskRequest);
 					}
@@ -364,10 +364,13 @@ public class TasksListActivity extends Activity {
 										.put(keys[i], task.getString("F"));
 							}
 
+							
+							
 							int delResponse = dbAdapter.deleteTasks(singleton
 									.getSelectedProjectID());
 							Log.d("Tasks deletion response: ", "---->"
 									+ delResponse);
+							
 							if (singleton.getTaskList().size() > 0) {
 								writeTasksToDb();
 							}
@@ -458,19 +461,21 @@ public class TasksListActivity extends Activity {
 			details.setHasData(val.getHasData());
 			details.setTIdentity(val.getTIdentity());
 			details.setStatus(val.getStatus());
+			details.setPid(val.getPid());
 			Utilities.tdata.add(details);
 
 		}
 		Log.d("arraylength", "---->" + Utilities.tdata.size());
 		dbAdapter.Close();
-		for (int i = 0; i < Utilities.tdata.size(); i++) {
-			Log.d("taskdataid", "---->" + Utilities.tdata.get(i).getTID());
-			Log.d("taskdataname", "---->"
-					+ Utilities.tdata.get(i).getTIdentity());
-			Log.d("statusa", "---->" + Utilities.tdata.get(i).getStatus());
-
-		}
+		
 		Collections.sort(Utilities.tdata, new TaskData.OrderByTName());
+		for (int i = 0; i < Utilities.tdata.size(); i++) {
+			Log.d("taskdataid", "---->" 
+		+ Utilities.tdata.get(i).getTID()+" "
+		+Utilities.tdata.get(i).getTIdentity()+" "
+		+Utilities.tdata.get(i).getPid()+" "
+		+Utilities.tdata.get(i).getStatus());
+		}
 		Log.d("taskdata", "---->" + Utilities.tdata);
 		tAdapter = new TaskAdapter(TasksListActivity.this);
 		taskListView.setAdapter(tAdapter);

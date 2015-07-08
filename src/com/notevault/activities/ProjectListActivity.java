@@ -44,7 +44,9 @@ public class ProjectListActivity extends Activity {
 	private static long back_pressed;
 	DBAdapter DbAdapter;
 	Button chooseProject;
+	private TextView welcomusername;
 	int k = 0;
+	String username;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +55,11 @@ public class ProjectListActivity extends Activity {
 
 		singleton = Singleton.getInstance();
 		DbAdapter = DBAdapter.get_dbAdapter(this);
-		TextView companyName;
 
-		companyName = (TextView) findViewById(R.id.companyName_text);
 		LinearLayout settingLayout = (LinearLayout) findViewById(R.id.image_layout);
 		chooseProject = (Button) findViewById(R.id.chooseproject);
 		projects = (NumberPicker) findViewById(R.id.numberpicker);
+		welcomusername = (TextView) findViewById(R.id.welcomusername);
 		settingLayout.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -68,10 +69,11 @@ public class ProjectListActivity extends Activity {
 				startActivity(settingIntent);
 			}
 		});
-
+		
 		// online
 		if (singleton.isOnline()) {
-			companyName.setText(singleton.getCompanyName());
+			
+			welcomusername.setText("Welcome "+singleton.getUsername()+",");
 			int i = 0;
 			keys = new int[singleton.getProjectsList().size()];
 			values = new String[singleton.getProjectsList().size()];
@@ -171,8 +173,8 @@ public class ProjectListActivity extends Activity {
 		}
 		// offline ls size
 		else {
-			companyName.setText(Utilities.lData.get(0).getCompany());
-
+			Log.d("grouped details offline","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
+			welcomusername.setText("Welcome " +singleton.getUsername()+ ",");
 			Log.d("arraylist", "---->" + Utilities.pdata.size());
 
 			List<ProjectDB> data = DbAdapter.getAllProjectRecords();
@@ -211,18 +213,18 @@ public class ProjectListActivity extends Activity {
 						int newVal) {
 
 					selectedpickerindex = newVal;
-					
-							Log.d("newval", "-->" + selectedpickerindex);
 
-							}
+					Log.d("newval", "-->" + selectedpickerindex);
+
+				}
 			});
 			chooseProject.setOnClickListener(new View.OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
-					
-					singleton.setSelectedProjectName(Utilities.pdata
-							.get(selectedpickerindex).getPName());
+
+					singleton.setSelectedProjectName(Utilities.pdata.get(
+							selectedpickerindex).getPName());
 
 					singleton.setSelectedProjectID(Utilities.pdata.get(
 							selectedpickerindex).getPID());
@@ -233,42 +235,34 @@ public class ProjectListActivity extends Activity {
 					SimpleDateFormat format1 = new SimpleDateFormat(
 							"dd-MM-yyyy");
 					try {
-						singleton
-								.setCurrentSelectedDateFormatted(format1
-										.parse(format1.format(curDate))
-										.toString()
-										.replace(" 00:00:00 GMT+05:30",
-												","));
+						singleton.setCurrentSelectedDateFormatted(format1
+								.parse(format1.format(curDate)).toString()
+								.replace(" 00:00:00 GMT+05:30", ","));
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					singleton
-							.setCurrentSelectedDate(new SimpleDateFormat(
-									"yyyyMMdd").format(curDate));
+					singleton.setCurrentSelectedDate(new SimpleDateFormat(
+							"yyyyMMdd").format(curDate));
 
 					Intent intent;
 
 					if (singleton.isEnableTasks()) {
 						if (k == 0) {
-							intent = new Intent(
-									ProjectListActivity.this,
+							intent = new Intent(ProjectListActivity.this,
 									TasksListActivity.class);
 							startActivity(intent);
 							k++;
 						}
 					} else {
 						if (k == 0) {
-							intent = new Intent(
-									ProjectListActivity.this,
+							intent = new Intent(ProjectListActivity.this,
 									ActivitiesListActivity.class);
 							startActivity(intent);
 							k++;
 						}
 
 					}
-				
 
-		
 				}
 			});
 		}

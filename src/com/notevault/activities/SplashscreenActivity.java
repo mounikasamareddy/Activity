@@ -1,7 +1,19 @@
 package com.notevault.activities;
 
+import java.security.SecureRandom;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,24 +24,14 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.notevault.arraylistsupportclasses.LoginData;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.ServerUtilities;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.security.SecureRandom;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import com.notevault.support.Utilities;
 
 public class SplashscreenActivity extends Activity{
     private static int SPLASH_TIME_OUT = 500;
@@ -52,6 +54,7 @@ public class SplashscreenActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
+        
         singleton = Singleton.getInstance();
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         dbAdapter = DBAdapter.get_dbAdapter(this);
@@ -60,6 +63,7 @@ public class SplashscreenActivity extends Activity{
         if (!connectivity) {
             // write your code
             System.out.println("You are now offline");
+            Log.d("offline..con","--->");
             singleton.setOnline(false);
         } else {
             //write your code
@@ -112,81 +116,83 @@ public class SplashscreenActivity extends Activity{
     }
 
     public void syncDataWithServer(){
-        Cursor c;
-        String name, trade_comp, classification_status, ID, Date;
-        double hr_qty = 0;
-        int ActivityID, AccountID, ProjectID, SubID, TaskID, UserID;
-        c = dbAdapter.queryOfflineEntries();
-        if (c != null ) {
-            if  (c.moveToFirst()) {
-                //int entriesArrayLength = c.getCount();
-                UpdateEntries updateEntries;
-                //mProgressDialog = new ProgressDialog(SplashscreenActivity.this);
-                //mProgressDialog.setMessage("Loading...");
-                //mProgressDialog.setIndeterminate(false);
-                //mProgressDialog.show();
-                singleton.setSyncingToServer(true);
-                do {
-                    System.out.println("#######  SYNC IN PROGRESS.  #######");
-                    name = c.getString(c.getColumnIndex("NAME"));
-                    trade_comp = c.getString(c.getColumnIndex("TRD_COMP"));
-                    classification_status = c.getString(c.getColumnIndex("CLASSI_STAT"));
-                    action = c.getString(c.getColumnIndex("ACTION"));
-                    type = c.getString(c.getColumnIndex("TYPE"));
-                    ID = c.getString(c.getColumnIndex("ID"));
-                    Date = c.getString(c.getColumnIndex("DATE"));
-
-                    hr_qty = c.getDouble(c.getColumnIndex("HR_QTY"));
-                    ProjectID = c.getInt(c.getColumnIndex("PID"));
-                    TaskID = c.getInt(c.getColumnIndex("TID"));
-                    ActivityID = c.getInt(c.getColumnIndex("AID"));
-                    UserID = c.getInt(c.getColumnIndex("UserID"));
-                    AccountID = c.getInt(c.getColumnIndex("AccountID"));
-                    SubID = c.getInt(c.getColumnIndex("SubID"));
-                    offlineEntryJSONObj = new JSONObject();
-
-                    try {
-                        if(action.equals("I")){
-                            offlineEntryJSONObj.put("AccountID", AccountID);
-                            offlineEntryJSONObj.put("SubscriberID", SubID);
-                            offlineEntryJSONObj.put("ProjectID", ProjectID);
-                            offlineEntryJSONObj.put("ActivityId", ActivityID);
-                            offlineEntryJSONObj.put("ProjectDay", Date);
-                            offlineEntryJSONObj.put("Name", name);
-                            offlineEntryJSONObj.put("Trade", trade_comp);
-                            offlineEntryJSONObj.put("Classification", classification_status);
-                            offlineEntryJSONObj.put("Hours", hr_qty);
-                            offlineEntryJSONObj.put("TaskId", TaskID);
-                            offlineEntryJSONObj.put("UserId", UserID);
-                        }else if(action.equals("U")){
-                            offlineEntryJSONObj.put("AccountID", AccountID);
-                            offlineEntryJSONObj.put("SubscriberID", SubID);
-                            offlineEntryJSONObj.put("ProjectID", ProjectID);
-                            offlineEntryJSONObj.put("ActivityId", ActivityID);
-                            offlineEntryJSONObj.put("ID", ID);
-                            offlineEntryJSONObj.put("Name", name);
-                            offlineEntryJSONObj.put("Trade", trade_comp);
-                            offlineEntryJSONObj.put("Classification", classification_status);
-                            offlineEntryJSONObj.put("Hours", hr_qty);
-                        }else{
-                            offlineEntryJSONObj.put("Id", ID);
-                        }
-
-                        updateEntries = new UpdateEntries();
-                        updateEntries.execute();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }while (c.moveToNext());
-                //mProgressDialog.dismiss();
-                singleton.setSyncingToServer(false);
-            }else{
-                //System.out.println("No Tasks found in DB for selected Project.");
-            }
-        }
-        singleton.setOnline(true);
-    }
+    	
+    	Log.d("offline","-->");
+//        Cursor c;
+//        String name, trade_comp, classification_status, ID, Date;
+//        double hr_qty = 0;
+//        int ActivityID, AccountID, ProjectID, SubID, TaskID, UserID;
+//        c = dbAdapter.queryOfflineEntries();
+//        if (c != null ) {
+//            if  (c.moveToFirst()) {
+//                //int entriesArrayLength = c.getCount();
+//                UpdateEntries updateEntries;
+//                //mProgressDialog = new ProgressDialog(SplashscreenActivity.this);
+//                //mProgressDialog.setMessage("Loading...");
+//                //mProgressDialog.setIndeterminate(false);
+//                //mProgressDialog.show();
+//                singleton.setSyncingToServer(true);
+//                do {
+//                    System.out.println("#######  SYNC IN PROGRESS.  #######");
+//                    name = c.getString(c.getColumnIndex("NAME"));
+//                    trade_comp = c.getString(c.getColumnIndex("TRD_COMP"));
+//                    classification_status = c.getString(c.getColumnIndex("CLASSI_STAT"));
+//                    action = c.getString(c.getColumnIndex("ACTION"));
+//                    type = c.getString(c.getColumnIndex("TYPE"));
+//                    ID = c.getString(c.getColumnIndex("ID"));
+//                    Date = c.getString(c.getColumnIndex("DATE"));
+//
+//                    hr_qty = c.getDouble(c.getColumnIndex("HR_QTY"));
+//                    ProjectID = c.getInt(c.getColumnIndex("PID"));
+//                    TaskID = c.getInt(c.getColumnIndex("TID"));
+//                    ActivityID = c.getInt(c.getColumnIndex("AID"));
+//                    UserID = c.getInt(c.getColumnIndex("UserID"));
+//                    AccountID = c.getInt(c.getColumnIndex("AccountID"));
+//                    SubID = c.getInt(c.getColumnIndex("SubID"));
+//                    offlineEntryJSONObj = new JSONObject();
+//
+//                    try {
+//                        if(action.equals("I")){
+//                            offlineEntryJSONObj.put("AccountID", AccountID);
+//                            offlineEntryJSONObj.put("SubscriberID", SubID);
+//                            offlineEntryJSONObj.put("ProjectID", ProjectID);
+//                            offlineEntryJSONObj.put("ActivityId", ActivityID);
+//                            offlineEntryJSONObj.put("ProjectDay", Date);
+//                            offlineEntryJSONObj.put("Name", name);
+//                            offlineEntryJSONObj.put("Trade", trade_comp);
+//                            offlineEntryJSONObj.put("Classification", classification_status);
+//                            offlineEntryJSONObj.put("Hours", hr_qty);
+//                            offlineEntryJSONObj.put("TaskId", TaskID);
+//                            offlineEntryJSONObj.put("UserId", UserID);
+//                        }else if(action.equals("U")){
+//                            offlineEntryJSONObj.put("AccountID", AccountID);
+//                            offlineEntryJSONObj.put("SubscriberID", SubID);
+//                            offlineEntryJSONObj.put("ProjectID", ProjectID);
+//                            offlineEntryJSONObj.put("ActivityId", ActivityID);
+//                            offlineEntryJSONObj.put("ID", ID);
+//                            offlineEntryJSONObj.put("Name", name);
+//                            offlineEntryJSONObj.put("Trade", trade_comp);
+//                            offlineEntryJSONObj.put("Classification", classification_status);
+//                            offlineEntryJSONObj.put("Hours", hr_qty);
+//                        }else{
+//                            offlineEntryJSONObj.put("Id", ID);
+//                        }
+//
+//                        updateEntries = new UpdateEntries();
+//                        updateEntries.execute();
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }while (c.moveToNext());
+//                //mProgressDialog.dismiss();
+//                singleton.setSyncingToServer(false);
+//            }else{
+//                //System.out.println("No Tasks found in DB for selected Project.");
+//            }
+//        }
+//        singleton.setOnline(true);
+  }
 
     private class UpdateEntries extends AsyncTask<Void, Void, String> {
 
@@ -349,38 +355,46 @@ public class SplashscreenActivity extends Activity{
             }else{
                 Toast.makeText(getApplicationContext(),
                         "You seem to be offline! Cannot login.", Toast.LENGTH_SHORT).show();
-                intent = new Intent(SplashscreenActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                
+                Cursor c = dbAdapter.queryCredentialsLogin();
+				if (c.getCount() != 0) {
 
-                /*Cursor c = dbAdapter.queryCredentials(username, password);
-                if (c != null ) {
-                    if (c.moveToFirst()) {
-                        do {
-                            singleton.setAccountId(c.getInt(c.getColumnIndex("AccountID")));
-                            singleton.setUserId(c.getInt(c.getColumnIndex("UserID")));
-                            singleton.setCompanyId(c.getInt(c.getColumnIndex("CompanyID")));
-                            singleton.setLNPCID(c.getInt(c.getColumnIndex("LNPCID")));
-                            singleton.setLTCID(c.getInt(c.getColumnIndex("LTCID")));
-                            singleton.setLCCID(c.getInt(c.getColumnIndex("LCCID")));
-                            singleton.setENCID(c.getInt(c.getColumnIndex("ENCID")));
-                            singleton.setCCID(c.getInt(c.getColumnIndex("CCID")));
-                            singleton.setMNCID(c.getInt(c.getColumnIndex("MNCID")));
-                            singleton.setSubscriberId(c.getInt(c.getColumnIndex("SubID")));
-                            singleton.setCompanyName(c.getString(c.getColumnIndex("Company")));
-                        } while (c.moveToNext());
+					Log.d("curfdsfdf", "--->" + c.getCount());
 
-                        readProjectsFromDb();
+					if (c.moveToFirst()) {
+						singleton.setUserId(c.getInt(c
+								.getColumnIndex("UserID")));
+						singleton.setAccountId(c.getInt(c
+								.getColumnIndex("AccountID")));
+						singleton.setCompanyId(c.getInt(c
+								.getColumnIndex("CompanyID")));
+						singleton.setLNCID(c.getInt(c
+								.getColumnIndex("LNPCID")));
+						singleton.setLTCID(c.getInt(c
+								.getColumnIndex("LTCID")));
+						singleton.setLCCID(c.getInt(c
+								.getColumnIndex("LCCID")));
+						singleton.setENCID(c.getInt(c
+								.getColumnIndex("ENCID")));
+						singleton.setCCID(c.getInt(c
+								.getColumnIndex("CCID")));
+						singleton.setMNCID(c.getInt(c
+								.getColumnIndex("MNCID")));
+						singleton.setSubscriberId(c.getInt(c
+								.getColumnIndex("SubID")));
+						singleton.setCompanyName(c.getString(c
+								.getColumnIndex("Company")));
+						singleton.setUsername(c.getString(c.getColumnIndex("displayname")));
+						
+					}
 
-                    } else {
-                        System.out.println("No Credentials found in DB for this user account.");
-                        Toast.makeText(getApplicationContext(),
-                                "You seem to be offline! Cannot login.", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(SplashscreenActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                    }
-                }*/
+					startActivity(new Intent(getApplicationContext(),
+							ProjectListActivity.class));
+//                intent = new Intent(SplashscreenActivity.this, MainActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(intent);
+
+				}  
             }
 
         }else{
@@ -489,7 +503,7 @@ public class SplashscreenActivity extends Activity{
                             singleton.setMNCID(obj.getJSONObject("id").getInt("MNCID"));
                             singleton.setSubscriberId(obj.getJSONObject("id").getInt("SubID"));
                             singleton.setCompanyName(obj.getJSONObject("id").getString("Company"));
-
+                            singleton.setUsername(obj.getJSONObject("id").getString("DisplayName"));
                             JSONArray projects = obj.getJSONArray("p");
                             singleton.getProjectsList().clear();
                             LoginActivity.projectsListStatus.clear();

@@ -25,10 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.notevault.adapter.CustomAdapter;
+import com.notevault.adapter.EntriesAdapter;
 import com.notevault.adapter.EntriesListAdapteroffline;
 import com.notevault.arraylistsupportclasses.EntityAlign;
 import com.notevault.arraylistsupportclasses.EntityDB;
 import com.notevault.arraylistsupportclasses.EntityData;
+
 import com.notevault.arraylistsupportclasses.GroupData;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
@@ -40,120 +42,121 @@ public class EntriesListByTypeActivity extends Activity {
 	Singleton singleton;
 	String values[];
 	ArrayList<String> entries = new ArrayList<String>();
-	
+
 	private CustomAdapter mAdapter;
+	private EntriesAdapter mAdapter1;
 	public static int reload = 0;
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	public String glue = "-~-";
-	ListView ls;
+	ListView ls, ls2;
 	DBAdapter dbAdapter;
-	TextView totalHrs,materialsPlace,hoursPerUnit;
-	int totalhours,materialsPlace1;
+
+	public static ArrayList<Integer> MaterialData = new ArrayList<Integer>();
+	public static int totalhours, materialsPlace1;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.types_activity);
-	
 		
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		singleton = Singleton.getInstance();
-		ls=(ListView)findViewById(R.id.groupedlist);
-		
-		totalHrs=(TextView)findViewById(R.id.hrs);
-		materialsPlace=(TextView)findViewById(R.id.matirial);
-		hoursPerUnit=(TextView)findViewById(R.id.units);
+		ls = (ListView) findViewById(R.id.groupedlist);
+		ls2 = (ListView) findViewById(R.id.groupedlist2);
+
 		if (singleton.isOnline()) {
 			entries.clear();
 			Utilities.groupdata.clear();
 			
 			new GetLaborEntries().execute();
-			
+
 		} else {
 
 			Log.d("offline", "---->");
-			
+
 			readEntriesFromDB();
 
 		}
-		
-	
-		
-		
-	}
 
+	}
 
 	protected void onResume() {
 		super.onResume();
-		Log.d("grouped onresume","-->"+singleton.isReloadPage());
+		Log.d("grouped onresume", "-->" + singleton.isReloadPage());
 		if (reload == 1) {
 			reload = 0;
 			singleton.setReloadPage(false);
 			this.onCreate(null);
 		}
 
-		
 		System.out.println("Entries By Date On resume called.");
-		if(singleton.isOnline())
-		{
-		if (singleton.isReloadPage()) {
-			System.out.println("Reloading the page.");
-			// readEntriesFromDB();
+		if (singleton.isOnline()) {
+			if (singleton.isReloadPage()) {
+				System.out.println("Reloading the page.");
+				
 
-			singleton.setReloadPage(false);
-			this.onCreate(null);
-		}}
-		else{
+				singleton.setReloadPage(false);
+				this.onCreate(null);
+			}
+		} else {
+			readEntriesFromDB();
 			singleton.setReloadPage(false);
 			this.onCreate(null);
 		}
 	}
 
 	private void setAdapter() {
-		Log.d("adapter","--->");
-		
+		Log.d("adapter", "--->");
+		MaterialData.clear();
 		mAdapter = new CustomAdapter(EntriesListByTypeActivity.this);
+		mAdapter1 = new EntriesAdapter(EntriesListByTypeActivity.this);
+		Log.d("entries", "-->" + Utilities.groupdata.size());
 
-		Log.d("entries","-->"+Utilities.groupdata.size());
-		
-		totalhours=0;
-		materialsPlace1=0;
-		for(int i=0;i<Utilities.groupdata.size();i++)
-		{
-			Log.d("adapter entries","--->"+Utilities.groupdata.get(i).getType()+" "+Utilities.groupdata.get(i).getName()+" "+Utilities.groupdata.get(i).getTrade()+
-					" "+Utilities.groupdata.get(i).getClassification()+" "+Utilities.groupdata.get(i).getHrs());
-			if(Utilities.groupdata.get(i).getType().equals("Labour")){
-				
-				totalhours=totalhours+(int)Utilities.groupdata.get(i).getHrs();
+		totalhours = 0;
+		materialsPlace1 = 0;
+		for (int i = 0; i < Utilities.groupdata.size(); i++) {
+			Log.d("adapter entries", "--->"
+					+ Utilities.groupdata.get(i).getType() + " "
+					+ Utilities.groupdata.get(i).getName() + " "
+					+ Utilities.groupdata.get(i).getTrade() + " "
+					+ Utilities.groupdata.get(i).getClassification() + " "
+					+ Utilities.groupdata.get(i).getHrs());
+			if (Utilities.groupdata.get(i).getType().equals("Labor")) {
+
+				totalhours = (int) (totalhours + Utilities.groupdata.get(i)
+						.getHrs());
 			}
-			if(Utilities.groupdata.get(i).getType().equals("Material"))
-			{
-				materialsPlace1=materialsPlace1+(int)Utilities.groupdata.get(i).getHrs();
+			if (Utilities.groupdata.get(i).getType().equals("Material")) {
+				MaterialData.add((int) Utilities.groupdata.get(i).getHrs());
 			}
-			
+
 		}
-		
+		Log.d("material qty", "--->" + MaterialData.size());
+		for (int i = 0; i < MaterialData.size(); i++) {
+			Log.d("material qty", "--->" + MaterialData.get(i));
+		}
 		mAdapter.notifyDataSetChanged();
 		ls.setAdapter(mAdapter);
-		totalHrs.setText(""+totalhours);
-		materialsPlace.setText(""+materialsPlace1);
-		if(totalhours==0){
-			totalhours=1;
-		}
-		double hoursPerUnit1=materialsPlace1/totalhours;
-		hoursPerUnit.setText(""+new DecimalFormat("##.000").format(hoursPerUnit1));
-	}
+		ls2.setAdapter(mAdapter1);
 
+		// totalHrs.setText(""+totalhours);
+		// materialsPlace.setText(""+materialsPlace1);
+		// if(totalhours==0){
+		// totalhours=1;
+		// }
+		// double hoursPerUnit1=materialsPlace1/totalhours;
+		// hoursPerUnit.setText(""+new
+		// DecimalFormat("##.000").format(hoursPerUnit1));
+	}
 
 	public static class ViewHolder {
 		TextView text;
 	}
 
-	
-	public class GetLaborEntries extends AsyncTask<Void,Void,String>{
+	public class GetLaborEntries extends AsyncTask<Void, Void, String> {
 
 		@Override
 		protected String doInBackground(Void... arg0) {
-
 
 			try {
 				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -206,17 +209,16 @@ public class EntriesListByTypeActivity extends Activity {
 					e.printStackTrace();
 				}
 			} catch (Exception e) {
-				//readEntriesFromDB();
+				// readEntriesFromDB();
 				e.printStackTrace();
 			}
 			return null;
-		
-			
+
 		}
-		
+
 		protected void onPostExecute(final String laborEntriesResponseJSONObj) {
 			// ArrayList<String> lid = new ArrayList<String>();
-			Log.d("labor response: " ,"--->"+ laborEntriesResponseJSONObj);
+			Log.d("labor response: ", "--->" + laborEntriesResponseJSONObj);
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
 				Toast.makeText(getApplicationContext(),
@@ -235,27 +237,25 @@ public class EntriesListByTypeActivity extends Activity {
 							String entriesString = jsonObj
 									.getString("Lentries");
 							JSONArray jsonArray = new JSONArray(entriesString);
-							
-							
+							Log.d("length","--->"+jsonArray.length());
 							if (jsonArray.length() > 0) {
-								
-								GroupData data1= new GroupData();
-								String str="null";
-									Log.d("p val","--->");
-									data1.setHeadname("Labor");
-									data1.setType(str);
-									data1.setName(str);
-									data1.setTrade(str);
-									data1.setClassification(str);
-									data1.setHrs(0);
-									data1.setEId(0);
-									Utilities.groupdata.add(data1);
-								
-								
-								Log.d("json len","-->"+jsonArray.length());
+
+								GroupData data1 = new GroupData();
+								String str = "null";
+								Log.d("p val", "--->");
+								data1.setHeadname("Labor");
+								data1.setType(str);
+								data1.setName(str);
+								data1.setTrade(str);
+								data1.setClassification(str);
+								data1.setHrs(0);
+								data1.setEId(0);
+								Utilities.groupdata.add(data1);
+
+								Log.d("json len", "-->" + jsonArray.length());
 								// Populating data into lists.
 								for (int i = 0; i < jsonArray.length(); i++) {
-									GroupData data= new GroupData();
+									GroupData data = new GroupData();
 									JSONObject e = jsonArray.getJSONObject(i);
 									String type = String.valueOf(e.getString(
 											"Type").charAt(0));
@@ -268,14 +268,14 @@ public class EntriesListByTypeActivity extends Activity {
 									double hour = e.getDouble("H");
 									String id = String.valueOf(e.getInt("I"));
 									String dateCreated = e.getString("D");
-									
-									entries.add(type
-											+ glue + name + glue + trade + glue
-											+ classification + glue + hour
-											+ glue + id + glue + dateCreated);
-									
-									Log.d("check","--->"+type
-											+ glue + name + glue + trade + glue
+
+									entries.add(type + glue + name + glue
+											+ trade + glue + classification
+											+ glue + hour + glue + id + glue
+											+ dateCreated);
+
+									Log.d("check", "--->" + type + glue + name
+											+ glue + trade + glue
 											+ classification + glue + hour
 											+ glue + id + glue + dateCreated);
 									data.setHeadname("empty");
@@ -287,17 +287,17 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setEId(Integer.parseInt(id));
 									Utilities.groupdata.add(data);
 								}
-							
-								//System.out.println("Debugging SortedListByDate : ..... "+ entries.size());
-							
+
+								// System.out.println("Debugging SortedListByDate : ..... "+
+								// entries.size());
+
 								// allEntriesID.addAll(lid);
 
-								
 							} else {
-								//System.out.println("No labor entries found.");
+								// System.out.println("No labor entries found.");
 							}
 						}
-						
+
 						GetEquipmentEntries equipmentEntries = new GetEquipmentEntries();
 						equipmentEntries.execute();
 					} catch (JSONException e) {
@@ -308,10 +308,11 @@ public class EntriesListByTypeActivity extends Activity {
 					System.out
 							.println("An error occurred! Could not fetch labor entries.");
 				}
-				
+
 			}
 		}
 	}
+
 	private class GetEquipmentEntries extends AsyncTask<Void, Void, String> {
 
 		@Override
@@ -394,23 +395,23 @@ public class EntriesListByTypeActivity extends Activity {
 							String entriesString = jsonObj
 									.getString("Eentries");
 							JSONArray jsonArray = new JSONArray(entriesString);
-							
+
 							if (jsonArray.length() > 0) {
-								
-								GroupData data1= new GroupData();
-								String str="null";
-									Log.d("p val","--->");
-									data1.setHeadname("Equipment");
-									data1.setType(str);
-									data1.setName(str);
-									data1.setTrade(str);
-									data1.setClassification(str);
-									data1.setHrs(0);
-									data1.setEId(0);
-									Utilities.groupdata.add(data1);
+
+								GroupData data1 = new GroupData();
+								String str = "null";
+								Log.d("p val", "--->");
+								data1.setHeadname("Equipment");
+								data1.setType(str);
+								data1.setName(str);
+								data1.setTrade(str);
+								data1.setClassification(str);
+								data1.setHrs(0);
+								data1.setEId(0);
+								Utilities.groupdata.add(data1);
 								// Populating data into lists.
 								for (int i = 0; i < jsonArray.length(); i++) {
-									GroupData data= new GroupData();
+									GroupData data = new GroupData();
 									JSONObject e = jsonArray.getJSONObject(i);
 									String name = e.getString("Nm");
 									String company = e.getString("Com");
@@ -422,16 +423,16 @@ public class EntriesListByTypeActivity extends Activity {
 									double qty = e.getDouble("Q");
 									// String desc = e.getString("N");
 									// eid.add(id);
-									
+
 									// collectiveConcatenatedEntryList.add(type
 									// + glue + name + glue + company + glue +
 									// status + glue + qty + glue + id + glue +
 									// desc);
-									entries.add(type
-											+ glue + name + glue + company
-											+ glue + status + glue + qty + glue
-											+ id + glue + dateCreated);
-									
+									entries.add(type + glue + name + glue
+											+ company + glue + status + glue
+											+ qty + glue + id + glue
+											+ dateCreated);
+
 									data.setHeadname("empty");
 									data.setType("Equipment");
 									data.setName(name);
@@ -441,17 +442,15 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setEId(Integer.parseInt(id));
 									Utilities.groupdata.add(data);
 								}
-								
+
 								// allEntriesID.addAll(eid);
 
-							
-								
 							} else {
 								System.out
 										.println("No equipment entries found.");
 							}
 						}
-						
+
 						GetMaterialEntries getMaterialEntries = new GetMaterialEntries();
 						getMaterialEntries.execute();
 
@@ -466,6 +465,7 @@ public class EntriesListByTypeActivity extends Activity {
 			}
 		}
 	}
+
 	private class GetMaterialEntries extends AsyncTask<Void, Void, String> {
 
 		@Override
@@ -546,31 +546,23 @@ public class EntriesListByTypeActivity extends Activity {
 							String entriesString = jsonObj
 									.getString("Mentries");
 							JSONArray jsonArray = new JSONArray(entriesString);
-							
-							
-							
-							
-							
-						
-								
-							
+
 							if (entriesString.length() > 0) {
-								
-								
-								GroupData data1= new GroupData();
-								String str="null";
-									Log.d("p val","--->");
-									data1.setHeadname("Material");
-									data1.setType(str);
-									data1.setName(str);
-									data1.setTrade(str);
-									data1.setClassification(str);
-									data1.setHrs(0);
-									data1.setEId(0);
-									Utilities.groupdata.add(data1);
+
+								GroupData data1 = new GroupData();
+								String str = "null";
+								Log.d("p val", "--->");
+								data1.setHeadname("Material");
+								data1.setType(str);
+								data1.setName(str);
+								data1.setTrade(str);
+								data1.setClassification(str);
+								data1.setHrs(0);
+								data1.setEId(0);
+								Utilities.groupdata.add(data1);
 								// Populating data into lists.
 								for (int i = 0; i < jsonArray.length(); i++) {
-									GroupData data= new GroupData();
+									GroupData data = new GroupData();
 									JSONObject e = jsonArray.getJSONObject(i);
 									String name = e.getString("Nm");
 									String company = e.getString("Com");
@@ -580,14 +572,11 @@ public class EntriesListByTypeActivity extends Activity {
 									String id = String.valueOf(e.getInt("I"));
 									double qty = e.getDouble("Q");
 									String dateCreated = e.getString("D");
-									
-									
-									
-									
-									entries.add(type
-											+ glue + name + glue + company
-											+ glue + status + glue + qty + glue
-											+ id + glue + dateCreated);
+
+									entries.add(type + glue + name + glue
+											+ company + glue + status + glue
+											+ qty + glue + id + glue
+											+ dateCreated);
 									data.setHeadname("empty");
 									data.setType("Material");
 									data.setName(name);
@@ -596,18 +585,35 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setHrs(qty);
 									data.setEId(Integer.parseInt(id));
 									Utilities.groupdata.add(data);
-									
+
 								}
-								for(int i=0;i<Utilities.groupdata.size();i++)
-								{
-									Log.d("matirial entries","--->"+Utilities.groupdata.get(i).getHeadname()+" "+Utilities.groupdata.get(i).getType()+" "+Utilities.groupdata.get(i).getName()+" "+Utilities.groupdata.get(i).getTrade()+
-											" "+Utilities.groupdata.get(i).getClassification()+" "+Utilities.groupdata.get(i).getHrs()+" "+Utilities.groupdata.get(i).getEId());
-									
-									
+								for (int i = 0; i < Utilities.groupdata.size(); i++) {
+									Log.d("matirial entries", "--->"
+											+ Utilities.groupdata.get(i)
+													.getHeadname()
+											+ " "
+											+ Utilities.groupdata.get(i)
+													.getType()
+											+ " "
+											+ Utilities.groupdata.get(i)
+													.getName()
+											+ " "
+											+ Utilities.groupdata.get(i)
+													.getTrade()
+											+ " "
+											+ Utilities.groupdata.get(i)
+													.getClassification()
+											+ " "
+											+ Utilities.groupdata.get(i)
+													.getHrs()
+											+ " "
+											+ Utilities.groupdata.get(i)
+													.getEId());
+
 								}
-								
+
 								// allEntriesID.addAll(mid);
-								
+
 							} else {
 								System.out
 										.println("No material entries found.");
@@ -653,6 +659,7 @@ public class EntriesListByTypeActivity extends Activity {
 
 		}
 	}
+
 	public void readEntriesFromDB() {
 
 		int Aid = singleton.getSelectedActivityID();
@@ -660,7 +667,8 @@ public class EntriesListByTypeActivity extends Activity {
 		Utilities.edata.clear();
 		Utilities.eAligndata.clear();
 		List<EntityDB> data = null;
-
+		MaterialData.clear();
+		mAdapter1 = new EntriesAdapter(EntriesListByTypeActivity.this);
 		if (Tid == 0 && Aid == 0) {
 			Log.d("both", "-->" + singleton.getSelectedTaskIdentityoffline());
 			data = dbAdapter.getAllEntityRecords(singleton
@@ -682,6 +690,7 @@ public class EntriesListByTypeActivity extends Activity {
 			data = dbAdapter.getAllEntityRecords(Aid);
 			Log.d("activity id not 0", "--->" + Aid + " " + data.size());
 		}
+
 		if (data.size() > 0) {
 			for (EntityDB val : data) {
 				EntityData details = new EntityData();
@@ -698,24 +707,29 @@ public class EntriesListByTypeActivity extends Activity {
 			}
 		}
 		dbAdapter.Close();
-		if(Utilities.edata.size()>0){
-			EntityAlign align = new EntityAlign();
-			String str="null";
-			align.setHeader("Labor");
-			align.setEIdentity(0);
-			align.setID(0);
-			align.setTYPE(str);
-			align.setNAME(str);
-			align.setCLASSI_STAT(str);
-			align.setHR_QTY(0);
-			align.setTRD_COMP(str);
-			align.setAction(str);
-			Utilities.eAligndata.add(align);
-			
-			
-		}
-		for (int i = 0; i < Utilities.edata.size(); i++) {
+		if (Utilities.edata.size() > 0) {
 
+		}
+		int p = 0;
+		for (int i = 0; i < Utilities.edata.size(); i++) {
+			if (Utilities.edata.get(i).getTYPE().equals("L")) {
+				if (p == 0) {
+					EntityAlign align1 = new EntityAlign();
+					String str = "null";
+					align1.setHeader("Labor");
+					align1.setEIdentity(0);
+					align1.setID(0);
+					align1.setTYPE(str);
+					align1.setNAME(str);
+					align1.setCLASSI_STAT(str);
+					align1.setHR_QTY(str);
+					align1.setTRD_COMP(str);
+					align1.setAction(str);
+					Utilities.eAligndata.add(align1);
+
+					p++;
+				}
+			}
 			if (Utilities.edata.get(i).getTYPE().equals("L")) {
 				EntityAlign align = new EntityAlign();
 				align.setHeader("Empty");
@@ -731,24 +745,25 @@ public class EntriesListByTypeActivity extends Activity {
 			}
 
 		}
-if(Utilities.edata.size()>0)
-{
-	EntityAlign align = new EntityAlign();
-	String str="null";
-	align.setHeader("Equipment");
-	align.setEIdentity(0);
-	align.setID(0);
-	align.setTYPE(str);
-	align.setNAME(str);
-	align.setCLASSI_STAT(str);
-	align.setHR_QTY(0);
-	align.setTRD_COMP(str);
-	align.setAction(str);
-	Utilities.eAligndata.add(align);
-
-}
+		int q = 0;
 		for (int i = 0; i < Utilities.edata.size(); i++) {
-
+			if (q == 0) {
+				if (Utilities.edata.get(i).getTYPE().equals("E")) {
+					EntityAlign align1 = new EntityAlign();
+					String str = "null";
+					align1.setHeader("Equipment");
+					align1.setEIdentity(0);
+					align1.setID(0);
+					align1.setTYPE(str);
+					align1.setNAME(str);
+					align1.setCLASSI_STAT(str);
+					align1.setHR_QTY(str);
+					align1.setTRD_COMP(str);
+					align1.setAction(str);
+					Utilities.eAligndata.add(align1);
+					q++;
+				}
+			}
 			if (Utilities.edata.get(i).getTYPE().equals("E")) {
 				EntityAlign align = new EntityAlign();
 				align.setHeader("Empty");
@@ -764,24 +779,25 @@ if(Utilities.edata.size()>0)
 			}
 
 		}
-		if(Utilities.edata.size()>0){
-			EntityAlign align = new EntityAlign();
-			String str="null";
-			align.setHeader("Material");
-			align.setEIdentity(0);
-			align.setID(0);
-			align.setTYPE(str);
-			align.setNAME(str);
-			align.setCLASSI_STAT(str);
-			align.setHR_QTY(0);
-			align.setTRD_COMP(str);
-			align.setAction(str);
-			Utilities.eAligndata.add(align);
-			
-			
-		}
+		
+		int r=0;
 		for (int i = 0; i < Utilities.edata.size(); i++) {
-
+if(r==0)
+{if (Utilities.edata.get(i).getTYPE().equals("M")) {
+	EntityAlign align1 = new EntityAlign();
+String str = "null";
+align1.setHeader("Material");
+align1.setEIdentity(0);
+align1.setID(0);
+align1.setTYPE(str);
+align1.setNAME(str);
+align1.setCLASSI_STAT(str);
+align1.setHR_QTY(str);
+align1.setTRD_COMP(str);
+align1.setAction(str);
+Utilities.eAligndata.add(align1);
+	r++;
+}}
 			if (Utilities.edata.get(i).getTYPE().equals("M")) {
 				EntityAlign align = new EntityAlign();
 				align.setHeader("Empty");
@@ -798,8 +814,8 @@ if(Utilities.edata.size()>0)
 
 		}
 		Log.d("ealigndata arraylength", "---->" + Utilities.eAligndata.size());
-		totalhours=0;
-		materialsPlace1=0;
+		totalhours = 0;
+
 		if (Utilities.eAligndata.size() > 0) {
 			for (int i = 0; i < Utilities.eAligndata.size(); i++) {
 				Log.d("alighdata", "---->"
@@ -812,17 +828,20 @@ if(Utilities.edata.size()>0)
 						+ Utilities.eAligndata.get(i).getHR_QTY() + " "
 						+ Utilities.eAligndata.get(i).getTYPE() + " "
 						+ Utilities.eAligndata.get(i).getAction());
-				
-				if(Utilities.eAligndata.get(i).getTYPE().equals("L")){
-					
-					totalhours=totalhours+(int)Utilities.eAligndata.get(i).getHR_QTY();
+
+				if (Utilities.eAligndata.get(i).getTYPE().equals("L")) {
+
+					totalhours = (int) (totalhours + Double
+							.parseDouble(Utilities.eAligndata.get(i)
+									.getHR_QTY()));
 				}
-				if(Utilities.eAligndata.get(i).getTYPE().equals("M"))
-				{
-					materialsPlace1=materialsPlace1+(int)Utilities.eAligndata.get(i).getHR_QTY();
+				if (Utilities.eAligndata.get(i).getTYPE().equals("M")) {
+					Log.d("material qty offline", "--->"
+							+ Utilities.eAligndata.get(i).getHR_QTY());
+					MaterialData.add((int) Double
+							.parseDouble(Utilities.eAligndata.get(i)
+									.getHR_QTY()));
 				}
-					
-				
 
 			}
 		} else {
@@ -831,28 +850,12 @@ if(Utilities.edata.size()>0)
 						.getselectedActivityIdentityoffline());
 			}
 		}
-		
-		EntriesListAdapteroffline entriesListAdapter = new EntriesListAdapteroffline(this);
-		ls.setAdapter(entriesListAdapter);
-		
-		totalHrs.setText(""+totalhours);
-		
-		materialsPlace.setText(""+materialsPlace1);
-		//total zero na leads to arthimatic exception
-		if(totalhours==0){
-			totalhours=1;
-		}
-		double hoursPerUnit1=materialsPlace1/totalhours;
-		hoursPerUnit.setText(""+new DecimalFormat("00.000").format(hoursPerUnit1));
-		
-		singleton.setReloadPage(true);
 
-		// if zero records in Perticular Activity Id... change hasdata 0 in
-		// Activity table
-		// if(data.size()==0)
-		// {
-		// int record= dbAdapter.updateActivity(TaskID, ActID)
-		// }
+		EntriesListAdapteroffline entriesListAdapter = new EntriesListAdapteroffline(
+				this);
+		ls.setAdapter(entriesListAdapter);
+
+		ls2.setAdapter(mAdapter1);
 
 	}
 }

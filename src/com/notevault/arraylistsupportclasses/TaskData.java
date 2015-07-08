@@ -8,8 +8,17 @@ public class TaskData implements Comparable<TaskData> {
 	int hasData;
 	int TIdentity;
 	String Status;
+	String Pid;
 	
 	
+	public String getPid() {
+		return Pid;
+	}
+
+	public void setPid(String pid) {
+		Pid = pid;
+	}
+
 	public String getStatus() {
 		return Status;
 	}

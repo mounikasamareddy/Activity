@@ -114,6 +114,7 @@ public class ActivitiesListActivity extends Activity {
 		// ****************
 		backTask = (TextView) findViewById(R.id.textView1);
 		if (singleton.isEnableTasks()) {
+			
 			backTask.setText("TASKS");
 			taskName.setText(singleton.getSelectedTaskName());
 			breadcrumb_separator.setVisibility(View.VISIBLE);
@@ -132,7 +133,7 @@ public class ActivitiesListActivity extends Activity {
 		if (singleton.isOnline()) {
 
 			
-			
+			Log.d("grouped details","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
 			
 			Log.d("online", "---->");
 			if (singleton.isEnableTasks()) {
@@ -1102,13 +1103,24 @@ public class ActivitiesListActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		
+if(singleton.isOnline())
+{
+	
 		if (singleton.isReloadPage()) {
 			singleton.setReloadPage(false);
 			listAdapter.notifyDataSetChanged();
 			this.onCreate(null);
 		}
 		
+}
+else{
+	String str = singleton.getCurrentSelectedDate();
+	
+	Log.d("offine onresume","--->"+str);
+	
+	readDbData(str);
+}
 	}
 
 	// copy to today and copy to yesterday api calls.

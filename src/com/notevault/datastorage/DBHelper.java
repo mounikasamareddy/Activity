@@ -35,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
             "   UserID      INT(10),        AccountID   INT(10),        SubID   INT(10), " +
             "   CompanyID   INT(10),        Company     VARCHAR(20), " +
             "   LNPCID      INT(10),        LTCID       INT(10),        LCCID   INT(10), " +
-            "   ENCID       INT(10),        CCID        INT(10),        MNCID   INT(10));";
+            "   ENCID       INT(10),        CCID        INT(10),        MNCID   INT(10),displayname    VARCHAR(20));";
 
     public final String GLOSSARY_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Glossary " +
             "( GIdentity INTEGER PRIMARY KEY AUTOINCREMENT, GCID         INT(10),        GName       VARCHAR(20),    PID    INT(10),    CompanyID   INT(10),status VARCHAR(8));";

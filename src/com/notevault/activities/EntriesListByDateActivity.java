@@ -17,10 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.notevault.activities.ActivitiesListActivity.SwipeListAdapter;
+import com.notevault.adapter.EntriesAdapter;
 import com.notevault.adapter.TaskAdapter;
+import com.notevault.arraylistsupportclasses.EntitiAlignDate;
 import com.notevault.arraylistsupportclasses.EntityAlign;
 import com.notevault.arraylistsupportclasses.EntityDB;
 import com.notevault.arraylistsupportclasses.EntityData;
+import com.notevault.arraylistsupportclasses.ProjectData;
 import com.notevault.arraylistsupportclasses.TaskData;
 import com.notevault.arraylistsupportclasses.TasksDB;
 import com.notevault.datastorage.DBAdapter;
@@ -50,7 +53,7 @@ public class EntriesListByDateActivity extends Activity {
 
 	Singleton singleton;
 	DBAdapter dbAdapter;
-	ListView entriesListView;
+	ListView entriesListView,enteredlist;
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	public ArrayList<String> dateList = new ArrayList<String>();
 	public Set<String> dateSorted = new HashSet<String>();
@@ -60,7 +63,8 @@ public class EntriesListByDateActivity extends Activity {
 	String values[];
 	public String glue = "-~-";
 	LinearLayout hintMessage;
-
+	private EntriesAdapter mAdapter1;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		System.out.println("On create called.");
@@ -68,16 +72,19 @@ public class EntriesListByDateActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.entered_activity);
 		hintMessage = (LinearLayout) findViewById(R.id.hintMessage_layout);
-
+		enteredlist=(ListView)findViewById(R.id.enteredlist2);
 		singleton = Singleton.getInstance();
 		collectiveConcatenatedEntryList.clear();
 	
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		if (singleton.isOnline()) {
+			
 			getEntries();
+			mAdapter1 = new EntriesAdapter(EntriesListByDateActivity.this);
+			enteredlist.setAdapter(mAdapter1);
 		} else {
 
-			Log.d("offline", "---->");
+			Log.d("entered offline", "---->");
 			readEntriesFromDB();
 
 		}
@@ -214,17 +221,17 @@ public class EntriesListByDateActivity extends Activity {
 			} else {
 
 				Log.d("offline", "--->");
-				roundTv.setText(Utilities.eAligndata.get(position).getTYPE());
-				tv.setText(Utilities.eAligndata.get(position).getNAME());
-				tv1.setText(Utilities.eAligndata.get(position).getTRD_COMP());
-				tv2.setText(Utilities.eAligndata.get(position).getCLASSI_STAT());
-				tv3.setText(Utilities.eAligndata.get(position).getHR_QTY() + "");
-				if (Utilities.eAligndata.get(position).getTYPE().equals("L")) {
+				roundTv.setText(Utilities.eAligndate.get(position).getTYPE());
+				tv.setText(Utilities.eAligndate.get(position).getNAME());
+				tv1.setText(Utilities.eAligndate.get(position).getTRD_COMP());
+				tv2.setText(Utilities.eAligndate.get(position).getCLASSI_STAT());
+				tv3.setText(Utilities.eAligndate.get(position).getHR_QTY() + "");
+				if (Utilities.eAligndate.get(position).getTYPE().equals("L")) {
 					roundTv.setBackgroundResource(R.drawable.circleyellow);
-				} else if (Utilities.eAligndata.get(position).getTYPE()
+				} else if (Utilities.eAligndate.get(position).getTYPE()
 						.equals("E")) {
 					roundTv.setBackgroundResource(R.drawable.circleblack);
-				} else if (Utilities.eAligndata.get(position).getTYPE()
+				} else if (Utilities.eAligndate.get(position).getTYPE()
 						.equals("M")) {
 					roundTv.setBackgroundResource(R.drawable.circleblue);
 				}
@@ -233,64 +240,64 @@ public class EntriesListByDateActivity extends Activity {
 					public void onClick(View v) {
 
 						singleton
-								.setCurrentSelectedEntryID(Utilities.eAligndata
+								.setCurrentSelectedEntryID(Utilities.eAligndate
 										.get(position).getID());
 						singleton.setNewEntryFlag(false);
 						singleton
-								.setSelectedEntityIdentity(Utilities.eAligndata
+								.setSelectedEntityIdentity(Utilities.eAligndate
 										.get(position).getEIdentity());
 
-						if (Utilities.eAligndata.get(position).getTYPE()
+						if (Utilities.eAligndate.get(position).getTYPE()
 								.equals("L")) {
-							singleton.setSelectedLaborName(Utilities.eAligndata
+							singleton.setSelectedLaborName(Utilities.eAligndate
 									.get(position).getNAME());
 							singleton
-									.setSelectedLaborTrade(Utilities.eAligndata
+									.setSelectedLaborTrade(Utilities.eAligndate
 											.get(position).getTRD_COMP());
 							singleton
-									.setSelectedLaborClassification(Utilities.eAligndata
+									.setSelectedLaborClassification(Utilities.eAligndate
 											.get(position).getCLASSI_STAT());
 
 							singleton
-									.setSelectedLaborHours(Utilities.eAligndata
+									.setSelectedLaborHours(Utilities.eAligndate
 											.get(position).getHR_QTY() + "");
 							// singleton.setSelectedLaborDescription(val[6]);
 							Intent intent = new Intent(
 									EntriesListByDateActivity.this,
 									AddLabor.class);
 							startActivity(intent);
-						} else if (Utilities.eAligndata.get(position).getTYPE()
+						} else if (Utilities.eAligndate.get(position).getTYPE()
 								.equals("E")) {
 							singleton
-									.setSelectedEquipmentName(Utilities.eAligndata
+									.setSelectedEquipmentName(Utilities.eAligndate
 											.get(position).getNAME());
 							singleton
-									.setSelectedEquipmentCompany(Utilities.eAligndata
+									.setSelectedEquipmentCompany(Utilities.eAligndate
 											.get(position).getTRD_COMP());
 							singleton
-									.setSelectedEquipmentStatus(Utilities.eAligndata
+									.setSelectedEquipmentStatus(Utilities.eAligndate
 											.get(position).getCLASSI_STAT());
 							singleton
-									.setSelectedEquipmentQty(Utilities.eAligndata
+									.setSelectedEquipmentQty(Utilities.eAligndate
 											.get(position).getHR_QTY() + "");
 							// singleton.setSelectedEquipmentDescription(val[6]);
 							Intent intent = new Intent(
 									EntriesListByDateActivity.this,
 									AddEquipment.class);
 							startActivity(intent);
-						} else if (Utilities.eAligndata.get(position).getTYPE()
+						} else if (Utilities.eAligndate.get(position).getTYPE()
 								.equals("M")) {
 							singleton
-									.setSelectedMaterialName(Utilities.eAligndata
+									.setSelectedMaterialName(Utilities.eAligndate
 											.get(position).getNAME());
 							singleton
-									.setSelectedMaterialCompany(Utilities.eAligndata
+									.setSelectedMaterialCompany(Utilities.eAligndate
 											.get(position).getTRD_COMP());
 							singleton
-									.setSelectedMaterialStatus(Utilities.eAligndata
+									.setSelectedMaterialStatus(Utilities.eAligndate
 											.get(position).getCLASSI_STAT());
 							singleton
-									.setSelectedMaterialQty(Utilities.eAligndata
+									.setSelectedMaterialQty(Utilities.eAligndate
 											.get(position).getHR_QTY() + "");
 							// singleton.setSelectedMaterialDescription(val[6]);
 							Intent intent = new Intent(
@@ -324,7 +331,7 @@ public class EntriesListByDateActivity extends Activity {
 		super.onResume();
 		System.out.println("Entries By Date On resume called.");
 		Log.d(" enteredonresume", "--->" + singleton.isReloadPage());
-		
+		singleton.setReloadPage(true);
 		if (singleton.isOnline()) {
 			if (singleton.isReloadPage()) {
 				System.out.println("Reloading the page.");
@@ -451,12 +458,16 @@ public class EntriesListByDateActivity extends Activity {
 									// + glue + name + glue + trade + glue +
 									// classification + glue + hour + glue + id
 									// + glue + desc);
+//									dateCreated=dateCreated.replace("-","");
+//									dateCreated=dateCreated.replace(" ", "");
+//									dateCreated=dateCreated.replace(":", "");
 									collectiveConcatenatedEntryList.add(type
 											+ glue + name + glue + trade + glue
 											+ classification + glue + hour
 											+ glue + id + glue + dateCreated);
 									
 									
+									Log.d("dateCreated","--->"+dateCreated);
 								}
 //								for(int i=0;i<collectiveConcatenatedEntryList.size();i++)
 //								{
@@ -591,6 +602,7 @@ public class EntriesListByDateActivity extends Activity {
 									// String desc = e.getString("N");
 									// eid.add(id);
 									dateList.add(dateCreated);
+								
 									// collectiveConcatenatedEntryList.add(type
 									// + glue + name + glue + company + glue +
 									// status + glue + qty + glue + id + glue +
@@ -728,6 +740,7 @@ public class EntriesListByDateActivity extends Activity {
 									// + glue + name + glue + company + glue +
 									// status + glue + qty + glue + id + glue +
 									// desc);
+									
 									collectiveConcatenatedEntryList.add(type
 											+ glue + name + glue + company
 											+ glue + status + glue + qty + glue
@@ -848,11 +861,11 @@ public class EntriesListByDateActivity extends Activity {
 	}
 
 	public void readEntriesFromDB() {
-
+		mAdapter1 = new EntriesAdapter(this);
 		int Aid = singleton.getSelectedActivityID();
 		int Tid = singleton.getSelectedTaskID();
 		Utilities.edata.clear();
-		Utilities.eAligndata.clear();
+		Utilities.eAligndate.clear();
 		List<EntityDB> data = null;
 
 		if (Tid == 0 && Aid == 0) {
@@ -887,15 +900,19 @@ public class EntriesListByDateActivity extends Activity {
 				details.setHR_QTY(val.getHR_QTY());
 				details.setTYPE(val.getType());
 				details.setAction(val.getAction());
+				details.setDate(val.getDate());
 				Utilities.edata.add(details);
 
 			}
 		}
 		dbAdapter.Close();
+
 		for (int i = 0; i < Utilities.edata.size(); i++) {
 
-			if (Utilities.edata.get(i).getTYPE().equals("L")) {
-				EntityAlign align = new EntityAlign();
+		
+				EntitiAlignDate align = new EntitiAlignDate(Utilities.edata.get(i).getEIDentity(),Utilities.edata.get(i).getID(),Utilities.edata.get(i).getTYPE()
+						,Utilities.edata.get(i).getNAME(),Utilities.edata.get(i).getCLASSI_STAT(),Utilities.edata.get(i).getHR_QTY(),Utilities.edata.get(i).getTRD_COMP(),
+						Utilities.edata.get(i).getAction(),Integer.parseInt(Utilities.edata.get(i).getDate()));
 				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
 				align.setID(Utilities.edata.get(i).getID());
 				align.setTYPE(Utilities.edata.get(i).getTYPE());
@@ -904,56 +921,26 @@ public class EntriesListByDateActivity extends Activity {
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
 				align.setAction(Utilities.edata.get(i).getAction());
-				Utilities.eAligndata.add(align);
-			}
+				align.setDate(Integer.parseInt(Utilities.edata.get(i).getDate()));
+				Utilities.eAligndate.add(align);
+			
 
 		}
-
-		for (int i = 0; i < Utilities.edata.size(); i++) {
-
-			if (Utilities.edata.get(i).getTYPE().equals("E")) {
-				EntityAlign align = new EntityAlign();
-				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
-				align.setID(Utilities.edata.get(i).getID());
-				align.setTYPE(Utilities.edata.get(i).getTYPE());
-				align.setNAME(Utilities.edata.get(i).getNAME());
-				align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
-				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
-				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
-				align.setAction(Utilities.edata.get(i).getAction());
-				Utilities.eAligndata.add(align);
-			}
-
-		}
-		for (int i = 0; i < Utilities.edata.size(); i++) {
-
-			if (Utilities.edata.get(i).getTYPE().equals("M")) {
-				EntityAlign align = new EntityAlign();
-				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
-				align.setID(Utilities.edata.get(i).getID());
-				align.setTYPE(Utilities.edata.get(i).getTYPE());
-				align.setNAME(Utilities.edata.get(i).getNAME());
-				align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
-				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
-				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
-				align.setAction(Utilities.edata.get(i).getAction());
-				Utilities.eAligndata.add(align);
-			}
-
-		}
-		Log.d("ealigndata arraylength", "---->" + Utilities.eAligndata.size());
-		if (Utilities.eAligndata.size() > 0) {
-			for (int i = 0; i < Utilities.eAligndata.size(); i++) {
+		Collections.sort(Utilities.eAligndate, new EntitiAlignDate.OrderByEDate());
+		Log.d("eAligndate arraylength", "---->" + Utilities.eAligndate.size());
+		if (Utilities.eAligndate.size() > 0) {
+			for (int i = 0; i < Utilities.eAligndate.size(); i++) {
 				Log.d("alighdata", "---->"
-						+ Utilities.eAligndata.get(i).getID() + " "
-						+ Utilities.eAligndata.get(i).getTYPE() + " "
-						+ Utilities.eAligndata.get(i).getEIdentity() + " "
-						+ Utilities.eAligndata.get(i).getNAME() + " "
-						+ Utilities.eAligndata.get(i).getTRD_COMP() + " "
-						+ Utilities.eAligndata.get(i).getCLASSI_STAT() + " "
-						+ Utilities.eAligndata.get(i).getHR_QTY() + " "
-						+ Utilities.eAligndata.get(i).getTYPE() + " "
-						+ Utilities.eAligndata.get(i).getAction());
+						+ Utilities.eAligndate.get(i).getDate() + " "
+						+ Utilities.eAligndate.get(i).getID() + " "
+						+ Utilities.eAligndate.get(i).getTYPE() + " "
+						+ Utilities.eAligndate.get(i).getEIdentity() + " "
+						+ Utilities.eAligndate.get(i).getNAME() + " "
+						+ Utilities.eAligndate.get(i).getTRD_COMP() + " "
+						+ Utilities.eAligndate.get(i).getCLASSI_STAT() + " "
+						+ Utilities.eAligndate.get(i).getHR_QTY() + " "
+						+ Utilities.eAligndate.get(i).getTYPE() + " "
+						+ Utilities.eAligndate.get(i).getAction());
 
 			}
 		} else {
@@ -967,14 +954,10 @@ public class EntriesListByDateActivity extends Activity {
 		entriesListView.setAdapter(entriesListAdapter);
 		entriesListAdapter.notifyDataSetChanged();
 		entriesListAdapter.notifyDataSetInvalidated();
+		enteredlist.setAdapter(mAdapter1);
 		singleton.setReloadPage(true);
 
-		// if zero records in Perticular Activity Id... change hasdata 0 in
-		// Activity table
-		// if(data.size()==0)
-		// {
-		// int record= dbAdapter.updateActivity(TaskID, ActID)
-		// }
+		
 
 	}
 }

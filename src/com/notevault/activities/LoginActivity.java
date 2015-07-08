@@ -241,8 +241,7 @@ public class LoginActivity extends Activity {
 						// offline
 						Toast.makeText(getApplicationContext(),
 								"Ur in Offline.", Toast.LENGTH_SHORT).show();
-						Cursor c = dbAdapter.queryCredentials(username,
-								password);
+						Cursor c = dbAdapter.queryCredentialsLogin();
 						if (c.getCount() != 0) {
 
 							Log.d("curfdsfdf", "--->" + c.getCount());
@@ -271,6 +270,8 @@ public class LoginActivity extends Activity {
 								data.setCCID(c.getInt(c.getColumnIndex("CCID")));
 								data.setMNCID(c.getInt(c
 										.getColumnIndex("MNCID")));
+								data.setUsername(c.getString(c
+										.getColumnIndex("displayname")));
 
 								singleton.setUserId(c.getInt(c
 										.getColumnIndex("UserID")));
@@ -294,7 +295,10 @@ public class LoginActivity extends Activity {
 										.getColumnIndex("SubID")));
 								singleton.setCompanyName(c.getString(c
 										.getColumnIndex("Company")));
+								singleton.setUsername(c.getString(c.getColumnIndex("displayname")));
+							
 								Utilities.lData.add(data);
+								Log.d("grouped details offline","--->"+Utilities.lData.get(0).getAccountID()+" "+singleton.getSubscriberId());
 							}
 
 							startActivity(new Intent(getApplicationContext(),
@@ -498,9 +502,10 @@ public class LoginActivity extends Activity {
 									"MNCID"));
 							singleton.setSubscriberId(obj.getJSONObject("id")
 									.getInt("SubID"));
+							Log.d("grouped details online","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
 							singleton.setCompanyName(obj.getJSONObject("id")
 									.getString("Company"));
-
+							singleton.setUsername(obj.getJSONObject("id").getString("DisplayName"));
 							Cursor c = dbAdapter.queryCredentials(username,
 									password);
 

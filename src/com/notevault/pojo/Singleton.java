@@ -29,6 +29,7 @@ public class Singleton {
     private int currentSelectedEntryID;
     private String currentSelectedEntryType;
     private String toDate;
+    private String Username;
     private int LNCID, LTCID, LCCID, ENCID, CCID, ESCID, MNCID, MSCID;
 
     private boolean loggedOut = true;
@@ -37,6 +38,9 @@ public class Singleton {
     private boolean EnableShiftTracking;
     private boolean EnableOvertimeTracking;
     private String ResentShiftItem;
+    
+
+
 private int selectedEntriesIdentityoffline;
     public int getSelectedEntriesIdentityoffline() {
 	return selectedEntriesIdentityoffline;
@@ -114,6 +118,7 @@ public void setSelectedEntriesIdentityoffline(int selectedEntriesIdentityoffline
         this.setAccountId(0);
         this.setUserId(0);
         this.setCompanyId(0);
+        this.setUsername(null);
     }
 
     public static Singleton getInstance() {
@@ -583,6 +588,12 @@ public int getSelectedEntityIdentity() {
 		return selectedEntityIdentity;
 	}
 
+public String getUsername() {
+	return Username;
+}
 
+public void setUsername(String username) {
+	Username = username;
+}
 	
 }

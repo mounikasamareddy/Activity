@@ -26,6 +26,8 @@ import com.notevault.arraylistsupportclasses.TasksDB;
 import com.notevault.arraylistsupportclasses.TradeDb;
 import com.notevault.arraysupportclasses.CalenderActivity;
 
+import com.notevault.arraysupportclasses.UpdateEntriesProjo;
+
 import com.notevault.pojo.Singleton;
 
 /**
@@ -80,6 +82,7 @@ public class DBAdapter {
 		contentValues.put("ENCID", singleton.getENCID());
 		contentValues.put("CCID", singleton.getCCID());
 		contentValues.put("MNCID", singleton.getMNCID());
+		contentValues.put("displayname", singleton.getUsername());
 		opnToWrite();
 		long val = SQLObj.insert("Login", null, contentValues);
 		Close();
@@ -176,7 +179,7 @@ public class DBAdapter {
 		contentValues.put("NAME", NAME);
 		contentValues.put("TRD_COMP", TRD_COMP);
 		contentValues.put("CLASSI_STAT", CLASSI_STAT);
-		contentValues.put("HR_QTY", Double.parseDouble(HR_QTY));
+		contentValues.put("HR_QTY", HR_QTY);
 		// contentValues.put("DESC", DESC);
 		contentValues.put("TYPE", TYPE);
 		contentValues.put("ACTION", ACTION);
@@ -201,7 +204,7 @@ public class DBAdapter {
 		contentValues.put("NAME", NAME);
 		contentValues.put("TRD_COMP", TRD_COMP);
 		contentValues.put("CLASSI_STAT", CLASSI_STAT);
-		contentValues.put("HR_QTY", Double.parseDouble(HR_QTY));
+		contentValues.put("HR_QTY", HR_QTY);
 		// contentValues.put("DESC", DESC);
 		contentValues.put("TYPE", TYPE);
 		contentValues.put("ACTION", ACTION);
@@ -263,7 +266,7 @@ public class DBAdapter {
 
 	public Cursor queryCredentials(String username, String password) {
 		String[] cols = { "UserID", "AccountID", "SubID", "CompanyID",
-				"Company", "LNPCID", "LTCID", "LCCID", "ENCID", "CCID", "MNCID" };
+				"Company", "LNPCID", "LTCID", "LCCID", "ENCID", "CCID", "MNCID","displayname"};
 		opnToWrite();
 		Cursor c = SQLObj
 				.query("Login", cols, "username = '" + username
@@ -271,7 +274,15 @@ public class DBAdapter {
 						null, null);
 		return c;
 	}
-
+	public Cursor queryCredentialsLogin() {
+		String[] cols = { "UserID", "AccountID", "SubID", "CompanyID",
+				"Company", "LNPCID", "LTCID", "LCCID", "ENCID", "CCID", "MNCID","displayname"};
+		opnToWrite();
+		Cursor c = SQLObj
+				.query("Login", cols,null,null, null,
+						null, null);
+		return c;
+	}
 	public Cursor queryProjects() {
 		String[] cols = { "PID", "PName", "hasData", "hasActivities" };
 		opnToWrite();
@@ -338,6 +349,7 @@ public class DBAdapter {
 				data.setTIdentity(cursor.getInt(0));
 				data.setTID(cursor.getInt(1));
 				data.setTName(cursor.getString(2));
+				data.setPid(cursor.getString(3));
 				data.setHasData(cursor.getInt(5));
 				data.setStatus(cursor.getString(6));
 				dataList.add(data);
@@ -454,6 +466,7 @@ public class DBAdapter {
 		return dataList;
 
 	}
+
 	public List<ActivityDB> getAllActivityRecords() {
 		// Select All Query
 		opnToWrite();
@@ -485,6 +498,7 @@ public class DBAdapter {
 		return dataList;
 
 	}
+
 	public List<CalenderActivity> getAllActivityRecordsForCalender(int tid) {
 		// Select All Query
 		opnToWrite();
@@ -582,6 +596,76 @@ public class DBAdapter {
 		return dataList;
 	}
 
+	public List<UpdateEntriesProjo> getAllEntriesUpdateRecords(String action,String type) {
+		opnToWrite();
+		List<UpdateEntriesProjo> dataList1 = new ArrayList<UpdateEntriesProjo>();
+		dataList1.clear();
+		String selectQuery = "SELECT  * FROM Entries where status is null and Type='"+type+"' and ACTION='"
+				+ action + "'";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				UpdateEntriesProjo data = new UpdateEntriesProjo();
+				data.setEIdenty(cursor.getInt(0));
+				data.setEname(cursor.getString(1));
+				data.setTRD_C(cursor.getString(2));
+				data.setClassesI(cursor.getString(3));
+				data.setHR_QTY(cursor.getString(4));
+				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setEId(cursor.getInt(7));
+				data.setPID(cursor.getInt(8));
+				data.setTid(cursor.getInt(9));
+				data.setAid(cursor.getInt(12));
+				data.setEdate(cursor.getString(14));
+				data.setStatus(cursor.getString(15));
+				dataList1.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		return dataList1;
+	}
+	public List<UpdateEntriesProjo> getAllEntriesUpdateRecords(String action) {
+		opnToWrite();
+		List<UpdateEntriesProjo> dataList1 = new ArrayList<UpdateEntriesProjo>();
+		dataList1.clear();
+		String selectQuery = "SELECT  * FROM Entries where status is null and ACTION='"
+				+ action + "'";
+
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				UpdateEntriesProjo data = new UpdateEntriesProjo();
+				data.setEIdenty(cursor.getInt(0));
+				data.setEname(cursor.getString(1));
+				data.setTRD_C(cursor.getString(2));
+				data.setClassesI(cursor.getString(3));
+				data.setHR_QTY(cursor.getString(4));
+				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setEId(cursor.getInt(7));
+				data.setPID(cursor.getInt(8));
+				data.setTid(cursor.getInt(9));
+				data.setAid(cursor.getInt(12));
+				data.setEdate(cursor.getString(14));
+				data.setStatus(cursor.getString(15));
+				dataList1.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
+
+		return dataList1;
+	}
 	public List<EntriesNetworkDB> getAllOfflineEntriesRecords() {
 		opnToWrite();
 		List<EntriesNetworkDB> dataList = new ArrayList<EntriesNetworkDB>();
@@ -645,6 +729,7 @@ public class DBAdapter {
 	public List<EntityDB> getAllEntityRecords(int aid) {
 		opnToWrite();
 		List<EntityDB> dataList = new ArrayList<EntityDB>();
+		dataList.clear();
 		String selectQuery = "SELECT  * FROM Entries where ACTION IN('N','U') and AID="
 				+ aid;
 
@@ -658,11 +743,11 @@ public class DBAdapter {
 				data.setNAME(cursor.getString(1));
 				data.setTRD_COMP(cursor.getString(2));
 				data.setCLASSI_STAT(cursor.getString(3));
-				data.setHR_QTY(cursor.getShort(4));
+				data.setHR_QTY(cursor.getString(4));
 				data.setType(cursor.getString(5));
 				data.setAction(cursor.getString(6));
 				data.setID(cursor.getInt(7));
-
+				data.setDate(cursor.getString(14));
 				dataList.add(data);
 
 				// Adding contact to list
@@ -690,7 +775,7 @@ public class DBAdapter {
 				data.setNAME(cursor.getString(1));
 				data.setTRD_COMP(cursor.getString(2));
 				data.setCLASSI_STAT(cursor.getString(3));
-				data.setHR_QTY(cursor.getShort(4));
+				data.setHR_QTY(cursor.getString(4));
 				data.setType(cursor.getString(5));
 				data.setAction(cursor.getString(6));
 				data.setID(cursor.getInt(7));
@@ -706,7 +791,7 @@ public class DBAdapter {
 		return dataList;
 	}
 
-	public Cursor queryOfflineEntries() {
+	public Cursor queryOfflineLogin() {
 		String[] cols = { "TYPE", "NAME", "TRD_COMP", "CLASSI_STAT", "HR_QTY",
 				"ID", "ACTION", "PID", "TID", "AID", "DATE", "UserID",
 				"AccountID", "SubID" };
@@ -1013,6 +1098,26 @@ public class DBAdapter {
 		return val;
 	}
 
+	public long updateEntriesAction(int EIdentity, String EID) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("ID", EID);
+		contentValues.put("status", "");
+		opnToWrite();
+		long val = SQLObj.update("Entries", contentValues, "EIdentity = "
+				+ EIdentity + " and status='offline'", null);
+		Close();
+		return val;
+	}
+	public long updateEntriesAction1(int Eid) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("ACTION", "N");
+		
+		opnToWrite();
+		long val = SQLObj.update("Entries", contentValues, "ID = "
+				+ Eid , null);
+		Close();
+		return val;
+	}
 	public long updateActivity(int TaskID, int ActID) {
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("hasData", 1);
@@ -1030,6 +1135,7 @@ public class DBAdapter {
 	public long updateEntry(String name, String trade_company,
 			String classification_status, String hr_qty, String type,
 			String action, String ID) {
+		Log.d("db", "--->" + hr_qty);
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("EIdentity", singleton.getSelectedEntityIdentity());
 		contentValues.put("NAME", name);
@@ -1083,9 +1189,7 @@ public class DBAdapter {
 
 	public int deleteTasks(int PID) {
 		opnToWrite();
-		int val = SQLObj.delete("Tasks", "ProjectID = " + PID
-				+ " and ProjectDay = '" + singleton.getCurrentSelectedDate()
-				+ "'", null);
+		int val = SQLObj.delete("Tasks", "ProjectID = " + PID, null);
 		Close();
 		return val;
 	}
@@ -1128,6 +1232,14 @@ public class DBAdapter {
 						+ singleton.getSelectedTaskID() + " and AID = "
 						+ singleton.getSelectedActivityID() + " and DATE = '"
 						+ singleton.getCurrentSelectedDate() + "'", null);
+		Close();
+		return val;
+	}
+	public int deleteEntryByIDNetwork(String ID) {
+		opnToWrite();
+		int val = SQLObj.delete(
+				"Entries",
+				"ID = '" + ID + "'", null);
 		Close();
 		return val;
 	}

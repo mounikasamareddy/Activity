@@ -1,13 +1,16 @@
 package com.notevault.adapter;
 
+import android.R.color;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.notevault.activities.AddEquipment;
@@ -58,6 +61,8 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 			
 		holder.label1=(TextView) convertView
 				.findViewById(R.id.label1);
+		holder.layout = (RelativeLayout) convertView
+				.findViewById(R.id.relativelay);
 			holder.roundTv = (TextView) convertView
 					.findViewById(R.id.tv);
 			holder.textView = (TextView) convertView
@@ -94,8 +99,11 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 			holder.tv1.setText("");
 			holder.tv2.setText("");
 			holder.tv3.setText("");
+			holder.layout.setBackgroundColor(Color.parseColor("#EBEBE9"));
+			
 		}
 		else{
+			//holder.layout.setBackgroundColor(Color.WHITE);
 			holder.label1.setVisibility(View.GONE);
 			holder.roundTv.setVisibility(View.VISIBLE);
 			holder.img.setVisibility(View.VISIBLE);
@@ -116,7 +124,7 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 		holder.textView.setText(Utilities.eAligndata.get(position).getNAME());
 		holder.tv1.setText(Utilities.eAligndata.get(position).getTRD_COMP());
 		holder.tv2.setText(Utilities.eAligndata.get(position).getCLASSI_STAT());
-		holder.tv3.setText(Utilities.eAligndata.get(position).getHR_QTY()+"");
+		holder.tv3.setText((int)Double.parseDouble(Utilities.eAligndata.get(position).getHR_QTY())+"");
 		
 		if (Utilities.eAligndata.get(position).getTYPE().equals("L")) {
 			holder.roundTv.setBackgroundResource(R.drawable.circleyellow);
@@ -140,7 +148,7 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 					singleton.setSelectedLaborTrade(Utilities.eAligndata.get(position).getTRD_COMP());
 					singleton
 							.setSelectedLaborClassification(Utilities.eAligndata.get(position).getCLASSI_STAT());
-					singleton.setSelectedLaborHours(Utilities.eAligndata.get(position).getHR_QTY()+"");
+					singleton.setSelectedLaborHours((int)Double.parseDouble(Utilities.eAligndata.get(position).getHR_QTY())+"");
 					// singleton.setSelectedLaborDescription(val[6]);
 					Intent intent = new Intent(
 							context,
@@ -152,7 +160,7 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 							.setSelectedEquipmentCompany(Utilities.eAligndata.get(position).getTRD_COMP());
 					singleton
 							.setSelectedEquipmentStatus(Utilities.eAligndata.get(position).getCLASSI_STAT());
-					singleton.setSelectedEquipmentQty(Utilities.eAligndata.get(position).getHR_QTY()+"");
+					singleton.setSelectedEquipmentQty((int)Double.parseDouble(Utilities.eAligndata.get(position).getHR_QTY())+"");
 					// singleton.setSelectedEquipmentDescription(val[6]);
 					Intent intent = new Intent(
 							context,
@@ -163,7 +171,7 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 					singleton
 							.setSelectedMaterialCompany(Utilities.eAligndata.get(position).getTRD_COMP());
 					singleton.setSelectedMaterialStatus(Utilities.eAligndata.get(position).getCLASSI_STAT());
-					singleton.setSelectedMaterialQty(Utilities.eAligndata.get(position).getHR_QTY()+"");
+					singleton.setSelectedMaterialQty((int)Double.parseDouble(Utilities.eAligndata.get(position).getHR_QTY())+"");
 					// singleton.setSelectedMaterialDescription(val[6]);
 					Intent intent = new Intent(
 							context,
@@ -182,5 +190,6 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 	static class UserHolder {
 		TextView roundTv,textView,tv2,tv1,tv3,label1;
 		ImageView img,listbutton;
+		RelativeLayout layout;
 	}
 }

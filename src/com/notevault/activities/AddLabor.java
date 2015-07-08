@@ -75,6 +75,9 @@ public class AddLabor extends Activity {
 		System.err.println("onStart: " + singleton.getSelectedLaborName());
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 
+		
+		
+		Log.d("details","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
 		if (singleton.isEnableOvertimeTracking()) {
 
 			timeAndHalf = (EditText) findViewById(R.id.timeandhalf);
@@ -701,6 +704,7 @@ public class AddLabor extends Activity {
 					// jsonAddLabor.put("UserId", singleton.getUserId());
 					System.out.println("labor sent id :"
 							+ singleton.getCurrentSelectedEntryID());
+					Log.d("back responce","--->"+jsonAddLabor);
 					return jsonDataPost.updateLaborEntry(jsonAddLabor);
 
 				} catch (JSONException e) {
@@ -715,6 +719,8 @@ public class AddLabor extends Activity {
 
 		protected void onPostExecute(final String result) {
 			long laborUpdateResponse = 0;
+			
+			Log.d("labour update responce","--->"+result);
 			// mProgressDialog.dismiss();
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
@@ -723,18 +729,18 @@ public class AddLabor extends Activity {
 						Toast.LENGTH_LONG).show();
 
 				Log.d("offline entry", "--->" + singleton.isOfflineEntry());
-				if (singleton.isOfflineEntry())
-					laborUpdateResponse = dbAdapter.updateEntry(
-							singleton.getSelectedLaborName(),
-							singleton.getSelectedLaborTrade(),
-							singleton.getSelectedLaborClassification(),
-							singleton.getSelectedLaborHours(),
-							"L",
-							"I",
-							"OF"
-									+ String.valueOf(singleton
-											.getCurrentSelectedEntryID()));
-				else
+//				if (singleton.isOfflineEntry())
+//					laborUpdateResponse = dbAdapter.updateEntry(
+//							singleton.getSelectedLaborName(),
+//							singleton.getSelectedLaborTrade(),
+//							singleton.getSelectedLaborClassification(),
+//							singleton.getSelectedLaborHours(),
+//							"L",
+//							"I",
+//							"OF"
+//									+ String.valueOf(singleton
+//											.getCurrentSelectedEntryID()));
+//				else
 					laborUpdateResponse = dbAdapter.updateEntry(singleton
 							.getSelectedLaborName(), singleton
 							.getSelectedLaborTrade(), singleton
@@ -756,20 +762,20 @@ public class AddLabor extends Activity {
 										"N", String.valueOf(singleton
 												.getCurrentSelectedEntryID()));
 					} else {
-						if (singleton.isOfflineEntry())
-							laborUpdateResponse = dbAdapter
-									.updateEntry(
-											singleton.getSelectedLaborName(),
-											singleton.getSelectedLaborTrade(),
-											singleton
-													.getSelectedLaborClassification(),
-											singleton.getSelectedLaborHours(),
-											"L",
-											"I",
-											"OF"
-													+ String.valueOf(singleton
-															.getCurrentSelectedEntryID()));
-						else
+//						if (singleton.isOfflineEntry())
+//							laborUpdateResponse = dbAdapter
+//									.updateEntry(
+//											singleton.getSelectedLaborName(),
+//											singleton.getSelectedLaborTrade(),
+//											singleton
+//													.getSelectedLaborClassification(),
+//											singleton.getSelectedLaborHours(),
+//											"L",
+//											"I",
+//											"OF"
+//													+ String.valueOf(singleton
+//															.getCurrentSelectedEntryID()));
+//						else
 							laborUpdateResponse = dbAdapter.updateEntry(
 									singleton.getSelectedLaborName(), singleton
 											.getSelectedLaborTrade(), singleton
@@ -782,18 +788,18 @@ public class AddLabor extends Activity {
 				} else {
 					System.out
 							.println("An error occurred! Could not update entry.");
-					if (singleton.isOfflineEntry())
-						laborUpdateResponse = dbAdapter.updateEntry(
-								singleton.getSelectedLaborName(),
-								singleton.getSelectedLaborTrade(),
-								singleton.getSelectedLaborClassification(),
-								singleton.getSelectedLaborHours(),
-								"L",
-								"I",
-								"OF"
-										+ String.valueOf(singleton
-												.getCurrentSelectedEntryID()));
-					else
+//					if (singleton.isOfflineEntry())
+//						laborUpdateResponse = dbAdapter.updateEntry(
+//								singleton.getSelectedLaborName(),
+//								singleton.getSelectedLaborTrade(),
+//								singleton.getSelectedLaborClassification(),
+//								singleton.getSelectedLaborHours(),
+//								"L",
+//								"I",
+//								"OF"
+//										+ String.valueOf(singleton
+//												.getCurrentSelectedEntryID()));
+//					else
 						laborUpdateResponse = dbAdapter
 								.updateEntry(
 										singleton.getSelectedLaborName(),

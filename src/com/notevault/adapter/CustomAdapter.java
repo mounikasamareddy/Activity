@@ -2,12 +2,14 @@ package com.notevault.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.notevault.activities.AddEquipment;
@@ -56,7 +58,8 @@ public class CustomAdapter extends BaseAdapter{
 		if (convertView == null) {
 			convertView= infilate.inflate(R.layout.customlist2, null);
 			holder=new UserHolder();
-			
+			holder.layout = (RelativeLayout) convertView
+					.findViewById(R.id.relativelay);
 		holder.label1=(TextView) convertView
 				.findViewById(R.id.label1);
 			holder.roundTv = (TextView) convertView
@@ -95,8 +98,10 @@ public class CustomAdapter extends BaseAdapter{
 			holder.tv1.setText("");
 			holder.tv2.setText("");
 			holder.tv3.setText("");
+			holder.layout.setBackgroundColor(Color.parseColor("#EBEBE9"));
 		}
 		else{
+			//holder.layout.setBackgroundColor(Color.WHITE);
 			holder.label1.setVisibility(View.GONE);
 			holder.roundTv.setVisibility(View.VISIBLE);
 			holder.img.setVisibility(View.VISIBLE);
@@ -117,7 +122,7 @@ public class CustomAdapter extends BaseAdapter{
 		holder.textView.setText(Utilities.groupdata.get(position).getName());
 		holder.tv1.setText(Utilities.groupdata.get(position).getTrade());
 		holder.tv2.setText(Utilities.groupdata.get(position).getClassification());
-		holder.tv3.setText(Utilities.groupdata.get(position).getHrs()+"");
+		holder.tv3.setText((int) Utilities.groupdata.get(position).getHrs()+"");
 		
 		if (Utilities.groupdata.get(position).getType().equals("Labor")) {
 			holder.roundTv.setBackgroundResource(R.drawable.circleyellow);
@@ -141,7 +146,8 @@ public class CustomAdapter extends BaseAdapter{
 					singleton.setSelectedLaborTrade(Utilities.groupdata.get(position).getTrade());
 					singleton
 							.setSelectedLaborClassification(Utilities.groupdata.get(position).getClassification());
-					singleton.setSelectedLaborHours(Utilities.groupdata.get(position).getHrs()+"");
+					singleton.setSelectedLaborHours((int)Utilities.groupdata.get(position).getHrs()+"");
+					
 					// singleton.setSelectedLaborDescription(val[6]);
 					Intent intent = new Intent(
 							context,
@@ -154,7 +160,7 @@ public class CustomAdapter extends BaseAdapter{
 							.setSelectedEquipmentCompany(Utilities.groupdata.get(position).getTrade());
 					singleton
 							.setSelectedEquipmentStatus(Utilities.groupdata.get(position).getClassification());
-					singleton.setSelectedEquipmentQty(Utilities.groupdata.get(position).getHrs()+"");
+					singleton.setSelectedEquipmentQty((int)Utilities.groupdata.get(position).getHrs()+"");
 					// singleton.setSelectedEquipmentDescription(val[6]);
 					Intent intent = new Intent(
 							context,
@@ -165,7 +171,7 @@ public class CustomAdapter extends BaseAdapter{
 					singleton
 							.setSelectedMaterialCompany(Utilities.groupdata.get(position).getTrade());
 					singleton.setSelectedMaterialStatus(Utilities.groupdata.get(position).getClassification());
-					singleton.setSelectedMaterialQty(Utilities.groupdata.get(position).getHrs()+"");
+					singleton.setSelectedMaterialQty((int)Utilities.groupdata.get(position).getHrs()+"");
 					// singleton.setSelectedMaterialDescription(val[6]);
 					Intent intent = new Intent(
 							context,
@@ -184,6 +190,7 @@ public class CustomAdapter extends BaseAdapter{
 	static class UserHolder {
 		TextView roundTv,textView,tv2,tv1,tv3,label1;
 		ImageView img,listbutton;
+		RelativeLayout layout;
 	}
 
 }

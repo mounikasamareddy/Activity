@@ -206,6 +206,8 @@ public class AddMaterial extends Activity {
 				c = singleton.getSelectedMaterialCompany();
 				s = singleton.getSelectedMaterialStatus();
 				q = singleton.getSelectedMaterialQty();
+				
+				Log.d("q val","--->"+q);
 
 				if (n.equalsIgnoreCase(""))
 					errorMsg = "Name";
@@ -241,6 +243,7 @@ public class AddMaterial extends Activity {
 							}
 						});
 
+				Log.d("after q val","-->");
 				if (errorMsg.equalsIgnoreCase("")) {
 					if (singleton.isNewEntryFlag()) {
 						if (singleton.isOnline()) {
@@ -252,14 +255,15 @@ public class AddMaterial extends Activity {
 							AddMaterialEntries materialEntries = new AddMaterialEntries();
 							materialEntries.execute();
 						} else {
-
-							Toast.makeText(getApplicationContext(), "Offline",
+							Log.d("offline readdb","-->");
+							Toast.makeText(getApplicationContext(), "add material Offline",
 									Toast.LENGTH_LONG).show();
 							readDBData();
 							
 						}
 
 					} else {
+						Log.d("update","-->");
 						mProgressDialog = new ProgressDialog(AddMaterial.this);
 						mProgressDialog.setMessage("Loading...");
 						mProgressDialog.setIndeterminate(false);
@@ -427,6 +431,8 @@ public class AddMaterial extends Activity {
 
 		protected void onPostExecute(final String result) {
 			long materialInsertResponse = 0;
+			
+			Log.d("responce","--->"+result);
 			mProgressDialog.dismiss();
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
@@ -589,6 +595,10 @@ public class AddMaterial extends Activity {
 				Toast.makeText(getApplicationContext(),
 						"Sorry! Server could not be reached.",
 						Toast.LENGTH_LONG).show();
+				Log.d("update post","--->"+
+				singleton
+				.getSelectedMaterialQty());
+				
 				if (singleton.isOfflineEntry())
 					materialUpdateResponse = dbAdapter.updateEntry(
 							singleton.getSelectedMaterialName(),
@@ -799,6 +809,8 @@ public class AddMaterial extends Activity {
 		}
 	}
 	protected void readDBData() {
+		
+		Log.d("readDb","-->");
 		if (singleton.getSelectedActivityID() == 0) {
 			if (singleton.getSelectedTaskID() == 0) {
 				long insertEntities = dbAdapter.insertEntryOffline(
@@ -829,10 +841,12 @@ public class AddMaterial extends Activity {
 						singleton
 								.getSelectedTaskIdentityoffline(),
 						singleton.getSelectedActivityID());
-				Log.d("en_insert labour 0 id", "----->"
-						+ insertEntities + " "
-						+ updateEntity);
+//				Log.d("en_insert labour 0 id", "----->"
+//						+ insertEntities + " "
+//						+ updateEntity);
 			} else {
+				
+				Log.d("q val in insert","--->"+singleton.getSelectedMaterialQty());
 				long insertEntities = dbAdapter.insertEntryOffline(
 						singleton.getSelectedMaterialName(),
 						singleton
@@ -850,9 +864,9 @@ public class AddMaterial extends Activity {
 				long updateEntity = dbAdapter.updateActivity(
 						singleton.getSelectedTaskID(),
 						singleton.getSelectedActivityID());
-				Log.d("en_insert labour 0 id", "----->"
-						+ insertEntities + " "
-						+ updateEntity);
+//				Log.d("en_insert labour 0 id", "----->"
+//						+ insertEntities + " "
+//						+ updateEntity);
 			}
 
 		} else {
