@@ -18,8 +18,10 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,6 +48,7 @@ public class AddActivity extends Activity {
 	Singleton singleton;
 	EditText editText;
 	String newActivityName;
+	SharedPreferences settingPreferences;
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	DBAdapter dbAdapter;
 	LinearLayout shift;
@@ -53,7 +56,7 @@ public class AddActivity extends Activity {
 	ArrayAdapter<String> adapter;
 	Spinner spinner;
 	int spinnerSelectedItem;
-
+int shiftval=0;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,6 +67,16 @@ public class AddActivity extends Activity {
 		singleton = Singleton.getInstance();
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 
+		
+		settingPreferences = getSharedPreferences(
+				SettingActivity.EnableSHIFTPREFERENCES, Context.MODE_PRIVATE);
+		if (settingPreferences.contains(String.valueOf(singleton.getUserId()))) {
+			if (settingPreferences.getString(
+					String.valueOf(singleton.getUserId()), "")
+					.equalsIgnoreCase("true")) {
+				singleton.setEnableShiftTracking(true);
+			}
+		}
 		Log.d("shift", "--->" + singleton.isEnableShiftTracking());
 
 		if (singleton.isEnableShiftTracking()) {
@@ -87,6 +100,8 @@ public class AddActivity extends Activity {
 				@Override
 				public void onItemSelected(AdapterView<?> parent, View arg1,
 						int pos, long arg3) {
+					
+					shiftval=pos;
 					Log.d("shif selected item", "-->"
 							+ parent.getItemAtPosition(pos).toString());
 					singleton.setResentShiftItem(parent.getItemAtPosition(pos)
@@ -131,74 +146,19 @@ public class AddActivity extends Activity {
 					alertDialog.show();
 				} else {
 					if (singleton.isOnline()) {
-						AddActivityProject addActivity = new AddActivityProject();
-						addActivity.execute();
-					} else {
-
-						// Log.d("taskdata","---->"+singleton.getSelectedTaskID());
-						List<ActivityDB> data;
-						Log.d("checking",
-								"-->"
-										+ singleton.getSelectedTaskID()
-										+ "  "
-										+ singleton
-												.getSelectedTaskIdentityoffline()
-										+ " "
-										+ singleton.getSelectedActivityID());
-
-						if (singleton.getSelectedTaskID() == 0) {
-							long act = dbAdapter.inserActivityoffline(0,
-									newActivityName,
-									singleton.getSelectedTaskIdentityoffline(),
-									0, "offline");
-							Log.d("activity created with task id=0", "--->"
-									+ act);
-							data = dbAdapter.getAllActivityRecords();
-							for (ActivityDB val : data) {
-								Log.d("activity created with task id=0", "--->"
-										+ val.getAIdentity());
-								singleton
-										.setselectedActivityIdentityoffline(val
-												.getAIdentity());
-							}
-
-							singleton.setSelectedActivityName(newActivityName);
-							singleton.setSelectedActivityID(0);
-
+						Log.d("shift tracking","--->"+singleton.isEnableShiftTracking());
+						if (singleton.isEnableShiftTracking()) {
+							Log.d("add activity","--->"+newActivityName);
+							AddActivityProjectShift addActivityShift = new AddActivityProjectShift();
+							addActivityShift.execute();
+							
 						} else {
-							long act1 = dbAdapter.inserActivityoffline(0,
-									newActivityName,
-									singleton.getSelectedTaskID(), 0, "offline");
-							Log.d("activity created with task offline status",
-									"--->" + act1 + " "
-											+ singleton.getSelectedTaskID());
-							data = dbAdapter.getAllActivityRecords();
-							for (ActivityDB val : data) {
-								Log.d("activity created with task id=0", "--->"
-										+ val.getAIdentity());
-								singleton
-										.setselectedActivityIdentityoffline(val
-												.getAIdentity());
-							}
-							singleton.setSelectedActivityID(0);
-
-							singleton.setSelectedActivityName(newActivityName);
-
+							Log.d("add activity","--->"+newActivityName);
+							AddActivityProject addActivity = new AddActivityProject();
+							addActivity.execute();
 						}
-
-						dbAdapter.updateTask(singleton.getSelectedProjectID(),
-								singleton.getSelectedTaskID(),
-								singleton.getCurrentSelectedDate());
-						Intent intent = new Intent(AddActivity.this,
-								EntriesListActivity.class);
-						Bundle bundle = new Bundle();
-						bundle.putInt("index", 1);
-
-						intent.putExtras(bundle);
-						startActivity(intent);
-
-						finish();
-
+					} else {
+						Insertintodb();
 					}
 
 				}
@@ -213,7 +173,10 @@ public class AddActivity extends Activity {
 				onBackPressed();
 			}
 		});
+		
 	}
+
+	
 
 	private class AddActivityProject extends AsyncTask<Void, Void, String> {
 
@@ -325,8 +288,138 @@ public class AddActivity extends Activity {
 
 					intent.putExtras(bundle);
 					startActivity(intent);
-
 					finish();
+				} else if (Status == 201) {
+					Toast.makeText(getApplicationContext(),
+							"An activity with this name already exists!",
+							Toast.LENGTH_LONG).show();
+				} else {
+					Toast.makeText(getApplicationContext(),
+							"An error occurred while adding activity!",
+							Toast.LENGTH_LONG).show();
+				}
+			
+				
+				} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	private class AddActivityProjectShift extends AsyncTask<Void, Void, String> {
+
+		// String addActivityResponseString;
+
+		@Override
+		protected String doInBackground(Void... params) {
+			try {
+				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+					@Override
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					@Override
+					public void checkClientTrusted(
+							java.security.cert.X509Certificate[] arg0,
+							String arg1) {
+					}
+
+					@Override
+					public void checkServerTrusted(
+							java.security.cert.X509Certificate[] chain,
+							String authType) {
+					}
+				} };
+
+				HostnameVerifier hv = new HostnameVerifier() {
+
+					@Override
+					public boolean verify(String hostname, SSLSession session) {
+						return false;
+					}
+				};
+				SSLContext sc = SSLContext.getInstance("SSL");
+				sc.init(null, trustAllCerts, new SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(sc
+						.getSocketFactory());
+				HttpsURLConnection.setDefaultHostnameVerifier(hv);
+
+				try {
+					String GMTdateTime = new SimpleDateFormat("yyyy-MM-dd",
+							Locale.ENGLISH)
+							.format(new SimpleDateFormat("yyyyMMd")
+									.parse(singleton.getCurrentSelectedDate()))
+							+ " "
+							+ new SimpleDateFormat("HH:mm:ss")
+									.format(new Date());
+					JSONObject jsonAddActivityShift = new JSONObject();
+					jsonAddActivityShift
+							.put("TaskId", singleton.getSelectedTaskID());
+					
+					jsonAddActivityShift.put("DateCreated", GMTdateTime);
+					
+					jsonAddActivityShift.put("Name", newActivityName);
+					
+					jsonAddActivityShift.put("UserId", singleton.getUserId());
+					jsonAddActivityShift.put("Shift", shiftval);
+					
+					Log.d("Request: jsonAddActivity: ","--->"
+							+ jsonAddActivityShift);
+					// System.out.println("GMT Date: %%%%%%%%%%%%%%%%%%%%%%%%%%%% : "+
+					// GMTdateTime);
+					return jsonDataPost.addActivityShiftToTask(jsonAddActivityShift);
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		@Override
+		protected void onPostExecute(String param) {
+			Log.d("Response add activity shift ..","--->"
+					+ param);
+			try {
+				JSONObject json = new JSONObject(param);
+				Log.d("status","--->"+json.getInt("AI"));
+				int Status = json.getInt("Status");
+				if (Status == 0 || Status == 200) {
+					singleton.setSelectedActivityID(Integer.parseInt(json
+							.getString("AI")));
+					singleton.getActivitiesList().put(json.getString("AI"),
+							Singleton.toTitleCase(newActivityName));
+					System.out.println("...data......" + newActivityName
+							+ "..........activityid........."
+							+ singleton.getSelectedActivityID());
+					singleton.setSelectedActivityName(Singleton
+							.toTitleCase(newActivityName));
+					ActivitiesListActivity.activityListStatus.put(
+							json.getString("AI"), "F");
+					TasksListActivity.taskListStatus.put(
+							singleton.getSelectedTaskID(), "T");
+					long insertResponse = dbAdapter.insertActivity(
+							json.getString("AI"),
+							Singleton.toTitleCase(newActivityName),
+							singleton.getSelectedTaskID(),
+							singleton.getCurrentSelectedDate(), 0,
+							singleton.getUserId());
+					Log.d("insert", "--->" + insertResponse);
+					dbAdapter.updateTask(singleton.getSelectedProjectID(),
+							singleton.getSelectedTaskID(),
+							singleton.getCurrentSelectedDate());
+					Intent intent = new Intent(AddActivity.this,
+							EntriesListActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putInt("index", 1);
+
+					intent.putExtras(bundle);
+					startActivity(intent);
+					finish();
+					
 				} else if (Status == 201) {
 					Toast.makeText(getApplicationContext(),
 							"An activity with this name already exists!",
@@ -339,6 +432,66 @@ public class AddActivity extends Activity {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+			
 		}
+	}
+	protected void Insertintodb() {
+		// Log.d("taskdata","---->"+singleton.getSelectedTaskID());
+		List<ActivityDB> data;
+		Log.d("checking",
+				"-->"
+						+ singleton.getSelectedTaskID()
+						+ "  "
+						+ singleton
+								.getSelectedTaskIdentityoffline()
+						+ " "
+						+ singleton.getSelectedActivityID());
+if(singleton.isEnableShiftTracking())
+{
+	long act1 = dbAdapter.inserActivityoffline(0,
+			newActivityName.replace("\\", ""),
+			singleton.getSelectedTaskID(), 0, "offline",shiftval);
+	Log.d("activity created with task offline status",
+			"--->" + act1 + " "
+					+ singleton.getSelectedTaskID());
+}else{
+	long act1 = dbAdapter.inserActivityoffline(0,
+			newActivityName.replace("\\", ""),
+			singleton.getSelectedTaskID(), 0, "offline",10);
+	Log.d("activity created with task offline status",
+			"--->" + act1 + " "
+					+ singleton.getSelectedTaskID());
+}
+		
+			
+			data = dbAdapter.getAllActivityRecords();
+			for (ActivityDB val : data) {
+				Log.d("activity created with task id=0", "--->"
+						+ val.getAIdentity());
+				singleton
+						.setselectedActivityIdentityoffline(val
+								.getAIdentity());
+			}
+			singleton.setSelectedActivityID(0);
+
+			singleton.setSelectedActivityName(newActivityName);
+
+		
+
+		dbAdapter.updateTask(singleton.getSelectedProjectID(),
+				singleton.getSelectedTaskID(),
+				singleton.getCurrentSelectedDate());
+		Intent intent = new Intent(AddActivity.this,
+				EntriesListActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putInt("index", 1);
+
+		intent.putExtras(bundle);
+		startActivity(intent);
+
+		finish();
+
+	
+		
 	}
 }

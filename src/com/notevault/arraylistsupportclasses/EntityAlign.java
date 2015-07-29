@@ -11,7 +11,21 @@ public class EntityAlign {
 	String Action;
 	String header;
 	String Date;
+	String TimeandHalf;
+	String DoubleTime;
 	
+	public String getTimeandHalf() {
+		return TimeandHalf;
+	}
+	public void setTimeandHalf(String timeandHalf) {
+		TimeandHalf = timeandHalf;
+	}
+	public String getDoubleTime() {
+		return DoubleTime;
+	}
+	public void setDoubleTime(String doubleTime) {
+		DoubleTime = doubleTime;
+	}
 	public String getDate() {
 		return Date;
 	}

@@ -16,8 +16,10 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -66,6 +68,7 @@ public class AddLabor extends Activity {
 	String trade, classification;
 	EditText timeAndHalf, doubleTime;
 	List<EntityDB> data;
+	SharedPreferences settingPreferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,16 +78,20 @@ public class AddLabor extends Activity {
 		System.err.println("onStart: " + singleton.getSelectedLaborName());
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 
-		
-		
-		Log.d("details","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
-		if (singleton.isEnableOvertimeTracking()) {
-
-			timeAndHalf = (EditText) findViewById(R.id.timeandhalf);
-			timeAndHalf.setVisibility(View.VISIBLE);
-			doubleTime = (EditText) findViewById(R.id.doubletime);
-			doubleTime.setVisibility(View.VISIBLE);
+		settingPreferences = getSharedPreferences(
+				SettingActivity.EnableOVERTIMETRACKPREFERENCES,
+				Context.MODE_PRIVATE);
+		if (settingPreferences.contains(String.valueOf(singleton.getUserId()))) {
+			if (settingPreferences.getString(
+					String.valueOf(singleton.getUserId()), "")
+					.equalsIgnoreCase("true")) {
+				singleton.setEnableOvertimeTracking(true);
+			}
 		}
+
+		Log.d("details",
+				"--->" + singleton.getAccountId() + " "
+						+ singleton.getSubscriberId());
 
 		projectText = (TextView) findViewById(R.id.greeting);
 		taskText = (TextView) findViewById(R.id.txt);
@@ -92,6 +99,16 @@ public class AddLabor extends Activity {
 		activityText = (TextView) findViewById(R.id.textv);
 
 		hourEditText = (EditText) findViewById(R.id.editText4);
+		if (singleton.isEnableOvertimeTracking()) {
+
+			timeAndHalf = (EditText) findViewById(R.id.timeandhalf);
+			doubleTime = (EditText) findViewById(R.id.doubletime);
+
+			timeAndHalf.setVisibility(View.VISIBLE);
+
+			doubleTime.setVisibility(View.VISIBLE);
+
+		}
 		// descEditText = (EditText)findViewById(R.id.desc_textView6);
 		deleteTextView = (TextView) findViewById(R.id.textView6_delete);
 
@@ -103,7 +120,13 @@ public class AddLabor extends Activity {
 		laborView = (ListView) findViewById(R.id.listView1);
 		Myadapter myad = new Myadapter();
 		laborView.setAdapter(myad);
+		Log.d("214739582609764","--->"+singleton.getSelectedLaborHours());
 		hourEditText.setText(singleton.getSelectedLaborHours());
+		if (singleton.isEnableOvertimeTracking()) {
+			doubleTime.setText(singleton.getSelectedLaborDoubleTime());
+			timeAndHalf.setText(singleton.getSelectedLaborTimeAndHalf());
+		}
+
 		if (descEditText != null) {
 			descEditText.setText(singleton.getSelectedLaborDescription());
 		}
@@ -157,8 +180,7 @@ public class AddLabor extends Activity {
 													+ " "
 													+ singleton
 															.getSelectedEntityIdentity());
-									
-									
+
 									if (singleton.getCurrentSelectedEntryID() == 0) {
 
 										int deleteEntity = dbAdapter
@@ -225,9 +247,16 @@ public class AddLabor extends Activity {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
-
+				Log.d("add ~!$#@%$&", "--->"
+						+ hourEditText.getText().toString().trim());
+				addImageLayout.setEnabled(false);
 				singleton.setSelectedLaborHours(hourEditText.getText()
 						.toString().trim());
+				if (singleton.isEnableOvertimeTracking()) {
+					singleton.setSelectedLaborTimeAndHalf(timeAndHalf.getText()
+							.toString().trim());
+
+				}
 				// singleton.setSelectedLaborDescription(descEditText.getText().toString().trim());
 				String n, t, c, h;
 				errorMsg = "";
@@ -253,6 +282,16 @@ public class AddLabor extends Activity {
 					if (!errorMsg.equalsIgnoreCase(""))
 						errorMsg += ", ";
 					errorMsg += "Hour";
+				}
+				if (singleton.isEnableOvertimeTracking()) {
+					if (timeAndHalf.getText().toString().equals("")) {
+						errorMsg += ", ";
+						errorMsg += "TimeAndHalf";
+					}
+					if (doubleTime.getText().toString().equals("")) {
+						errorMsg += ", ";
+						errorMsg += "DoubleTime";
+					}
 				}
 				if (errorMsg.length() > 0) {
 					if (errorMsg.contains(",")) {
@@ -357,7 +396,7 @@ public class AddLabor extends Activity {
 				ViewGroup parent) {
 
 			LayoutInflater li = getLayoutInflater();
-			convertView = li.inflate(R.layout.customlist, null);
+			convertView = li.inflate(R.layout.entrieslistview, null);
 			TextView tv = (TextView) convertView.findViewById(R.id.textView1);
 			tv2 = (TextView) convertView.findViewById(R.id.textView2);
 
@@ -366,13 +405,13 @@ public class AddLabor extends Activity {
 			tv2.setVisibility(View.VISIBLE);
 
 			if (val[0].equals("Name")) {
-
+				
 				tv2.setText(singleton.getSelectedLaborName());
 
 			} else if (val[0].equals("Trade")) {
-
-				Log.d("test", "--->" + singleton.getSelectedLaborName() + "  "
-						+ singleton.getSelectedLaborTrade());
+				
+				Log.d("test", "--->" + singleton.getSelectedLaborName() + "..."
+						+ !singleton.getSelectedLaborName().equals(""));
 
 				if (!singleton.getSelectedLaborName().equals("")) {
 
@@ -384,14 +423,17 @@ public class AddLabor extends Activity {
 								.getSelectedLaborName());
 						Log.d("text", "--->" + data.size());
 						if (data.size() > 0) {
+							trade = "";
+							classification = "";
 							for (EntityDB val1 : data) {
+								if (val1.getNAME().equals(
+										singleton.getSelectedLaborName())) {
+									trade = val1.getTRD_COMP();
+									classification = val1.getCLASSI_STAT();
 
-								trade = val1.getTRD_COMP();
-								classification = val1.getCLASSI_STAT();
-
-								Log.d("dataname", "--->" + trade + " "
-										+ classification);
-
+								}
+								Log.d("dataname", "--->" + val1.getNAME() + " "
+										+ trade + " " + classification);
 							}
 							singleton.setSelectedLaborTrade(trade);
 							tv2.setText(trade);
@@ -410,6 +452,8 @@ public class AddLabor extends Activity {
 					if (!singleton.getSelectedLaborClassification().equals("")) {
 						tv2.setText(singleton.getSelectedLaborClassification());
 					} else {
+
+						Log.d("classfication", "--->" + data.size());
 						if (data.size() > 0) {
 							singleton
 									.setSelectedLaborClassification(classification);
@@ -418,7 +462,7 @@ public class AddLabor extends Activity {
 						}
 						tv2.setText(singleton.getSelectedLaborClassification());
 					}
-					
+
 				}
 			} else {
 				tv2.setText(singleton.getSelectedLaborClassification());
@@ -433,6 +477,8 @@ public class AddLabor extends Activity {
 							+ hourEditText.getText().toString().trim());
 					singleton.setSelectedLaborHours(hourEditText.getText()
 							.toString().trim());
+
+							
 					// singleton.setSelectedLaborDescription(descEditText.getText().toString().trim());
 
 					if (val[0].equals("Name")) {
@@ -529,10 +575,17 @@ public class AddLabor extends Activity {
 							singleton.getSelectedLaborClassification());
 					jsonAddLabor
 							.put("Hours", singleton.getSelectedLaborHours());
-					// jsonAddLabor.put("Notes",
-					// singleton.getSelectedLaborDescription());
+					if (singleton.isEnableOvertimeTracking()) {
+						jsonAddLabor.put("TimeAndHalf", timeAndHalf.getText()
+								.toString());
+						jsonAddLabor.put("DoubleTime", doubleTime.getText()
+								.toString());
+
+					}
+
 					jsonAddLabor.put("TaskId", singleton.getSelectedTaskID());
 					jsonAddLabor.put("UserId", singleton.getUserId());
+					Log.d("request", "--->" + jsonAddLabor);
 					return jsonDataPost.addLaborEntry(jsonAddLabor);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -540,13 +593,13 @@ public class AddLabor extends Activity {
 
 			} catch (Exception e) {
 				String ID = dbAdapter.generateOfflineEntryID();
-				long laborInsertResponse = dbAdapter.insertEntry(
-						singleton.getSelectedLaborName(),
-						singleton.getSelectedLaborTrade(),
-						singleton.getSelectedLaborClassification(),
-						singleton.getSelectedLaborHours(), "L", "I", ID);
+				// long laborInsertResponse = dbAdapter.insertEntry(
+				// singleton.getSelectedLaborName(),
+				// singleton.getSelectedLaborTrade(),
+				// singleton.getSelectedLaborClassification(),
+				// singleton.getSelectedLaborHours(), "L", "I", ID);
 
-				Log.d("Labour data", "--->" + laborInsertResponse);
+				// Log.d("Labour data", "--->" + laborInsertResponse);
 				EntriesListByDateActivity.collectiveConcatenatedEntryList
 						.add("L" + glue + singleton.getSelectedLaborName()
 								+ glue + singleton.getSelectedLaborTrade()
@@ -554,9 +607,7 @@ public class AddLabor extends Activity {
 								+ singleton.getSelectedLaborClassification()
 								+ glue + singleton.getSelectedLaborHours()
 								+ glue + ID);
-				System.out
-						.println("laborInsertResponse inside Add Labor JSON Exception: "
-								+ laborInsertResponse);
+
 				singleton.setReloadPage(true);
 				e.printStackTrace();
 			}
@@ -564,6 +615,7 @@ public class AddLabor extends Activity {
 		}
 
 		protected void onPostExecute(final String result) {
+			Log.d("result", "--->" + result);
 			mProgressDialog.dismiss();
 			long laborInsertResponse = 0;
 			if (ServerUtilities.unknownHostException) {
@@ -571,12 +623,12 @@ public class AddLabor extends Activity {
 				Toast.makeText(getApplicationContext(),
 						"Sorry! Server could not be reached.",
 						Toast.LENGTH_LONG).show();
-				laborInsertResponse = dbAdapter.insertEntry(
-						singleton.getSelectedLaborName(),
-						singleton.getSelectedLaborTrade(),
-						singleton.getSelectedLaborClassification(),
-						singleton.getSelectedLaborHours(), "L", "I",
-						dbAdapter.generateOfflineEntryID());
+				// laborInsertResponse = dbAdapter.insertEntry(
+				// singleton.getSelectedLaborName(),
+				// singleton.getSelectedLaborTrade(),
+				// singleton.getSelectedLaborClassification(),
+				// singleton.getSelectedLaborHours(), "L", "I",
+				// dbAdapter.generateOfflineEntryID());
 			} else {
 				if (result != null) {
 					System.out.println("Add labor response: " + result);
@@ -590,49 +642,74 @@ public class AddLabor extends Activity {
 
 						if (Status.equals("Success") || StatusCode == 200
 								|| StatusCode == 0) {
-							laborInsertResponse = dbAdapter.insertEntry(
-									singleton.getSelectedLaborName(),
-									singleton.getSelectedLaborTrade(),
-									singleton.getSelectedLaborClassification(),
-									singleton.getSelectedLaborHours(), "L",
-									"N", jObject.getString("LID"));
-							Log.d("Labour", "---->" + laborInsertResponse);
+							if (singleton.isEnableOvertimeTracking()) {
 
+								laborInsertResponse = dbAdapter
+										.insertEntry(
+												singleton
+														.getSelectedLaborName(),
+												singleton
+														.getSelectedLaborTrade(),
+												singleton
+														.getSelectedLaborClassification(),
+												singleton
+														.getSelectedLaborHours(),
+												"L", "N", jObject
+														.getString("LID"),
+												Integer.parseInt(timeAndHalf
+														.getText().toString()),
+												Integer.parseInt(doubleTime
+														.getText().toString()));
+								Log.d("Labour", "---->" + laborInsertResponse);
+							} else {
+								laborInsertResponse = dbAdapter
+										.insertEntry(
+												singleton
+														.getSelectedLaborName(),
+												singleton
+														.getSelectedLaborTrade(),
+												singleton
+														.getSelectedLaborClassification(),
+												singleton
+														.getSelectedLaborHours(),
+												"L", "N", jObject
+														.getString("LID"), 0, 0);
+							}
 							System.out
 									.println("laborInsertResponse inside Add Labor Success: "
 											+ laborInsertResponse);
 							singleton.setReloadPage(true);
 						} else {
-							laborInsertResponse = dbAdapter.insertEntry(
-									singleton.getSelectedLaborName(),
-									singleton.getSelectedLaborTrade(),
-									singleton.getSelectedLaborClassification(),
-									singleton.getSelectedLaborHours(), "L",
-									"I", dbAdapter.generateOfflineEntryID());
-							System.out
-									.println("laborInsertResponse inside Add Labor Failure: "
-											+ laborInsertResponse);
-							singleton.setReloadPage(true);
+							// laborInsertResponse = dbAdapter.insertEntry(
+							// singleton.getSelectedLaborName(),
+							// singleton.getSelectedLaborTrade(),
+							// singleton.getSelectedLaborClassification(),
+							// singleton.getSelectedLaborHours(), "L",
+							// "I", dbAdapter.generateOfflineEntryID());
+							// System.out
+							// .println("laborInsertResponse inside Add Labor Failure: "
+							// + laborInsertResponse);
+							// singleton.setReloadPage(true);
 						}
 					} catch (JSONException e) {
-						laborInsertResponse = dbAdapter.insertEntry(
-								singleton.getSelectedLaborName(),
-								singleton.getSelectedLaborTrade(),
-								singleton.getSelectedLaborClassification(),
-								singleton.getSelectedLaborHours(), "L", "I",
-								dbAdapter.generateOfflineEntryID());
-						System.out
-								.println("laborInsertResponse inside Add Labor JSON Exception: "
-										+ laborInsertResponse);
+						// laborInsertResponse = dbAdapter.insertEntry(
+						// singleton.getSelectedLaborName(),
+						// singleton.getSelectedLaborTrade(),
+						// singleton.getSelectedLaborClassification(),
+						// singleton.getSelectedLaborHours(), "L", "I",
+						// dbAdapter.generateOfflineEntryID());
+						// System.out
+						// .println("laborInsertResponse inside Add Labor JSON Exception: "
+						// + laborInsertResponse);
 						e.printStackTrace();
 					}
 				} else {
-					laborInsertResponse = dbAdapter.insertEntry(
-							singleton.getSelectedLaborName(),
-							singleton.getSelectedLaborTrade(),
-							singleton.getSelectedLaborClassification(),
-							singleton.getSelectedLaborHours(), "L", "I",
-							dbAdapter.generateOfflineEntryID());
+					// laborInsertResponse = dbAdapter.insertEntry(
+					// singleton.getSelectedLaborName(),
+					// singleton.getSelectedLaborTrade(),
+					// singleton.getSelectedLaborClassification(),
+					// singleton.getSelectedLaborHours(), "L", "I",
+					// dbAdapter.generateOfflineEntryID());
 					System.out
 							.println("An error occurred! Could not add entry.");
 				}
@@ -704,7 +781,7 @@ public class AddLabor extends Activity {
 					// jsonAddLabor.put("UserId", singleton.getUserId());
 					System.out.println("labor sent id :"
 							+ singleton.getCurrentSelectedEntryID());
-					Log.d("back responce","--->"+jsonAddLabor);
+					Log.d("back responce", "--->" + jsonAddLabor);
 					return jsonDataPost.updateLaborEntry(jsonAddLabor);
 
 				} catch (JSONException e) {
@@ -719,8 +796,8 @@ public class AddLabor extends Activity {
 
 		protected void onPostExecute(final String result) {
 			long laborUpdateResponse = 0;
-			
-			Log.d("labour update responce","--->"+result);
+
+			Log.d("labour update responce", "--->" + result);
 			// mProgressDialog.dismiss();
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
@@ -729,24 +806,24 @@ public class AddLabor extends Activity {
 						Toast.LENGTH_LONG).show();
 
 				Log.d("offline entry", "--->" + singleton.isOfflineEntry());
-//				if (singleton.isOfflineEntry())
-//					laborUpdateResponse = dbAdapter.updateEntry(
-//							singleton.getSelectedLaborName(),
-//							singleton.getSelectedLaborTrade(),
-//							singleton.getSelectedLaborClassification(),
-//							singleton.getSelectedLaborHours(),
-//							"L",
-//							"I",
-//							"OF"
-//									+ String.valueOf(singleton
-//											.getCurrentSelectedEntryID()));
-//				else
-					laborUpdateResponse = dbAdapter.updateEntry(singleton
-							.getSelectedLaborName(), singleton
-							.getSelectedLaborTrade(), singleton
-							.getSelectedLaborClassification(), singleton
-							.getSelectedLaborHours(), "L", "U", String
-							.valueOf(singleton.getCurrentSelectedEntryID()));
+				// if (singleton.isOfflineEntry())
+				// laborUpdateResponse = dbAdapter.updateEntry(
+				// singleton.getSelectedLaborName(),
+				// singleton.getSelectedLaborTrade(),
+				// singleton.getSelectedLaborClassification(),
+				// singleton.getSelectedLaborHours(),
+				// "L",
+				// "I",
+				// "OF"
+				// + String.valueOf(singleton
+				// .getCurrentSelectedEntryID()));
+				// else
+				laborUpdateResponse = dbAdapter.updateEntry(
+						singleton.getSelectedLaborName(),
+						singleton.getSelectedLaborTrade(),
+						singleton.getSelectedLaborClassification(),
+						singleton.getSelectedLaborHours(), "L", "U",
+						String.valueOf(singleton.getCurrentSelectedEntryID()));
 			} else {
 				if (result != null) {
 					System.out.println("Update labor response: " + result);
@@ -762,44 +839,20 @@ public class AddLabor extends Activity {
 										"N", String.valueOf(singleton
 												.getCurrentSelectedEntryID()));
 					} else {
-//						if (singleton.isOfflineEntry())
-//							laborUpdateResponse = dbAdapter
-//									.updateEntry(
-//											singleton.getSelectedLaborName(),
-//											singleton.getSelectedLaborTrade(),
-//											singleton
-//													.getSelectedLaborClassification(),
-//											singleton.getSelectedLaborHours(),
-//											"L",
-//											"I",
-//											"OF"
-//													+ String.valueOf(singleton
-//															.getCurrentSelectedEntryID()));
-//						else
-							laborUpdateResponse = dbAdapter.updateEntry(
-									singleton.getSelectedLaborName(), singleton
-											.getSelectedLaborTrade(), singleton
-											.getSelectedLaborClassification(),
-									singleton.getSelectedLaborHours(), "L",
-									"U", String.valueOf(singleton
-											.getCurrentSelectedEntryID()));
-					}
-
-				} else {
-					System.out
-							.println("An error occurred! Could not update entry.");
-//					if (singleton.isOfflineEntry())
-//						laborUpdateResponse = dbAdapter.updateEntry(
-//								singleton.getSelectedLaborName(),
-//								singleton.getSelectedLaborTrade(),
-//								singleton.getSelectedLaborClassification(),
-//								singleton.getSelectedLaborHours(),
-//								"L",
-//								"I",
-//								"OF"
-//										+ String.valueOf(singleton
-//												.getCurrentSelectedEntryID()));
-//					else
+						// if (singleton.isOfflineEntry())
+						// laborUpdateResponse = dbAdapter
+						// .updateEntry(
+						// singleton.getSelectedLaborName(),
+						// singleton.getSelectedLaborTrade(),
+						// singleton
+						// .getSelectedLaborClassification(),
+						// singleton.getSelectedLaborHours(),
+						// "L",
+						// "I",
+						// "OF"
+						// + String.valueOf(singleton
+						// .getCurrentSelectedEntryID()));
+						// else
 						laborUpdateResponse = dbAdapter
 								.updateEntry(
 										singleton.getSelectedLaborName(),
@@ -809,6 +862,29 @@ public class AddLabor extends Activity {
 										singleton.getSelectedLaborHours(), "L",
 										"U", String.valueOf(singleton
 												.getCurrentSelectedEntryID()));
+					}
+
+				} else {
+					System.out
+							.println("An error occurred! Could not update entry.");
+					// if (singleton.isOfflineEntry())
+					// laborUpdateResponse = dbAdapter.updateEntry(
+					// singleton.getSelectedLaborName(),
+					// singleton.getSelectedLaborTrade(),
+					// singleton.getSelectedLaborClassification(),
+					// singleton.getSelectedLaborHours(),
+					// "L",
+					// "I",
+					// "OF"
+					// + String.valueOf(singleton
+					// .getCurrentSelectedEntryID()));
+					// else
+					laborUpdateResponse = dbAdapter.updateEntry(singleton
+							.getSelectedLaborName(), singleton
+							.getSelectedLaborTrade(), singleton
+							.getSelectedLaborClassification(), singleton
+							.getSelectedLaborHours(), "L", "U", String
+							.valueOf(singleton.getCurrentSelectedEntryID()));
 				}
 			}
 			singleton.setReloadPage(true);
@@ -939,63 +1015,68 @@ public class AddLabor extends Activity {
 
 	private void readDataFromDB() {
 		if (singleton.getSelectedActivityID() == 0) {
-			if (singleton.getSelectedTaskID() == 0) {
+
+			if (singleton.isEnableOvertimeTracking()) {
+				Log.d("shidt enabled",
+						"--->" + singleton.isEnableOvertimeTracking());
 				long insertEntities = dbAdapter.insertEntryOffline(
-						singleton.getSelectedLaborName(),
+
+				singleton.getSelectedLaborName(),
 						singleton.getSelectedLaborTrade(),
 						singleton.getSelectedLaborClassification(),
-						singleton.getSelectedLaborHours(),
-						"L",
-						"N",
-						"0",
-						singleton.getSelectedTaskIdentityoffline(),
+						singleton.getSelectedLaborHours(), "L", "N", "0",
+						singleton.getSelectedTaskID(),
 						singleton.getselectedActivityIdentityoffline(),
-						"offline");
-				Log.d("en_insert labour 0 id", "----->" + insertEntities + "  "
-						+ singleton.getSelectedTaskIdentityoffline() + "  "
-						+ singleton.getSelectedActivityID());
-				long updateEntity = dbAdapter.updateActivity(
-						singleton.getSelectedTaskIdentityoffline(),
-						singleton.getSelectedActivityID());
-				Log.d("en_insert labour 0 id", "----->" + insertEntities + " "
-						+ updateEntity);
+						"offline",
+						Integer.parseInt(timeAndHalf.getText().toString()),
+						Integer.parseInt(doubleTime.getText().toString()));
+
 			} else {
-				
-				
-				
+
 				long insertEntities = dbAdapter.insertEntryOffline(
-						
-						singleton.getSelectedLaborName(),
+
+				singleton.getSelectedLaborName(),
 						singleton.getSelectedLaborTrade(),
 						singleton.getSelectedLaborClassification(),
-						singleton.getSelectedLaborHours(),
-						"L",
-						"N",
-						"0",
+						singleton.getSelectedLaborHours(), "L", "N", "0",
 						singleton.getSelectedTaskID(),
 						singleton.getselectedActivityIdentityoffline(),
-						"offline");
-				long updateEntity = dbAdapter.updateActivity(
-						singleton.getSelectedTaskID(),
-						singleton.getSelectedActivityID());
-				Log.d("en_insert labour 0 id", "----->" + insertEntities + " "
-						+ updateEntity);
+						"offline", 0, 0);
+
 			}
 
-		} else {
-			long insertEntities = dbAdapter.insertEntryOffline(
-					singleton.getSelectedLaborName(),
-					singleton.getSelectedLaborTrade(),
-					singleton.getSelectedLaborClassification(),
-					singleton.getSelectedLaborHours(), "L", "N", "0",
-					singleton.getSelectedTaskID(),
-					singleton.getSelectedActivityID(), "offline");
 			long updateEntity = dbAdapter.updateActivity(
 					singleton.getSelectedTaskID(),
 					singleton.getSelectedActivityID());
-			Log.d("en_insert with offline ", "----->" + insertEntities + " "
-					+ updateEntity);
+			Log.d("en_insert labour 0 id", "----->" + updateEntity);
 
+		} else {
+			if (singleton.isEnableOvertimeTracking()) {
+				Log.d("shidt enabled",
+						"--->" + singleton.isEnableOvertimeTracking());
+				long insertEntities = dbAdapter.insertEntryOffline(
+						singleton.getSelectedLaborName(),
+						singleton.getSelectedLaborTrade(),
+						singleton.getSelectedLaborClassification(),
+						singleton.getSelectedLaborHours(), "L", "N", "0",
+						singleton.getSelectedTaskID(),
+						singleton.getSelectedActivityID(), "offline",
+						Integer.parseInt(timeAndHalf.getText().toString()),
+						Integer.parseInt(doubleTime.getText().toString()));
+
+			} else {
+				long insertEntities = dbAdapter.insertEntryOffline(
+						singleton.getSelectedLaborName(),
+						singleton.getSelectedLaborTrade(),
+						singleton.getSelectedLaborClassification(),
+						singleton.getSelectedLaborHours(), "L", "N", "0",
+						singleton.getSelectedTaskID(),
+						singleton.getSelectedActivityID(), "offline", 0, 0);
+			}
+			long updateEntity = dbAdapter.updateActivity(
+					singleton.getSelectedTaskID(),
+					singleton.getSelectedActivityID());
+			Log.d("en_insert with offline ", "----->" + updateEntity);
 		}
 		singleton.setReloadPage(true);
 		onBackPressed();

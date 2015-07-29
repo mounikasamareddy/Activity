@@ -14,12 +14,12 @@
         android:padding="0.0dip" >
 
         <ImageView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="450dp"
+            android:layout_height="60dp"
             android:layout_gravity="center"
             android:contentDescription="@null"
             android:gravity="center"
-            android:src="@drawable/notevault_logo_cya_150" >
+            android:src="@drawable/logob" >
         </ImageView>
 
        <ImageView
@@ -190,7 +190,7 @@
             android:layout_marginTop="20dp"
             android:background="#FFA500"
             android:gravity="center"
-            android:text="Sign up"
+            android:text="SIGN UP"
             android:textColor="#FFFFFF"
             android:onClick="signUp" />
     </LinearLayout>

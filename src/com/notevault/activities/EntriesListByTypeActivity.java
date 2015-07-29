@@ -1,7 +1,6 @@
 package com.notevault.activities;
 
 import java.security.SecureRandom;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +16,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,7 +32,6 @@ import com.notevault.adapter.EntriesListAdapteroffline;
 import com.notevault.arraylistsupportclasses.EntityAlign;
 import com.notevault.arraylistsupportclasses.EntityDB;
 import com.notevault.arraylistsupportclasses.EntityData;
-
 import com.notevault.arraylistsupportclasses.GroupData;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
@@ -42,7 +43,7 @@ public class EntriesListByTypeActivity extends Activity {
 	Singleton singleton;
 	String values[];
 	ArrayList<String> entries = new ArrayList<String>();
-
+	private ProgressDialog mdialog;
 	private CustomAdapter mAdapter;
 	private EntriesAdapter mAdapter1;
 	public static int reload = 0;
@@ -58,16 +59,16 @@ public class EntriesListByTypeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.types_activity);
-		
+
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		singleton = Singleton.getInstance();
 		ls = (ListView) findViewById(R.id.groupedlist);
 		ls2 = (ListView) findViewById(R.id.groupedlist2);
 
 		if (singleton.isOnline()) {
-			entries.clear();
-			Utilities.groupdata.clear();
 			
+			Utilities.groupdata.clear();
+			entries.clear();
 			new GetLaborEntries().execute();
 
 		} else {
@@ -82,6 +83,7 @@ public class EntriesListByTypeActivity extends Activity {
 
 	protected void onResume() {
 		super.onResume();
+		entries.clear();
 		Log.d("grouped onresume", "-->" + singleton.isReloadPage());
 		if (reload == 1) {
 			reload = 0;
@@ -93,7 +95,6 @@ public class EntriesListByTypeActivity extends Activity {
 		if (singleton.isOnline()) {
 			if (singleton.isReloadPage()) {
 				System.out.println("Reloading the page.");
-				
 
 				singleton.setReloadPage(false);
 				this.onCreate(null);
@@ -154,7 +155,12 @@ public class EntriesListByTypeActivity extends Activity {
 	}
 
 	public class GetLaborEntries extends AsyncTask<Void, Void, String> {
-
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			mhandler.sendEmptyMessage(0);
+		}
 		@Override
 		protected String doInBackground(Void... arg0) {
 
@@ -229,7 +235,7 @@ public class EntriesListByTypeActivity extends Activity {
 					try {
 						JSONObject jsonObj = new JSONObject(
 								laborEntriesResponseJSONObj);
-						entries.clear();
+						
 						if (jsonObj.getInt("Status") == 0
 								|| jsonObj.getInt("Status") == 200) {
 							System.out
@@ -237,7 +243,7 @@ public class EntriesListByTypeActivity extends Activity {
 							String entriesString = jsonObj
 									.getString("Lentries");
 							JSONArray jsonArray = new JSONArray(entriesString);
-							Log.d("length","--->"+jsonArray.length());
+							Log.d("length", "--->" + jsonArray.length());
 							if (jsonArray.length() > 0) {
 
 								GroupData data1 = new GroupData();
@@ -249,6 +255,8 @@ public class EntriesListByTypeActivity extends Activity {
 								data1.setTrade(str);
 								data1.setClassification(str);
 								data1.setHrs(0);
+								data1.setTimeandhalf(0);
+								data1.setDoubletime(0);
 								data1.setEId(0);
 								Utilities.groupdata.add(data1);
 
@@ -265,6 +273,18 @@ public class EntriesListByTypeActivity extends Activity {
 											"\\", "");
 									String classification = e.getString("Cl")
 											.replace("\\", "");
+									Log.d("data","--->"+e.getString("TH")+"...");
+									double timeandhours=0;
+									double doubletime=0;
+									if(e.getString("TH").equals(""))
+									{
+										 timeandhours=0;
+										 doubletime=0;
+									}else{
+										 timeandhours = e.getDouble("TH");
+
+										doubletime = e.getDouble("DT");
+									}
 									double hour = e.getDouble("H");
 									String id = String.valueOf(e.getInt("I"));
 									String dateCreated = e.getString("D");
@@ -272,7 +292,8 @@ public class EntriesListByTypeActivity extends Activity {
 									entries.add(type + glue + name + glue
 											+ trade + glue + classification
 											+ glue + hour + glue + id + glue
-											+ dateCreated);
+											+ dateCreated + glue + timeandhours
+											+ glue + doubletime);
 
 									Log.d("check", "--->" + type + glue + name
 											+ glue + trade + glue
@@ -284,6 +305,8 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setTrade(trade);
 									data.setClassification(classification);
 									data.setHrs(hour);
+									data.setTimeandhalf(timeandhours);
+									data.setDoubletime(doubletime);
 									data.setEId(Integer.parseInt(id));
 									Utilities.groupdata.add(data);
 								}
@@ -312,7 +335,29 @@ public class EntriesListByTypeActivity extends Activity {
 			}
 		}
 	}
+	Handler mhandler = new Handler() {
 
+		public void handleMessage(Message msg) {
+
+			switch (msg.what) {
+			case 0:
+				mdialog = ProgressDialog
+						.show(EntriesListByTypeActivity.this, "", "Loading...!");
+				removeMessages(0);
+				break;
+			
+			case 1:
+				if (mdialog.isShowing()) 
+				{
+					mdialog.cancel();
+				}
+				removeMessages(2);
+				break;
+
+			}
+		}
+
+	};
 	private class GetEquipmentEntries extends AsyncTask<Void, Void, String> {
 
 		@Override
@@ -408,14 +453,19 @@ public class EntriesListByTypeActivity extends Activity {
 								data1.setClassification(str);
 								data1.setHrs(0);
 								data1.setEId(0);
+								data1.setTimeandhalf(0);
+								data1.setDoubletime(0);
 								Utilities.groupdata.add(data1);
 								// Populating data into lists.
 								for (int i = 0; i < jsonArray.length(); i++) {
 									GroupData data = new GroupData();
 									JSONObject e = jsonArray.getJSONObject(i);
-									String name = e.getString("Nm");
-									String company = e.getString("Com");
-									String status = e.getString("S");
+									String name = e.getString("Nm").replace(
+											"\\", "");
+									String company = e.getString("Com")
+											.replace("\\", "");
+									String status = e.getString("S").replace(
+											"\\", "");
 									String type = String.valueOf(e.getString(
 											"Type").charAt(0));
 									String id = String.valueOf(e.getInt("I"));
@@ -431,7 +481,7 @@ public class EntriesListByTypeActivity extends Activity {
 									entries.add(type + glue + name + glue
 											+ company + glue + status + glue
 											+ qty + glue + id + glue
-											+ dateCreated);
+											+ dateCreated + glue + 0 + glue + 0);
 
 									data.setHeadname("empty");
 									data.setType("Equipment");
@@ -440,6 +490,8 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setClassification(status);
 									data.setHrs(qty);
 									data.setEId(Integer.parseInt(id));
+									data.setTimeandhalf(0);
+									data.setDoubletime(0);
 									Utilities.groupdata.add(data);
 								}
 
@@ -559,14 +611,19 @@ public class EntriesListByTypeActivity extends Activity {
 								data1.setClassification(str);
 								data1.setHrs(0);
 								data1.setEId(0);
+								data1.setTimeandhalf(0);
+								data1.setDoubletime(0);
 								Utilities.groupdata.add(data1);
 								// Populating data into lists.
 								for (int i = 0; i < jsonArray.length(); i++) {
 									GroupData data = new GroupData();
 									JSONObject e = jsonArray.getJSONObject(i);
-									String name = e.getString("Nm");
-									String company = e.getString("Com");
-									String status = e.getString("S");
+									String name = e.getString("Nm").replace(
+											"\\", "");
+									String company = e.getString("Com")
+											.replace("\\", "");
+									String status = e.getString("S").replace(
+											"\\", "");
 									String type = String.valueOf(e.getString(
 											"Type").charAt(0));
 									String id = String.valueOf(e.getInt("I"));
@@ -576,7 +633,7 @@ public class EntriesListByTypeActivity extends Activity {
 									entries.add(type + glue + name + glue
 											+ company + glue + status + glue
 											+ qty + glue + id + glue
-											+ dateCreated);
+											+ dateCreated + glue + 0 + glue + 0);
 									data.setHeadname("empty");
 									data.setType("Material");
 									data.setName(name);
@@ -584,6 +641,8 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setClassification(status);
 									data.setHrs(qty);
 									data.setEId(Integer.parseInt(id));
+									data1.setTimeandhalf(0);
+									data1.setDoubletime(0);
 									Utilities.groupdata.add(data);
 
 								}
@@ -637,8 +696,9 @@ public class EntriesListByTypeActivity extends Activity {
 							.println("An error occurred! Could not fetch material entries.");
 				}
 			}
+			mhandler.sendEmptyMessage(1);
 		}
-
+		
 		private void writeEntriesToDB() {
 			long insertResponse = 0;
 			for (String value : entries) {
@@ -650,8 +710,12 @@ public class EntriesListByTypeActivity extends Activity {
 				// insertResponse =
 				// dbAdapter.insertEntry(entry[1],entry[2],entry[3],
 				// Double.parseDouble(entry[4]),entry[6],entry[0],"N",entry[5]);
+				// Log.d("@%$#^%^&^(*","--->"+entry[7]+" "+entry[8]);
+				
 				insertResponse = dbAdapter.insertEntry(entry[1], entry[2],
-						entry[3], entry[4], entry[0], "N", entry[5]);
+						entry[3], entry[4], entry[0], "N", entry[5],
+						(int) Double.parseDouble(entry[7]),
+						(int) Double.parseDouble(entry[8]));
 				Log.d("insert", "--->" + insertResponse);
 				System.out.println(value);
 			}
@@ -702,6 +766,8 @@ public class EntriesListByTypeActivity extends Activity {
 				details.setHR_QTY(val.getHR_QTY());
 				details.setTYPE(val.getType());
 				details.setAction(val.getAction());
+				details.setTimeandHalf(val.getTimeandHalf());
+				details.setDoubleTime(val.getDoubleTime());
 				Utilities.edata.add(details);
 
 			}
@@ -725,6 +791,8 @@ public class EntriesListByTypeActivity extends Activity {
 					align1.setHR_QTY(str);
 					align1.setTRD_COMP(str);
 					align1.setAction(str);
+					align1.setTimeandHalf(str);
+					align1.setDoubleTime(str);
 					Utilities.eAligndata.add(align1);
 
 					p++;
@@ -741,6 +809,8 @@ public class EntriesListByTypeActivity extends Activity {
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
 				align.setAction(Utilities.edata.get(i).getAction());
+				align.setTimeandHalf(Utilities.edata.get(i).getTimeandHalf());
+				align.setDoubleTime(Utilities.edata.get(i).getDoubleTime());
 				Utilities.eAligndata.add(align);
 			}
 
@@ -760,6 +830,8 @@ public class EntriesListByTypeActivity extends Activity {
 					align1.setHR_QTY(str);
 					align1.setTRD_COMP(str);
 					align1.setAction(str);
+					align1.setTimeandHalf(str);
+					align1.setDoubleTime(str);
 					Utilities.eAligndata.add(align1);
 					q++;
 				}
@@ -775,29 +847,34 @@ public class EntriesListByTypeActivity extends Activity {
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
 				align.setAction(Utilities.edata.get(i).getAction());
+				align.setTimeandHalf(Utilities.edata.get(i).getTimeandHalf());
+				align.setDoubleTime(Utilities.edata.get(i).getDoubleTime());
 				Utilities.eAligndata.add(align);
 			}
 
 		}
-		
-		int r=0;
+
+		int r = 0;
 		for (int i = 0; i < Utilities.edata.size(); i++) {
-if(r==0)
-{if (Utilities.edata.get(i).getTYPE().equals("M")) {
-	EntityAlign align1 = new EntityAlign();
-String str = "null";
-align1.setHeader("Material");
-align1.setEIdentity(0);
-align1.setID(0);
-align1.setTYPE(str);
-align1.setNAME(str);
-align1.setCLASSI_STAT(str);
-align1.setHR_QTY(str);
-align1.setTRD_COMP(str);
-align1.setAction(str);
-Utilities.eAligndata.add(align1);
-	r++;
-}}
+			if (r == 0) {
+				if (Utilities.edata.get(i).getTYPE().equals("M")) {
+					EntityAlign align1 = new EntityAlign();
+					String str = "null";
+					align1.setHeader("Material");
+					align1.setEIdentity(0);
+					align1.setID(0);
+					align1.setTYPE(str);
+					align1.setNAME(str);
+					align1.setCLASSI_STAT(str);
+					align1.setHR_QTY(str);
+					align1.setTRD_COMP(str);
+					align1.setAction(str);
+					align1.setTimeandHalf(str);
+					align1.setDoubleTime(str);
+					Utilities.eAligndata.add(align1);
+					r++;
+				}
+			}
 			if (Utilities.edata.get(i).getTYPE().equals("M")) {
 				EntityAlign align = new EntityAlign();
 				align.setHeader("Empty");
@@ -809,6 +886,8 @@ Utilities.eAligndata.add(align1);
 				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
 				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
 				align.setAction(Utilities.edata.get(i).getAction());
+				align.setTimeandHalf(Utilities.edata.get(i).getTimeandHalf());
+				align.setDoubleTime(Utilities.edata.get(i).getDoubleTime());
 				Utilities.eAligndata.add(align);
 			}
 
@@ -827,7 +906,9 @@ Utilities.eAligndata.add(align1);
 						+ Utilities.eAligndata.get(i).getCLASSI_STAT() + " "
 						+ Utilities.eAligndata.get(i).getHR_QTY() + " "
 						+ Utilities.eAligndata.get(i).getTYPE() + " "
-						+ Utilities.eAligndata.get(i).getAction());
+						+ Utilities.eAligndata.get(i).getAction()+ " "
+						+Utilities.eAligndata.get(i).getTimeandHalf()+ " "
+						+Utilities.eAligndata.get(i).getDoubleTime());
 
 				if (Utilities.eAligndata.get(i).getTYPE().equals("L")) {
 
@@ -846,8 +927,8 @@ Utilities.eAligndata.add(align1);
 			}
 		} else {
 			if (singleton.getselectedActivityIdentityoffline() != 0) {
-				dbAdapter.updateActivity(singleton
-						.getselectedActivityIdentityoffline());
+//				dbAdapter.updateActivity(singleton
+//						.getselectedActivityIdentityoffline());
 			}
 		}
 

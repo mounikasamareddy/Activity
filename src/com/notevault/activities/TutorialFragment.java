@@ -12,8 +12,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -44,7 +43,7 @@ public class TutorialFragment extends FragmentActivity{
         fragments.add(Fragment.instantiate(this, SecondFragment.class.getName()));
         fragments.add(Fragment.instantiate(this, ThirdFragment.class.getName()));
         fragments.add(Fragment.instantiate(this, TutorialFour.class.getName()));
-        fragments.add(Fragment.instantiate(this, GettingStarted.class.getName()));
+        fragments.add(Fragment.instantiate(this, SettingActivity1.class.getName()));
         this.mPagerAdapter  = new PagerAdapter1(super.getSupportFragmentManager(), fragments);
         ViewPager pager = (ViewPager)super.findViewById(R.id.viewpager);
         pager.setAdapter(this.mPagerAdapter);

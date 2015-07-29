@@ -14,6 +14,22 @@ int Tid;
 int Aid;
 String Edate;
 String Status;
+int doubletime;
+int timeandhalf;
+ 
+
+public int getDoubletime() {
+	return doubletime;
+}
+public void setDoubletime(int doubletime) {
+	this.doubletime = doubletime;
+}
+public int getTimeandhalf() {
+	return timeandhalf;
+}
+public void setTimeandhalf(int timeandhalf) {
+	this.timeandhalf = timeandhalf;
+}
 public int getEIdenty() {
 	return EIdenty;
 }

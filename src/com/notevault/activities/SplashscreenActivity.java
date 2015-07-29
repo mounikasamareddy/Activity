@@ -36,7 +36,7 @@ import com.notevault.support.Utilities;
 public class SplashscreenActivity extends Activity{
     private static int SPLASH_TIME_OUT = 500;
     Singleton singleton;
-    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences,settingshifttask,settingPreferences2;
     public static final String MyPREFERENCES = "MyPrefs" ;
     static BroadcastReceiver networkStateReceiver;
     Intent intent;
@@ -49,7 +49,7 @@ public class SplashscreenActivity extends Activity{
     String type = "";
     String action = "";
     //private ProgressDialog mProgressDialog;
-
+String welcomwName1=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -384,7 +384,8 @@ public class SplashscreenActivity extends Activity{
 								.getColumnIndex("SubID")));
 						singleton.setCompanyName(c.getString(c
 								.getColumnIndex("Company")));
-						singleton.setUsername(c.getString(c.getColumnIndex("displayname")));
+						welcomwName1=c.getString(c.getColumnIndex("displayname"));
+						singleton.setUsername(welcomwName1);
 						
 					}
 
@@ -484,11 +485,37 @@ public class SplashscreenActivity extends Activity{
                             if(settingPreferences.contains(String.valueOf(singleton.getUserId()))
                                     && settingPreferences.getString(String.valueOf(singleton.getUserId()), "").equalsIgnoreCase("true"))
                             {
+                            	
                                 singleton.setEnableTasks(true);
+                                Log.d("enabled","--->"+singleton.isEnableTasks());
                             }else{
                                 singleton.setEnableTasks(false);
+                                Log.d("enabled","--->"+singleton.isEnableTasks());
                             }
+                            
+                         
+                            settingshifttask = getSharedPreferences(SettingActivity.EnableSHIFTPREFERENCES, Context.MODE_PRIVATE);
 
+                            if(settingshifttask.contains(String.valueOf(singleton.getUserId()))
+                                    && settingshifttask.getString(String.valueOf(singleton.getUserId()), "").equalsIgnoreCase("true"))
+                            {
+                                singleton.setEnableShiftTracking(true);
+                                Log.d("enabled","--->"+singleton.isEnableShiftTracking());
+                            }else{
+                            	singleton.setEnableShiftTracking(false);
+                                Log.d("shiftenabled","--->"+singleton.isEnableShiftTracking());
+                            }
+                            
+                            
+                          settingPreferences2 = getSharedPreferences(SettingActivity.EnableOVERTIMETRACKPREFERENCES, Context.MODE_PRIVATE);
+
+                            if(settingPreferences2.contains(String.valueOf(singleton.getUserId()))
+                                    && settingPreferences2.getString(String.valueOf(singleton.getUserId()), "").equalsIgnoreCase("true"))
+                            {
+                                singleton.setEnableOvertimeTracking(true);
+                            }else{
+                            	singleton.setEnableOvertimeTracking(false);
+                            }
                             /**
                              * Update Singleton with server response.
                              */
@@ -503,7 +530,10 @@ public class SplashscreenActivity extends Activity{
                             singleton.setMNCID(obj.getJSONObject("id").getInt("MNCID"));
                             singleton.setSubscriberId(obj.getJSONObject("id").getInt("SubID"));
                             singleton.setCompanyName(obj.getJSONObject("id").getString("Company"));
-                            singleton.setUsername(obj.getJSONObject("id").getString("DisplayName"));
+                           
+                            welcomwName1=obj.getJSONObject("id").getString("DisplayName");
+    						singleton.setUsername(welcomwName1);
+                         
                             JSONArray projects = obj.getJSONArray("p");
                             singleton.getProjectsList().clear();
                             LoginActivity.projectsListStatus.clear();

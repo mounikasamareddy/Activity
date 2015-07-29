@@ -163,7 +163,7 @@ public class EquipmentCompanyList extends Activity{
                     for(int i=0; i < equipmentCompanyArray.length(); i++) {
                         JSONObject equipmentCompany = equipmentCompanyArray.getJSONObject(i);
                         company.add(equipmentCompany.getString("W").replace("\\", ""));
-                        dbAdapter.insertGlossary(singleton.getCCID(), equipmentCompany.getString("W"));
+                        dbAdapter.insertGlossary(singleton.getCCID(), equipmentCompany.getString("W").replace("\\", ""));
                     }
                     setAdapter();
                 } catch (JSONException e) {

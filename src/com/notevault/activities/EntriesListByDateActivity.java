@@ -1,40 +1,5 @@
 package com.notevault.activities;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.notevault.activities.ActivitiesListActivity.SwipeListAdapter;
-import com.notevault.adapter.EntriesAdapter;
-import com.notevault.adapter.TaskAdapter;
-import com.notevault.arraylistsupportclasses.EntitiAlignDate;
-import com.notevault.arraylistsupportclasses.EntityAlign;
-import com.notevault.arraylistsupportclasses.EntityDB;
-import com.notevault.arraylistsupportclasses.EntityData;
-import com.notevault.arraylistsupportclasses.ProjectData;
-import com.notevault.arraylistsupportclasses.TaskData;
-import com.notevault.arraylistsupportclasses.TasksDB;
-import com.notevault.datastorage.DBAdapter;
-import com.notevault.pojo.Singleton;
-import com.notevault.support.ServerUtilities;
-import com.notevault.support.Utilities;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,22 +14,55 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.notevault.adapter.EntriesAdapter;
+import com.notevault.arraylistsupportclasses.EntitiAlignDate;
+import com.notevault.arraylistsupportclasses.EntityDB;
+import com.notevault.arraylistsupportclasses.EntityData;
+import com.notevault.datastorage.DBAdapter;
+import com.notevault.pojo.Singleton;
+import com.notevault.support.ServerUtilities;
+import com.notevault.support.Utilities;
+
 public class EntriesListByDateActivity extends Activity {
 
+	private ProgressDialog mdialog;
 	Singleton singleton;
 	DBAdapter dbAdapter;
-	ListView entriesListView,enteredlist;
+	ListView entriesListView, enteredlist;
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	public ArrayList<String> dateList = new ArrayList<String>();
 	public Set<String> dateSorted = new HashSet<String>();
 	public static ArrayList<String> collectiveConcatenatedEntryList = new ArrayList<String>();
 	public ArrayList<String> allEntriesID = new ArrayList<String>();
+	public ArrayList<String> datevalues = new ArrayList<String>();
 	public ArrayList<String> sortedListByDate = new ArrayList<String>();
 	String values[];
 	public String glue = "-~-";
 	LinearLayout hintMessage;
 	private EntriesAdapter mAdapter1;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		System.out.println("On create called.");
@@ -72,13 +70,13 @@ public class EntriesListByDateActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.entered_activity);
 		hintMessage = (LinearLayout) findViewById(R.id.hintMessage_layout);
-		enteredlist=(ListView)findViewById(R.id.enteredlist2);
+		enteredlist = (ListView) findViewById(R.id.enteredlist2);
 		singleton = Singleton.getInstance();
 		collectiveConcatenatedEntryList.clear();
-	
+
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		if (singleton.isOnline()) {
-			
+
 			getEntries();
 			mAdapter1 = new EntriesAdapter(EntriesListByDateActivity.this);
 			enteredlist.setAdapter(mAdapter1);
@@ -126,13 +124,14 @@ public class EntriesListByDateActivity extends Activity {
 		@Override
 		public View getView(final int position, View convertView,
 				ViewGroup parent) {
+
 			LayoutInflater li = getLayoutInflater();
 			convertView = li.inflate(R.layout.customlist2, null);
 			TextView tv = (TextView) convertView.findViewById(R.id.textView1);
 			TextView tv1 = (TextView) convertView.findViewById(R.id.textView2);
 			TextView tv2 = (TextView) convertView.findViewById(R.id.textView3);
 			TextView tv3 = (TextView) convertView.findViewById(R.id.textView4);
-
+			Log.d("adapter", "--->");
 			TextView roundTv = (TextView) convertView.findViewById(R.id.tv);
 
 			if (singleton.isOnline()) {
@@ -330,8 +329,9 @@ public class EntriesListByDateActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		System.out.println("Entries By Date On resume called.");
-		Log.d(" enteredonresume", "--->" + singleton.isReloadPage());
+
 		singleton.setReloadPage(true);
+		Log.d(" enteredonresume", "--->" + singleton.isReloadPage());
 		if (singleton.isOnline()) {
 			if (singleton.isReloadPage()) {
 				System.out.println("Reloading the page.");
@@ -354,6 +354,12 @@ public class EntriesListByDateActivity extends Activity {
 
 	private class GetLaborEntries extends AsyncTask<Void, Void, String> {
 
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			mhandler.sendEmptyMessage(0);
+		}
 		@Override
 		protected String doInBackground(Void... arg0) {
 
@@ -416,6 +422,7 @@ public class EntriesListByDateActivity extends Activity {
 
 		protected void onPostExecute(final String laborEntriesResponseJSONObj) {
 			// ArrayList<String> lid = new ArrayList<String>();
+			Log.d("labor response", "--->" + laborEntriesResponseJSONObj);
 			System.out
 					.println("labor response: " + laborEntriesResponseJSONObj);
 			if (ServerUtilities.unknownHostException) {
@@ -449,6 +456,16 @@ public class EntriesListByDateActivity extends Activity {
 									String classification = e.getString("Cl")
 											.replace("\\", "");
 									double hour = e.getDouble("H");
+									double timeandhours = 0;
+									double doubletime = 0;
+									if (e.getString("TH").equals("")) {
+										timeandhours = 0;
+										doubletime = 0;
+									} else {
+										timeandhours = e.getDouble("TH");
+
+										doubletime = e.getDouble("DT");
+									}
 									String id = String.valueOf(e.getInt("I"));
 									String dateCreated = e.getString("D");
 									// String desc = e.getString("N");
@@ -458,21 +475,31 @@ public class EntriesListByDateActivity extends Activity {
 									// + glue + name + glue + trade + glue +
 									// classification + glue + hour + glue + id
 									// + glue + desc);
-//									dateCreated=dateCreated.replace("-","");
-//									dateCreated=dateCreated.replace(" ", "");
-//									dateCreated=dateCreated.replace(":", "");
+									// dateCreated=dateCreated.replace("-","");
+									// dateCreated=dateCreated.replace(" ", "");
+									// dateCreated=dateCreated.replace(":", "");
 									collectiveConcatenatedEntryList.add(type
 											+ glue + name + glue + trade + glue
 											+ classification + glue + hour
-											+ glue + id + glue + dateCreated);
-									
-									
-									Log.d("dateCreated","--->"+dateCreated);
+											+ glue + id + glue + dateCreated
+											+ glue + timeandhours + glue
+											+ doubletime);
+
+									Log.d("dateCreated", "--->" + dateCreated);
 								}
-//								for(int i=0;i<collectiveConcatenatedEntryList.size();i++)
-//								{
-//									Log.d("collectiveConcatenatedEntryList","--->"+collectiveConcatenatedEntryList.get(i));
-//								}
+
+								for (int j = 0; j < collectiveConcatenatedEntryList
+										.size(); j++) {
+									Log.d("collectives",
+											"--->"
+													+ collectiveConcatenatedEntryList
+															.get(j));
+								}
+								// for(int
+								// i=0;i<collectiveConcatenatedEntryList.size();i++)
+								// {
+								// Log.d("collectiveConcatenatedEntryList","--->"+collectiveConcatenatedEntryList.get(i));
+								// }
 								System.out
 										.println("Debugging SortedListByDate : ..... "
 												+ collectiveConcatenatedEntryList);
@@ -504,7 +531,29 @@ public class EntriesListByDateActivity extends Activity {
 			}
 		}
 	}
+	Handler mhandler = new Handler() {
 
+		public void handleMessage(Message msg) {
+
+			switch (msg.what) {
+			case 0:
+				mdialog = ProgressDialog
+						.show(EntriesListByDateActivity.this, "", "Loading...!");
+				removeMessages(0);
+				break;
+			
+			case 1:
+				if (mdialog.isShowing()) 
+				{
+					mdialog.cancel();
+				}
+				removeMessages(2);
+				break;
+
+			}
+		}
+
+	};
 	private class GetEquipmentEntries extends AsyncTask<Void, Void, String> {
 
 		@Override
@@ -570,7 +619,9 @@ public class EntriesListByDateActivity extends Activity {
 		}
 
 		protected void onPostExecute(
-				final String equipmentEntriesResponseJSONObj) {
+
+		final String equipmentEntriesResponseJSONObj) {
+			Log.d("euitment response", "--->" + equipmentEntriesResponseJSONObj);
 			// ArrayList<String> eid = new ArrayList<String>();
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
@@ -602,7 +653,7 @@ public class EntriesListByDateActivity extends Activity {
 									// String desc = e.getString("N");
 									// eid.add(id);
 									dateList.add(dateCreated);
-								
+
 									// collectiveConcatenatedEntryList.add(type
 									// + glue + name + glue + company + glue +
 									// status + glue + qty + glue + id + glue +
@@ -610,7 +661,8 @@ public class EntriesListByDateActivity extends Activity {
 									collectiveConcatenatedEntryList.add(type
 											+ glue + name + glue + company
 											+ glue + status + glue + qty + glue
-											+ id + glue + dateCreated);
+											+ id + glue + dateCreated + glue
+											+ 0 + glue + 0);
 									System.out.println("concatenated List: "
 											+ collectiveConcatenatedEntryList);
 								}
@@ -706,6 +758,8 @@ public class EntriesListByDateActivity extends Activity {
 
 		protected void onPostExecute(final String materialEntriesResponseJSONObj) {
 			// ArrayList<String> mid = new ArrayList<String>();
+
+			Log.d("response", "--->" + materialEntriesResponseJSONObj);
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
 				Toast.makeText(getApplicationContext(),
@@ -740,14 +794,18 @@ public class EntriesListByDateActivity extends Activity {
 									// + glue + name + glue + company + glue +
 									// status + glue + qty + glue + id + glue +
 									// desc);
-									
+
 									collectiveConcatenatedEntryList.add(type
 											+ glue + name + glue + company
 											+ glue + status + glue + qty + glue
-											+ id + glue + dateCreated);
-									for(int j=0;j<collectiveConcatenatedEntryList.size();j++)
-									{
-										Log.d("collectives","--->"+collectiveConcatenatedEntryList.get(j));
+											+ id + glue + dateCreated + glue
+											+ 0 + glue + 0);
+									for (int j = 0; j < collectiveConcatenatedEntryList
+											.size(); j++) {
+										Log.d("collectives",
+												"--->"
+														+ collectiveConcatenatedEntryList
+																.get(j));
 									}
 								}
 								// allEntriesID.addAll(mid);
@@ -775,6 +833,7 @@ public class EntriesListByDateActivity extends Activity {
 							.println("An error occurred! Could not fetch material entries.");
 				}
 			}
+			mhandler.sendEmptyMessage(1);
 		}
 
 		private void writeEntriesToDB() {
@@ -789,7 +848,9 @@ public class EntriesListByDateActivity extends Activity {
 				// dbAdapter.insertEntry(entry[1],entry[2],entry[3],
 				// Double.parseDouble(entry[4]),entry[6],entry[0],"N",entry[5]);
 				insertResponse = dbAdapter.insertEntry(entry[1], entry[2],
-						entry[3], entry[4], entry[0], "N", entry[5]);
+						entry[3], entry[4], entry[0], "N", entry[5],
+						(int) Double.parseDouble(entry[7]),
+						(int) Double.parseDouble(entry[8]));
 				Log.d("insert", "--->" + insertResponse);
 				System.out.println(value);
 			}
@@ -802,26 +863,36 @@ public class EntriesListByDateActivity extends Activity {
 
 		// ArrayList<String> sortedList = new ArrayList<String>();
 		if (!singleton.isOnline()) {
+
+			Log.d("online", "--->");
 			allEntriesID.clear();
+
+			for (int j = 0; j < collectiveConcatenatedEntryList.size(); j++) {
+				Log.d("collectives",
+						"--->" + collectiveConcatenatedEntryList.get(j));
+			}
 			for (String entry : collectiveConcatenatedEntryList) {
 				String[] params = entry.split(glue);
 				allEntriesID.add(params[5]);
+
+				Log.d("id", "--->" + params[5]);
 			}
 		}
 		// System.out.println("Collective Concatenated Entry List: " +
 		// collectiveConcatenatedEntryList);
+
 		sortedListByDate.clear();
 		dateSorted.clear();
 		dateSorted.addAll(dateList);
 		for (String date : dateSorted) {
-			// System.out.println("date : -----"+date);
+			System.out.println("date : -----" + date);
 			for (String entryListDate : collectiveConcatenatedEntryList) {
-				String currentListDate = entryListDate.substring(
-						entryListDate.lastIndexOf(glue) + 3,
-						entryListDate.length());
-				// System.out.println("currentListDate : "+currentListDate);
+				Log.d("id", "--->" + entryListDate);
+				String[] params = entryListDate.split(glue);
+				String currentListDate = params[6];
+				System.out.println("currentListDate : " + currentListDate);
 				if (date.equals(currentListDate)) {
-					// System.out.println("List to add : "+entryListDate);
+					System.out.println("List to add : " + entryListDate);
 					sortedListByDate.add(entryListDate);
 				}
 			}
@@ -909,24 +980,28 @@ public class EntriesListByDateActivity extends Activity {
 
 		for (int i = 0; i < Utilities.edata.size(); i++) {
 
-		
-				EntitiAlignDate align = new EntitiAlignDate(Utilities.edata.get(i).getEIDentity(),Utilities.edata.get(i).getID(),Utilities.edata.get(i).getTYPE()
-						,Utilities.edata.get(i).getNAME(),Utilities.edata.get(i).getCLASSI_STAT(),Utilities.edata.get(i).getHR_QTY(),Utilities.edata.get(i).getTRD_COMP(),
-						Utilities.edata.get(i).getAction(),Integer.parseInt(Utilities.edata.get(i).getDate()));
-				align.setEIdentity(Utilities.edata.get(i).getEIDentity());
-				align.setID(Utilities.edata.get(i).getID());
-				align.setTYPE(Utilities.edata.get(i).getTYPE());
-				align.setNAME(Utilities.edata.get(i).getNAME());
-				align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
-				align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
-				align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
-				align.setAction(Utilities.edata.get(i).getAction());
-				align.setDate(Integer.parseInt(Utilities.edata.get(i).getDate()));
-				Utilities.eAligndate.add(align);
-			
+			EntitiAlignDate align = new EntitiAlignDate(Utilities.edata.get(i)
+					.getEIDentity(), Utilities.edata.get(i).getID(),
+					Utilities.edata.get(i).getTYPE(), Utilities.edata.get(i)
+							.getNAME(),
+					Utilities.edata.get(i).getCLASSI_STAT(), Utilities.edata
+							.get(i).getHR_QTY(), Utilities.edata.get(i)
+							.getTRD_COMP(), Utilities.edata.get(i).getAction(),
+					Integer.parseInt(Utilities.edata.get(i).getDate()));
+			align.setEIdentity(Utilities.edata.get(i).getEIDentity());
+			align.setID(Utilities.edata.get(i).getID());
+			align.setTYPE(Utilities.edata.get(i).getTYPE());
+			align.setNAME(Utilities.edata.get(i).getNAME());
+			align.setCLASSI_STAT(Utilities.edata.get(i).getCLASSI_STAT());
+			align.setHR_QTY(Utilities.edata.get(i).getHR_QTY());
+			align.setTRD_COMP(Utilities.edata.get(i).getTRD_COMP());
+			align.setAction(Utilities.edata.get(i).getAction());
+			align.setDate(Integer.parseInt(Utilities.edata.get(i).getDate()));
+			Utilities.eAligndate.add(align);
 
 		}
-		Collections.sort(Utilities.eAligndate, new EntitiAlignDate.OrderByEDate());
+		Collections.sort(Utilities.eAligndate,
+				new EntitiAlignDate.OrderByEDate());
 		Log.d("eAligndate arraylength", "---->" + Utilities.eAligndate.size());
 		if (Utilities.eAligndate.size() > 0) {
 			for (int i = 0; i < Utilities.eAligndate.size(); i++) {
@@ -945,8 +1020,8 @@ public class EntriesListByDateActivity extends Activity {
 			}
 		} else {
 			if (singleton.getselectedActivityIdentityoffline() != 0) {
-				dbAdapter.updateActivity(singleton
-						.getselectedActivityIdentityoffline());
+				// dbAdapter.updateActivity(singleton
+				// .getselectedActivityIdentityoffline());
 			}
 		}
 		entriesListView = (ListView) findViewById(R.id.list);
@@ -956,8 +1031,6 @@ public class EntriesListByDateActivity extends Activity {
 		entriesListAdapter.notifyDataSetInvalidated();
 		enteredlist.setAdapter(mAdapter1);
 		singleton.setReloadPage(true);
-
-		
 
 	}
 }

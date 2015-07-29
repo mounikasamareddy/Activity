@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="-20dp"
-                 android:textColor="#f49800"
+                android:textColor="#f49800"
                 android:textSize="15dp" />
         </LinearLayout>
     </FrameLayout>
@@ -135,87 +135,139 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/llayout"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal" >
+        android:orientation="vertical"
+        android:visibility="gone" >
 
-        <ListView
-            android:id="@+id/list2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:fastScrollEnabled="true" />
+            android:orientation="horizontal" >
+
+            <ListView
+                android:id="@+id/list2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fastScrollEnabled="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/laboursummary1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/laboursummary"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:background="#f49800"
+                android:text="@string/laborsummary"
+                android:textColor="#ffff"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/activity_layout1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#EBEBE9"
+                android:orientation="vertical"
+                android:visibility="gone" >
+
+                <TextView
+                    android:id="@+id/text1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="You havent added an"
+                    android:textColor="#999999"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/text2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Activity yet. Tap the + button"
+                    android:textColor="#999999"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/text3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:text="to add an Activity."
+                    android:textColor="#999999"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/activity_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="95dp"
+                android:layout_gravity="center"
+                android:background="#EBEBE9"
+                android:gravity="center"
+                android:orientation="vertical"
+                 >
+
+                <TextView
+                    android:id="@+id/text4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Tap + to add an activity."
+                    android:textColor="#999999"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/text5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Swipe left to copy an activity."
+                    android:textColor="#999999"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 
-    <RelativeLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
     <LinearLayout
-        android:id="@+id/activity_layout1"
+        android:id="@+id/emptytext"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#EBEBE9"
+        android:layout_height="fill_parent"
         android:orientation="vertical"
-       	android:visibility="gone">
+        android:visibility="visible" >
 
-       <TextView
+        <TextView
             android:id="@+id/text1"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="You havent added an"
+            android:layout_height="match_parent"
+            android:background="#EBEBE9"
+            android:gravity="top|center"
+            android:paddingTop="150dip"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:text="
+You haven&apos;t added an Activity yet. Tap the + button to add an Activity."
             android:textColor="#999999"
             android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/text2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Activity yet. Tap the + button"
-            android:textColor="#999999"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/text3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="to add an Activity."
-            android:textColor="#999999"
-            android:textSize="18sp" /> 
     </LinearLayout>
 
-     <LinearLayout
-        android:id="@+id/activity_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="95dp"
-        android:layout_gravity="center"
-        android:background="#EBEBE9"
-        android:orientation="vertical"
-       	android:gravity="center"
-        android:visibility="visible">
-
-        <TextView
-            android:id="@+id/text4"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Tap + to add an activity."
-            android:textColor="#999999"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:id="@+id/text5"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Swipe left to copy an activity."
-            android:textColor="#999999"
-            android:textSize="18sp" />
-    </LinearLayout> 
-</RelativeLayout>
 </LinearLayout>

@@ -11,8 +11,10 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.notevault.support.ServerUtilities;
 
@@ -22,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -31,38 +34,42 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SignUpActivity extends Activity{
+public class SignUpActivity extends Activity {
 
-	private EditText companyNameEditText, userFirstNameEditText, userLastNameEditText, phoneEditText,
-	emailIdEditText,passwordEditText, zipEditText, countryEditText;
-	private String companyName, userFirstName, userLastName, phoneText, zipText, countryText, emailText, passwordText, leadSource;
-	private	ProgressDialog mProgressDialog;
+	private EditText companyNameEditText, userFirstNameEditText,
+			userLastNameEditText, phoneEditText, emailIdEditText,
+			passwordEditText, zipEditText, countryEditText;
+	private String companyName, userFirstName, userLastName, phoneText,
+			zipText, countryText, emailText, passwordText, leadSource;
+	private ProgressDialog mProgressDialog;
 	private boolean validEmail;
 	private boolean validPhone;
 	TextView backTextView;
-	ServerUtilities jsonDataPost = new ServerUtilities();
-	//Spinner spinner;
+	ServerUtilities jsonDataPost;
+	// Spinner spinner;
 	List<String> nameslist;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_registration);
-		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
-		companyNameEditText=(EditText)findViewById(R.id.company_editText1);
-		userFirstNameEditText=(EditText)findViewById(R.id.username_editText2);
-		userLastNameEditText=(EditText)findViewById(R.id.lastname_editText3);
-		phoneEditText=(EditText)findViewById(R.id.phone_editText4);
-		zipEditText = (EditText)findViewById(R.id.zip_editText);
-		countryEditText = (EditText)findViewById(R.id.country_editText);
-		emailIdEditText=(EditText)findViewById(R.id.email_editText5);
-		passwordEditText=(EditText)findViewById(R.id.password_editText6);
+		jsonDataPost = new ServerUtilities();
+		this.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		companyNameEditText = (EditText) findViewById(R.id.company_editText1);
+		userFirstNameEditText = (EditText) findViewById(R.id.username_editText2);
+		userLastNameEditText = (EditText) findViewById(R.id.lastname_editText3);
+		phoneEditText = (EditText) findViewById(R.id.phone_editText4);
+		zipEditText = (EditText) findViewById(R.id.zip_editText);
+		countryEditText = (EditText) findViewById(R.id.country_editText);
+		emailIdEditText = (EditText) findViewById(R.id.email_editText5);
+		passwordEditText = (EditText) findViewById(R.id.password_editText6);
 		passwordEditText.setTypeface(Typeface.DEFAULT);
-		
-		//spinner = (Spinner)findViewById(R.id.spinner1);
 
-		backTextView = (TextView)findViewById(R.id.textView1);
+		// spinner = (Spinner)findViewById(R.id.spinner1);
+
+		backTextView = (TextView) findViewById(R.id.textView1);
 		backTextView.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -71,7 +78,7 @@ public class SignUpActivity extends Activity{
 
 			}
 		});
-	
+
 		nameslist = new ArrayList<String>();
 		nameslist.add("How did you refer us?");
 		nameslist.add("Friend's Referral");
@@ -82,29 +89,30 @@ public class SignUpActivity extends Activity{
 		nameslist.add("Evernote");
 		nameslist.add("Box");
 		nameslist.add("TV/Radio");
-		//ArrayAdapter<String> adapter = 	new ArrayAdapter<String> (this,android.R.layout.simple_spinner_item,nameslist);
-		//adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-		//spinner.setAdapter(adapter);
-		/*spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-		    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-		        Object item = parent.getItemAtPosition(pos);
-		        leadSource = item.toString();
-		        System.out.println("leadSource........"+leadSource);
-		     
-		    }
-		    public void onNothingSelected(AdapterView<?> parent) {
-		    }
-		});*/
+		// ArrayAdapter<String> adapter = new ArrayAdapter<String>
+		// (this,android.R.layout.simple_spinner_item,nameslist);
+		// adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+		// spinner.setAdapter(adapter);
+		/*
+		 * spinner.setOnItemSelectedListener(new
+		 * AdapterView.OnItemSelectedListener() { public void
+		 * onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+		 * Object item = parent.getItemAtPosition(pos); leadSource =
+		 * item.toString(); System.out.println("leadSource........"+leadSource);
+		 * 
+		 * } public void onNothingSelected(AdapterView<?> parent) { } });
+		 */
 	}
+
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
 	}
 
-	public void signUp(View v){
+	public void signUp(View v) {
 		mProgressDialog = new ProgressDialog(SignUpActivity.this);
-		mProgressDialog = new ProgressDialog(SignUpActivity.this);
+		// mProgressDialog = new ProgressDialog(SignUpActivity.this);
 		mProgressDialog.setMessage("Loading...");
 		mProgressDialog.setIndeterminate(false);
 		companyName = companyNameEditText.getText().toString().trim();
@@ -115,44 +123,31 @@ public class SignUpActivity extends Activity{
 		countryText = countryEditText.getText().toString().trim();
 		emailText = emailIdEditText.getText().toString().trim();
 		passwordText = passwordEditText.getText().toString();
-		System.out.println("entered value........................"+userFirstName);
-		System.out.println("entered value........................"+userLastName);
-		System.out.println("entered value........................"+phoneText);
-		System.out.println("entered value........................"+zipText);
-		System.out.println("entered value........................"+countryText);
-		System.out.println("entered value........................"+emailText);
-		System.out.println("entered value........................"+companyName);
-		System.out.println("entered value........................"+passwordText);
+		System.out.println("Entered User FirstName:	" + userFirstName);
+		System.out.println("Entered User LastName:	" + userLastName);
+		System.out.println("Entered Phone No.:		" + phoneText);
+		System.out.println("Entered Zip Code:		" + zipText);
+		System.out.println("Entered Country:		" + countryText);
+		System.out.println("Entered Email:			" + emailText);
+		System.out.println("Entered Company:		" + companyName);
+		System.out.println("Entered Password:		" + passwordText);
 		String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 		validEmail = emailText.matches(emailPattern);
 		validPhone = android.util.Patterns.PHONE.matcher(phoneText).matches();
-		System.out.println("email is =="+String.valueOf(validEmail)+" " +" phone is=="+String.valueOf(validPhone));
-		if((!emailText.equals(""))){
-			System.out.println("email text");
+		System.out.println("email:	" + String.valueOf(validEmail) + ",		"
+				+ "phone:	" + String.valueOf(validPhone));
+		if ((!emailText.equals(""))) {
 			if ((!passwordText.equals(""))) {
-				System.out.println("passwordText");
 				if ((!userFirstName.equals(""))) {
-					System.out.println("userFirstName");
 					if ((!userLastName.equals(""))) {
-						System.out.println("userLastName");
 						if ((!phoneText.equals(""))) {
-							System.out.println("phoneText");
 							if ((!zipText.equals(""))) {
-								System.out.println("zipText");
 								if ((!countryText.equals(""))) {
-									System.out.println("countryText");
 									if (validEmail) {
-										System.out.println("validEmail");
 										if (validPhone) {
-											System.out.println("validPhone");
 											mProgressDialog.show();
-											RegisterTask registerTask=new RegisterTask();
+											RegisterTask registerTask = new RegisterTask();
 											registerTask.execute();
-											/*if (phoneText.length()==10) {
-										System.out.println("phoneText");
-										System.out.println("Balakrishna");
-
-									}*/
 										}
 									}
 								}
@@ -162,19 +157,18 @@ public class SignUpActivity extends Activity{
 				}
 			}
 
-
-		}
-		else{
-			Toast.makeText(SignUpActivity.this, "In Valid Fields.. Enter fields correctly", Toast.LENGTH_LONG).show();
+		} else {
+			Toast.makeText(SignUpActivity.this,
+					"In Valid Fields.. Enter fields correctly",
+					Toast.LENGTH_LONG).show();
 		}
 
 	}
-	private class RegisterTask extends AsyncTask<Void, Void, String> {
 
-		String userDetailsString;
+	private class RegisterTask extends AsyncTask<Void, Void, String> {
 		@Override
 		protected String doInBackground(Void... params) {
-			try{
+			try {
 				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 
 					@Override
@@ -184,7 +178,8 @@ public class SignUpActivity extends Activity{
 
 					@Override
 					public void checkClientTrusted(
-							java.security.cert.X509Certificate[] arg0, String arg1) {
+							java.security.cert.X509Certificate[] arg0,
+							String arg1) {
 					}
 
 					@Override
@@ -198,50 +193,87 @@ public class SignUpActivity extends Activity{
 
 					@Override
 					public boolean verify(String hostname, SSLSession session) {
-						// TODO Auto-generated method stub
 						return false;
 					}
-
-
 				};
 				SSLContext sc = SSLContext.getInstance("SSL");
 				sc.init(null, trustAllCerts, new SecureRandom());
-				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+				HttpsURLConnection.setDefaultSSLSocketFactory(sc
+						.getSocketFactory());
 				HttpsURLConnection.setDefaultHostnameVerifier(hv);
 
-				System.out.println("Registration task............");
 				try {
 
 					JSONObject jsonobj = new JSONObject();
-					jsonobj.put("FirstName",userFirstName);
-					jsonobj.put("LastName",userLastName);
-					jsonobj.put("Email",emailText);
-					jsonobj.put("Password",passwordText);
-					jsonobj.put("Phone",phoneText);
-					jsonobj.put("Company",companyName);
-					jsonobj.put("Country",countryText);
-					jsonobj.put("Zip",zipText);
-					jsonobj.put("LeadSource",leadSource);
-					userDetailsString = jsonDataPost.signUp(jsonobj);
+					jsonobj.put("FirstName", userFirstName);
+					jsonobj.put("LastName", userLastName);
+					jsonobj.put("Email", emailText);
+					jsonobj.put("Password", passwordText);
+					jsonobj.put("CompanyName", companyName);
+					jsonobj.put("Country", countryText);
+					jsonobj.put("Zip", zipText);
+					// jsonobj.put("LeadSource", leadSource);
+
+					System.out.println(jsonobj);
+
+					return jsonDataPost.signUp(jsonobj);
 
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 
-			}catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 			return null;
 		}
-		
+
 		@Override
-		protected void onPostExecute(String param) {
+		protected void onPostExecute(String response) {
+			Log.d("Signup response", "--->" + response);
+			if (ServerUtilities.unknownHostException) {
+				ServerUtilities.unknownHostException = false;
+				Toast.makeText(getApplicationContext(), "You are offline",
+						Toast.LENGTH_LONG).show();
+
+			} else {
+				System.out.println("Sign Up Response: " + response);
+				String signUpResponse = response;
+
+				if (signUpResponse != null && signUpResponse != "") {
+					try {
+						JSONObject signUpJSONResponse = new JSONObject(
+								signUpResponse);
+
+						if ((signUpJSONResponse.getInt("Status") == 0)
+								|| (signUpJSONResponse.getInt("Status") == 200)) {
+
+							Toast.makeText(getApplicationContext(),
+									"Registration Succesful",
+									Toast.LENGTH_SHORT).show();
+							Intent i = new Intent(SignUpActivity.this,
+									LoginActivity.class);
+							startActivity(i);
+							finish();
+
+						} else {
+							Toast.makeText(
+									getApplicationContext(),
+									"Could not Register! Please contact support.",
+									Toast.LENGTH_LONG).show();
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				} else {
+					System.out.println("An error occurred! Could not SignUp");
+					Toast.makeText(getApplicationContext(),
+							"An error occurred while signing up!",
+							Toast.LENGTH_LONG).show();
+				}
+			}
 			mProgressDialog.dismiss();
-			Toast.makeText(getApplicationContext(), "Registration Succesful", Toast.LENGTH_SHORT).show();
-			Intent gcmIntent = new Intent(SignUpActivity.this,GettingStarted.class);
-			startActivity(gcmIntent);
-			finish();
 		}
 	}
 }

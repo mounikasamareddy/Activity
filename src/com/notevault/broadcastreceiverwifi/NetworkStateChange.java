@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +37,7 @@ import com.notevault.activities.ClassificationList;
 import com.notevault.activities.EntriesListActivity;
 import com.notevault.activities.EntriesListByDateActivity;
 import com.notevault.activities.ProjectListActivity;
+import com.notevault.activities.SettingActivity;
 import com.notevault.activities.TasksListActivity;
 import com.notevault.adapter.TaskAdapter;
 import com.notevault.arraylistsupportclasses.ANetworkData;
@@ -60,6 +62,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 	int projectid;
 	int Tidentity;
 	String tName, newActivityName;
+	
 	Singleton singleton;
 	List<ActivityNetworkDB> data2, data1;
 	List<EntriesNetworkDB> entries1, entries2;
@@ -68,6 +71,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 	String Adate;
 	List<UpdateEntriesProjo> uEntries, uEntries1;
 	int AAid, ActivityofflineId;
+	Context context;
 	List<TasksDB> data;
 	int ID = 0, tasksize, activitysize, EPid, EAid, Etid, Eidentity1,
 			Eidentity2, Eidentity3;
@@ -75,7 +79,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-
+this.context=context;
 		singleton = Singleton.getInstance();
 		dbadapter = DBAdapter.get_dbAdapter(context);
 
@@ -94,20 +98,19 @@ public class NetworkStateChange extends BroadcastReceiver {
 				info = intent
 						.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
 				if (info.isConnected()) {
-
+					
 					Log.d("wifi Available ", "---->" + info.isConnected());
 					singleton.setOnline(true);
-					
-					Toast.makeText(context, "Netowk Available "+singleton.isOnline(), Toast.LENGTH_LONG).show();
+
 					ReadWifiData();
 				} else if (mobileDataEnabled) {
-					
+
 					Log.d("Netowk Available ", "---->" + mobileDataEnabled);
-					
+
 					ReadWifiData();
 				} else {
 					singleton.setOnline(false);
-					Toast.makeText(context, " No Netowk "+singleton.isOnline(), Toast.LENGTH_LONG).show();
+					
 					Log.d(" not Netowk Available ", "---->");
 				}
 
@@ -132,55 +135,42 @@ public class NetworkStateChange extends BroadcastReceiver {
 		List<UpdateEntriesProjo> uEntries = dbadapter
 				.getAllEntriesUpdateRecords("U");
 
-		delete1= dbadapter
-				.getAllEntriesUpdateRecords("D");
-		
-		
+		delete1 = dbadapter.getAllEntriesUpdateRecords("D");
+
 		Cursor c = dbadapter.queryCredentialsLogin();
 		Log.d("curfdsfdf", "--->" + c.getCount());
+		
+		Log.d("shift enabled","--->"+singleton.isEnableShiftTracking());
 		if (c.getCount() != 0) {
 
 			Log.d("curfdsfdf", "--->" + c.getCount());
-		if (c.moveToFirst()) {
-		
+			if (c.moveToFirst()) {
 
-			singleton.setUserId(c.getInt(c
-					.getColumnIndex("UserID")));
-			singleton.setAccountId(c.getInt(c
-					.getColumnIndex("AccountID")));
-			singleton.setCompanyId(c.getInt(c
-					.getColumnIndex("CompanyID")));
-			singleton.setLNCID(c.getInt(c
-					.getColumnIndex("LNPCID")));
-			singleton.setLTCID(c.getInt(c
-					.getColumnIndex("LTCID")));
-			singleton.setLCCID(c.getInt(c
-					.getColumnIndex("LCCID")));
-			singleton.setENCID(c.getInt(c
-					.getColumnIndex("ENCID")));
-			singleton.setCCID(c.getInt(c
-					.getColumnIndex("CCID")));
-			singleton.setMNCID(c.getInt(c
-					.getColumnIndex("MNCID")));
-			singleton.setSubscriberId(c.getInt(c
-					.getColumnIndex("SubID")));
-			singleton.setCompanyName(c.getString(c
-					.getColumnIndex("Company")));
-			singleton.setUsername(c.getString(c.getColumnIndex("displayname")));
-		
-			Log.d("network details online","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
-		}
+				singleton.setUserId(c.getInt(c.getColumnIndex("UserID")));
+				singleton.setAccountId(c.getInt(c.getColumnIndex("AccountID")));
+				singleton.setCompanyId(c.getInt(c.getColumnIndex("CompanyID")));
+				singleton.setLNCID(c.getInt(c.getColumnIndex("LNPCID")));
+				singleton.setLTCID(c.getInt(c.getColumnIndex("LTCID")));
+				singleton.setLCCID(c.getInt(c.getColumnIndex("LCCID")));
+				singleton.setENCID(c.getInt(c.getColumnIndex("ENCID")));
+				singleton.setCCID(c.getInt(c.getColumnIndex("CCID")));
+				singleton.setMNCID(c.getInt(c.getColumnIndex("MNCID")));
+				singleton.setSubscriberId(c.getInt(c.getColumnIndex("SubID")));
+				singleton.setCompanyName(c.getString(c
+						.getColumnIndex("Company")));
+				singleton.setUsername(c.getString(c
+						.getColumnIndex("displayname")));
+				
+				Log.d("network details online",
+						"--->" + singleton.getAccountId() + " "
+								+ singleton.getSubscriberId());
+			}
 
-		
-	
 		}
-		if(delete1.size()>0)
-		{
+		if (delete1.size() > 0) {
 			new DeleteLaborTask().execute();
-			
-		}
-		else if (uEntries.size() > 0) {
-			
+
+		} else if (uEntries.size() > 0) {
 
 			Log.d("readdata", "-->" + uEntries.size());
 			UpdateEntries updateLabor = new UpdateEntries();
@@ -188,14 +178,14 @@ public class NetworkStateChange extends BroadcastReceiver {
 		}
 
 		else if (data2.size() > 0) {
-		 Log.d("activity", "--->" + data2.size());
-		 ReadActivitydata();
-		 } else if (entries2.size() > 0) {
-		
-		 Log.d("entries", "--->" + entries2.size());
-		 readEntriesdata();
-		
-		 }
+			Log.d("activity", "--->" + data2.size());
+			ReadActivitydata();
+		} else if (entries2.size() > 0) {
+
+			Log.d("entries", "--->" + entries2.size());
+			readEntriesdata();
+
+		}
 
 	}
 
@@ -253,7 +243,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 						new EntiesLabourData().execute();
 					} else {
 						for (ActivityNetworkDB val : data1) {
-
+							Log.d("shift enabled","--->"+singleton.isEnableShiftTracking());
 							Log.d("Activity status offline",
 									"--->" + val.getAIdentity() + " "
 											+ val.getAId() + " "
@@ -262,7 +252,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 											+ val.getTid() + " "
 											+ val.getAstatus());
 
-							newActivityName = val.getAName().replace("@", "");
+							//newActivityName = val.getAName().replace("@", "");
 							singleton.setSelectedTaskID(val.getTid());
 							singleton.setCurrentSelectedDate(val.getADate());
 							Adate = val.getADate();
@@ -280,11 +270,15 @@ public class NetworkStateChange extends BroadcastReceiver {
 							JSONObject jsonAddActivity = new JSONObject();
 
 							jsonAddActivity.put("TaskId", AAid);
-							jsonAddActivity.put("Name", newActivityName);
+							jsonAddActivity.put("Name", val.getAName());
 							jsonAddActivity
 									.put("UserId", singleton.getUserId());
 							jsonAddActivity.put("DateCreated", GMTdateTime);
 							jsonAddActivity.put("ProjectDay", Adate);
+							
+							if (val.getShift()!=10) {
+							jsonAddActivity.put("Shift", val.getShift());
+							}
 							Log.d("details", "------>" + jsonAddActivity);
 							System.out.println("Request: jsonAddActivity: "
 									+ jsonAddActivity);
@@ -424,7 +418,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 									+ " " + singleton.getSubscriberId() + " "
 									+ EPid + " " + EAid + " " + entridate + " "
 									+ name + " " + trade + " " + clasification
-									+ " " + hours);
+									+ " " + hours+"..."+val.getDoubletime()+"..."+val.getTimeandhalf());
 
 							jsonAddLabor.put("AccountID",
 									singleton.getAccountId());
@@ -437,10 +431,15 @@ public class NetworkStateChange extends BroadcastReceiver {
 							jsonAddLabor.put("Trade", trade);
 							jsonAddLabor.put("Classification", clasification);
 							jsonAddLabor.put("Hours", hours);
-							// jsonAddLabor.put("Notes",
-							// singleton.getSelectedLaborDescription());
+							
 							jsonAddLabor.put("TaskId", val.getTid());
 							jsonAddLabor.put("UserId", singleton.getUserId());
+							if(val.getDoubletime()>0)
+							{
+								jsonAddLabor
+								.put("TimeAndHalf",val.getTimeandhalf() );
+								jsonAddLabor.put("DoubleTime",val.getDoubletime());
+							}
 							Log.d("details", "-->" + jsonAddLabor);
 							return jsonDataPost.addLaborEntry(jsonAddLabor);
 						}
@@ -813,48 +812,38 @@ public class NetworkStateChange extends BroadcastReceiver {
 				try {
 
 					List<UpdateEntriesProjo> uEntries1 = dbadapter
-							.getAllEntriesUpdateRecords("U","L");
-					Log.d("no labour update entries","--->"+uEntries1.size());
+							.getAllEntriesUpdateRecords("U", "L");
+					Log.d("no labour update entries", "--->" + uEntries1.size());
 					if (uEntries1.size() == 0) {
-						Log.d("no labour update entries","--->");
+						Log.d("no labour update entries", "--->");
 						new UpdateEntriesEquipment().execute();
 					} else {
 						for (UpdateEntriesProjo val1 : uEntries1) {
 
-							
-								Log.d("labour update",
-										"--->" + val1.getPID() + " "
-												+ val1.getAid() + " "
-												+ val1.getEId() + " "
-												+ val1.getEname() + " "
-												+ val1.getTRD_C() + " "
-												+ val1.getClassesI() + " ");
-								singleton.setCurrentSelectedEntryID(val1
-										.getEId());
-								JSONObject jsonAddLabor = new JSONObject();
-								jsonAddLabor.put("AccountID",
-										singleton.getAccountId());
-								jsonAddLabor.put("SubscriberID",
-										singleton.getSubscriberId());
-								jsonAddLabor.put("ProjectID", val1.getPID());
-								jsonAddLabor.put("ActivityId", val1.getAid());
-								jsonAddLabor.put("ID",
-										val1.getEId());
-								jsonAddLabor.put("Name", val1.getEname());
-								jsonAddLabor.put("Trade", val1.getTRD_C());
-								jsonAddLabor.put("Classification",
-										val1.getClassesI());
-								jsonAddLabor.put("Hours", val1.getHR_QTY());
-								// jsonAddLabor.put("Notes",
-								// singleton.getSelectedLaborDescription());
-								// jsonAddLabor.put("UserId",
-								// singleton.getUserId());
-								Log.d("labor sent id :","--->"
-										+ jsonAddLabor);
-								return jsonDataPost
-										.updateLaborEntry(jsonAddLabor);
-							
-						
+							Log.d("labour update", "--->" + val1.getPID() + " "
+									+ val1.getAid() + " " + val1.getEId() + " "
+									+ val1.getEname() + " " + val1.getTRD_C()
+									+ " " + val1.getClassesI() + " ");
+							singleton.setCurrentSelectedEntryID(val1.getEId());
+							JSONObject jsonAddLabor = new JSONObject();
+							jsonAddLabor.put("AccountID",
+									singleton.getAccountId());
+							jsonAddLabor.put("SubscriberID",
+									singleton.getSubscriberId());
+							jsonAddLabor.put("ProjectID", val1.getPID());
+							jsonAddLabor.put("ActivityId", val1.getAid());
+							jsonAddLabor.put("ID", val1.getEId());
+							jsonAddLabor.put("Name", val1.getEname());
+							jsonAddLabor.put("Trade", val1.getTRD_C());
+							jsonAddLabor.put("Classification",
+									val1.getClassesI());
+							jsonAddLabor.put("Hours", val1.getHR_QTY());
+							// jsonAddLabor.put("Notes",
+							// singleton.getSelectedLaborDescription());
+							// jsonAddLabor.put("UserId",
+							// singleton.getUserId());
+							Log.d("labor sent id :", "--->" + jsonAddLabor);
+							return jsonDataPost.updateLaborEntry(jsonAddLabor);
 
 						}
 					}
@@ -948,49 +937,43 @@ public class NetworkStateChange extends BroadcastReceiver {
 
 				try {
 					List<UpdateEntriesProjo> uEntries1 = dbadapter
-							.getAllEntriesUpdateRecords("U","E");
-					Log.d("no labour update entries","--->"+uEntries1.size());
+							.getAllEntriesUpdateRecords("U", "E");
+					Log.d("no labour update entries", "--->" + uEntries1.size());
 					if (uEntries1.size() == 0) {
-						Log.d("goto material","--->");
+						Log.d("goto material", "--->");
 						new UpdateEntriesMaterial().execute();
 					} else {
 						for (UpdateEntriesProjo val1 : uEntries1) {
 							singleton.setCurrentSelectedEntryID(val1.getEId());
-							
-								Log.d("Equipment update",
-										"--->" + val1.getPID() + " "
-												+ val1.getAid() + " "
-												+ val1.getEId() + " "
-												+ val1.getEname() + " "
-												+ val1.getTRD_C() + " "
-												+ val1.getClassesI() + " ");
-								JSONObject jsonaddPersionnel = new JSONObject();
-								jsonaddPersionnel.put("AccountID",
-										singleton.getAccountId());
-								jsonaddPersionnel.put("SubscriberID",
-										singleton.getSubscriberId());
-								jsonaddPersionnel.put("ProjectID",
-										val1.getPID());
-								jsonaddPersionnel.put("ActivityId",
-										val1.getAid());
-								jsonaddPersionnel.put("Name", val1.getEname());
-								jsonaddPersionnel.put("Owner", val1.getTRD_C());
-								jsonaddPersionnel.put("Status",
-										val1.getClassesI());
-								jsonaddPersionnel.put("Quantity",
-										val1.getHR_QTY());
-								// jsonaddPersionnel.put("Notes",
-								// singleton.getSelectedEquipmentDescription());
-								jsonaddPersionnel.put("ID", val1.getEId());
-								// jsonaddPersionnel.put("UserId",
-								// singleton.getUserId());
-								System.out
-										.println("equipment id.............."
-												+ singleton
-														.getCurrentSelectedEntryID());
-								return jsonDataPost
-										.updateEquipmentEntry(jsonaddPersionnel);
-							
+
+							Log.d("Equipment update",
+									"--->" + val1.getPID() + " "
+											+ val1.getAid() + " "
+											+ val1.getEId() + " "
+											+ val1.getEname() + " "
+											+ val1.getTRD_C() + " "
+											+ val1.getClassesI() + " ");
+							JSONObject jsonaddPersionnel = new JSONObject();
+							jsonaddPersionnel.put("AccountID",
+									singleton.getAccountId());
+							jsonaddPersionnel.put("SubscriberID",
+									singleton.getSubscriberId());
+							jsonaddPersionnel.put("ProjectID", val1.getPID());
+							jsonaddPersionnel.put("ActivityId", val1.getAid());
+							jsonaddPersionnel.put("Name", val1.getEname());
+							jsonaddPersionnel.put("Owner", val1.getTRD_C());
+							jsonaddPersionnel.put("Status", val1.getClassesI());
+							jsonaddPersionnel.put("Quantity", val1.getHR_QTY());
+							// jsonaddPersionnel.put("Notes",
+							// singleton.getSelectedEquipmentDescription());
+							jsonaddPersionnel.put("ID", val1.getEId());
+							// jsonaddPersionnel.put("UserId",
+							// singleton.getUserId());
+							System.out.println("equipment id.............."
+									+ singleton.getCurrentSelectedEntryID());
+							return jsonDataPost
+									.updateEquipmentEntry(jsonaddPersionnel);
+
 						}
 					}
 				} catch (JSONException e) {
@@ -1028,7 +1011,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 						Log.d("entri update", "--->" + entridata);
 
 					}
-					
+
 					new UpdateEntriesEquipment().execute();
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -1039,6 +1022,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 
 		}
 	}
+
 	private class UpdateEntriesMaterial extends AsyncTask<Void, Void, String> {
 
 		@Override
@@ -1080,53 +1064,48 @@ public class NetworkStateChange extends BroadcastReceiver {
 
 				try {
 					List<UpdateEntriesProjo> uEntries1 = dbadapter
-							.getAllEntriesUpdateRecords("U","M");
+							.getAllEntriesUpdateRecords("U", "M");
 					if (uEntries1.size() == 0) {
-						Log.d("goto Activities","--->");
-						 ReadActivitydata();
+						Log.d("goto Activities", "--->");
+						ReadActivitydata();
 					} else {
 						for (UpdateEntriesProjo val1 : uEntries1) {
 
 							singleton.setCurrentSelectedEntryID(val1.getEId());
-								Log.d("labour update",
-										"--->" + val1.getPID() + " "
-												+ val1.getAid() + " "
-												+ val1.getEId() + " "
-												+ val1.getEname() + " "
-												+ val1.getTRD_C() + " "
-												+ val1.getClassesI() + " ");
-					JSONObject jsonAddMaterialJSON = new JSONObject();
-					jsonAddMaterialJSON.put("AccountID",
-							singleton.getAccountId());
-					jsonAddMaterialJSON.put("SubscriberID",
-							singleton.getSubscriberId());
-					jsonAddMaterialJSON.put("ProjectID",
-							val1.getPID());
-					jsonAddMaterialJSON.put("ActivityId",
-							val1.getAid());
-					jsonAddMaterialJSON.put("Name",
-							val1.getEname());
-					jsonAddMaterialJSON.put("Company",
-							val1.getTRD_C());
-					jsonAddMaterialJSON.put("Status",
-							val1.getClassesI());
-					jsonAddMaterialJSON.put("Quantity",
-							val1.getHR_QTY());
-					// jsonaddPersionnel.put("Notes",
-					// singleton.getSelectedMaterialDescription());
-					// jsonaddPersionnel.put("ProjectDay",
-					// singleton.getCurrentSelectedDate());
-					jsonAddMaterialJSON.put("ID",
-							val1.getEId());
-					// jsonaddPersionnel.put("UserId", singleton.getUserId());
-					System.out.println("equipment id.............."
-							+ singleton.getCurrentSelectedEntryID());
+							Log.d("labour update", "--->" + val1.getPID() + " "
+									+ val1.getAid() + " " + val1.getEId() + " "
+									+ val1.getEname() + " " + val1.getTRD_C()
+									+ " " + val1.getClassesI() + " ");
+							JSONObject jsonAddMaterialJSON = new JSONObject();
+							jsonAddMaterialJSON.put("AccountID",
+									singleton.getAccountId());
+							jsonAddMaterialJSON.put("SubscriberID",
+									singleton.getSubscriberId());
+							jsonAddMaterialJSON.put("ProjectID", val1.getPID());
+							jsonAddMaterialJSON
+									.put("ActivityId", val1.getAid());
+							jsonAddMaterialJSON.put("Name", val1.getEname());
+							jsonAddMaterialJSON.put("Company", val1.getTRD_C());
+							jsonAddMaterialJSON.put("Status",
+									val1.getClassesI());
+							jsonAddMaterialJSON.put("Quantity",
+									val1.getHR_QTY());
+							// jsonaddPersionnel.put("Notes",
+							// singleton.getSelectedMaterialDescription());
+							// jsonaddPersionnel.put("ProjectDay",
+							// singleton.getCurrentSelectedDate());
+							jsonAddMaterialJSON.put("ID", val1.getEId());
+							// jsonaddPersionnel.put("UserId",
+							// singleton.getUserId());
+							System.out.println("equipment id.............."
+									+ singleton.getCurrentSelectedEntryID());
 
-					return jsonDataPost
-							.updateMaterialEntry(jsonAddMaterialJSON);
+							return jsonDataPost
+									.updateMaterialEntry(jsonAddMaterialJSON);
 
-				} }}
-				catch (JSONException e) {
+						}
+					}
+				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} catch (Exception e) {
@@ -1136,7 +1115,6 @@ public class NetworkStateChange extends BroadcastReceiver {
 		}
 
 		protected void onPostExecute(final String result) {
-
 
 			Log.d("result...", "--->" + result);
 			if (ServerUtilities.unknownHostException) {
@@ -1162,7 +1140,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 						Log.d("entri update", "--->" + entridata);
 
 					}
-					
+
 					new UpdateEntriesMaterial().execute();
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -1171,9 +1149,9 @@ public class NetworkStateChange extends BroadcastReceiver {
 
 			}
 
-		
 		}
 	}
+
 	private class DeleteLaborTask extends AsyncTask<Void, Void, String> {
 
 		@Override
@@ -1214,27 +1192,25 @@ public class NetworkStateChange extends BroadcastReceiver {
 				HttpsURLConnection.setDefaultHostnameVerifier(hv);
 
 				try {
-					
-					delete2= dbadapter
-							.getAllEntriesUpdateRecords("D");
-					if(delete2.size()==0)
-					{
+
+					delete2 = dbadapter.getAllEntriesUpdateRecords("D");
+					if (delete2.size() == 0) {
 						UpdateEntries updateLabor = new UpdateEntries();
 						updateLabor.execute();
-					}
-					else{
-					for(UpdateEntriesProjo val1:delete2){
-						singleton.setCurrentSelectedEntryID(val1.getEId());
-						Log.d("delete","--->"+val1.getEId()+" "+val1.getEname());
-						
-						
-					
-					JSONObject jsonLabor = new JSONObject();
-					jsonLabor.put("Id",val1.getEId());
-					return jsonDataPost.deleteLaborEntry(jsonLabor);
+					} else {
+						for (UpdateEntriesProjo val1 : delete2) {
+							singleton.setCurrentSelectedEntryID(val1.getEId());
+							Log.d("delete",
+									"--->" + val1.getEId() + " "
+											+ val1.getEname());
 
-				} }}
-				catch (JSONException e) {
+							JSONObject jsonLabor = new JSONObject();
+							jsonLabor.put("Id", val1.getEId());
+							return jsonDataPost.deleteLaborEntry(jsonLabor);
+
+						}
+					}
+				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 
@@ -1245,8 +1221,6 @@ public class NetworkStateChange extends BroadcastReceiver {
 		}
 
 		protected void onPostExecute(final String result) {
-
-
 
 			Log.d("result...", "--->" + result);
 			if (ServerUtilities.unknownHostException) {
@@ -1267,11 +1241,12 @@ public class NetworkStateChange extends BroadcastReceiver {
 						+ singleton.getCurrentSelectedEntryID());
 
 						long entridata = dbadapter
-								.deleteEntryByIDNetwork(singleton.getCurrentSelectedEntryID()+"");
+								.deleteEntryByIDNetwork(singleton
+										.getCurrentSelectedEntryID() + "");
 						Log.d("entri update", "--->" + entridata);
 
 					}
-					
+
 					new DeleteLaborTask().execute();
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -1280,8 +1255,6 @@ public class NetworkStateChange extends BroadcastReceiver {
 
 			}
 
-		
-		
 		}
 	}
 

@@ -14,6 +14,7 @@
 	<string name="addlaborprev_text">Copy Labor From Previous entries</string>
 	<string name="back_text">Back</string>
 	<string name="login_text">Login</string> 
+	<string name="laborsummary">View Labour Summary</string> 
 	<string name="username_text">Username</string>
 	<string name="username_hint">Username</string> 
 	<string name="password_text">Password</string>

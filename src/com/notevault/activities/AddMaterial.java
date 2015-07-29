@@ -41,7 +41,7 @@ import android.widget.Toast;
 public class AddMaterial extends Activity {
 
 	Singleton singleton;
-	String values[] = { "Name", "Company", "Status" };
+	String values[] = { "Name", "Company", "Unit of Measure" };
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	TextView deleteTextView;
 	ImageView addMaterialEntriesView;
@@ -304,7 +304,7 @@ public class AddMaterial extends Activity {
 				ViewGroup parent) {
 
 			LayoutInflater li = getLayoutInflater();
-			convertView = li.inflate(R.layout.customlist, null);
+			convertView = li.inflate(R.layout.entrieslistview, null);
 			TextView tv = (TextView) convertView.findViewById(R.id.textView1);
 			TextView tv2 = (TextView) convertView.findViewById(R.id.textView2);
 			final String val[] = values[position].split("~");
@@ -444,7 +444,7 @@ public class AddMaterial extends Activity {
 						singleton.getSelectedMaterialCompany(),
 						singleton.getSelectedMaterialStatus(),
 						singleton.getSelectedMaterialQty(), "M", "I",
-						dbAdapter.generateOfflineEntryID());
+						dbAdapter.generateOfflineEntryID(),0,0);
 			} else {
 				if (result != null) {
 
@@ -459,7 +459,7 @@ public class AddMaterial extends Activity {
 									singleton.getSelectedMaterialCompany(),
 									singleton.getSelectedMaterialStatus(),
 									singleton.getSelectedMaterialQty(), "M",
-									"N", jObject.getString("MID"));
+									"N", jObject.getString("MID"),0,0);
 							System.out
 									.println("materialInsertResponse inside Add Labor Success: "
 											+ materialInsertResponse);
@@ -476,7 +476,7 @@ public class AddMaterial extends Activity {
 									singleton.getSelectedMaterialCompany(),
 									singleton.getSelectedMaterialStatus(),
 									singleton.getSelectedMaterialQty(), "M",
-									"I", dbAdapter.generateOfflineEntryID());
+									"I", dbAdapter.generateOfflineEntryID(),0,0);
 							System.out
 									.println("materialInsertResponse inside Add Labor Failure: "
 											+ materialInsertResponse);
@@ -489,7 +489,7 @@ public class AddMaterial extends Activity {
 								singleton.getSelectedMaterialCompany(),
 								singleton.getSelectedMaterialStatus(),
 								singleton.getSelectedMaterialQty(), "M", "I",
-								dbAdapter.generateOfflineEntryID());
+								dbAdapter.generateOfflineEntryID(),0,0);
 					}
 				} else {
 					System.out
@@ -499,7 +499,7 @@ public class AddMaterial extends Activity {
 							singleton.getSelectedMaterialCompany(),
 							singleton.getSelectedMaterialStatus(),
 							singleton.getSelectedMaterialQty(), "M", "I",
-							dbAdapter.generateOfflineEntryID());
+							dbAdapter.generateOfflineEntryID(),0,0);
 				}
 			}
 			singleton.setReloadPage(true);

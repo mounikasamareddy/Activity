@@ -165,7 +165,7 @@ public class MaterialNameList extends Activity{
                     for(int i=0; i < materialNamesArray.length(); i++) {
                         JSONObject materialName = materialNamesArray.getJSONObject(i);
                         name.add(materialName.getString("W").replace("\\", ""));
-                        dbAdapter.insertGlossary(singleton.getMNCID(), materialName.getString("W"));
+                        dbAdapter.insertGlossary(singleton.getMNCID(), materialName.getString("W").replace("\\", ""));
                     }
                     setAdapter();
                 } catch (JSONException e) {

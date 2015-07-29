@@ -140,7 +140,7 @@ public class MaterialStatusList extends Activity{
                     dbAdapter.deleteGlossary(singleton.getMSCID());
                     for(int i = 0; i < materialStatusArray.length(); i++){
                         status.add(materialStatusArray.getString(i).replace("\\",""));
-                        dbAdapter.insertGlossary(singleton.getMSCID(), materialStatusArray.getString(i));
+                        dbAdapter.insertGlossary(singleton.getMSCID(), materialStatusArray.getString(i).replace("\\",""));
                     }
                     setAdapter();
                 } catch (JSONException e) {

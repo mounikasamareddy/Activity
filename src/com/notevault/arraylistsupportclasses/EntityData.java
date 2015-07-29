@@ -7,6 +7,22 @@ public class EntityData {
 	String TRD_COMP;
 	String CLASSI_STAT;
 	String HR_QTY;
+	String TimeandHalf;
+	String DoubleTime;
+	
+	
+	public String getTimeandHalf() {
+		return TimeandHalf;
+	}
+	public void setTimeandHalf(String timeandHalf) {
+		TimeandHalf = timeandHalf;
+	}
+	public String getDoubleTime() {
+		return DoubleTime;
+	}
+	public void setDoubleTime(String doubleTime) {
+		DoubleTime = doubleTime;
+	}
 	public String getHR_QTY() {
 		return HR_QTY;
 	}

@@ -7,7 +7,7 @@
 
     <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         android:layout_margin="0.0dip"
         android:background="#F5F5F5"
         android:orientation="horizontal"
@@ -35,7 +35,6 @@
             android:id="@+id/textv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-           
             android:text="Project"
             android:textColor="#000000"
             android:textSize="18sp" >
@@ -43,36 +42,35 @@
 
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
+            android:layout_width="450dp"
+            android:layout_height="80dp"
             android:layout_gravity="center"
             android:layout_margin="10dip"
-            android:src="@drawable/notevault" />
-
+            android:src="@drawable/logob" />
     </FrameLayout>
 
     <TextView
         android:id="@+id/welcomusername"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:layout_marginLeft="15dip"
+        android:layout_marginTop="5dp"
         android:lines="1"
-       android:textSize="22sp"
-       android:textStyle="bold"
-        >
+      
+        android:textSize="22sp"
+        android:textStyle="bold" 
+        android:gravity="center">
     </TextView>
 
     <TextView
         android:id="@+id/textv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dip"
+        android:layout_gravity="center"
         android:layout_marginTop="10dip"
         android:text="Select a Project"
         android:textColor="#000000"
-        android:textStyle="bold"
-        android:textSize="22sp" >
+        android:textSize="22sp"
+        android:textStyle="bold" >
     </TextView>
 
     <ScrollView
@@ -91,9 +89,10 @@
 
             <NumberPicker
                 android:id="@+id/numberpicker"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:divider="@color/black" />
+                
+                />
         </LinearLayout>
         <!-- <LinearLayout -->
         <!-- android:layout_width="fill_parent" -->
@@ -110,30 +109,31 @@
         <!-- android:fastScrollEnabled="true" /> -->
         <!-- </LinearLayout> -->
     </ScrollView>
- <LinearLayout
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-     android:gravity="center"
+        android:gravity="center"
         android:orientation="horizontal" >
-    <Button
-        android:id="@+id/chooseproject"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:layout_marginBottom="20dip"
-        android:background="#f49800"
-        android:layout_gravity="center"
-        android:lines="1"
-        android:paddingRight="40dip"
-        android:paddingLeft="40dip"
-        android:paddingTop="2dip"
-        android:paddingBottom="2dip"
-        android:text="@string/choose_project"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"/>
-</LinearLayout>
-   
 
-   
+        <Button
+            android:id="@+id/chooseproject"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dip"
+            android:layout_marginTop="1dp"
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip"
+            android:background="#f49800"
+            android:lines="1"
+            android:paddingBottom="2dip"
+            android:paddingLeft="75dip"
+            android:paddingRight="75dip"
+            android:paddingTop="2dip"
+            android:text="@string/choose_project"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+    </LinearLayout>
 
 </LinearLayout>

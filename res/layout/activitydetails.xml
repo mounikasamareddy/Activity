@@ -13,23 +13,26 @@
         android:orientation="horizontal"
         android:padding="0.0dip" >
 
-        <LinearLayout
-            android:id="@+id/image_layout"
+        <ImageView
+            android:id="@+id/addimage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="right|center_vertical"
+            android:layout_margin="10dip"
+            android:padding="10dip"
+            android:src="@drawable/plus" >
+        </ImageView>
+
+        <TextView
+            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:orientation="vertical" >
-
-            <ImageView
-                android:id="@+id/addimage"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="right|center_vertical"
-                android:layout_margin="10dip"
-                android:padding="10dip"
-                android:src="@drawable/plus" >
-            </ImageView>
-        </LinearLayout>
+           
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dip"
+            android:text="ACTIVITIES"
+            android:textColor="#f49800"
+            android:textSize="15dp" />
 
         <TextView
             android:id="@+id/activity_txt"
@@ -37,36 +40,20 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="10dip"
+        	android:background="#F5F5F5"
+            android:maxLines="1"
             android:padding="10dip"
             android:text="Pour foundation"
             android:textColor="#000000"
             android:textSize="18sp" >
         </TextView>
 
-        <LinearLayout
-            android:id="@+id/back_layout"
+        <ImageView
+            android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|left"
-            android:orientation="horizontal" >
-
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|left"
-                android:src="@drawable/backimage2" />
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="-20dp"
-                android:text="ACTIVITIES"
-                android:textColor="#f49800"
-                android:textSize="15dp" />
-        </LinearLayout>
+            android:src="@drawable/backimage2" />
     </FrameLayout>
 
     <LinearLayout
@@ -79,9 +66,9 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp" >
+            android:orientation="horizontal" >
 
             <TextView
                 android:id="@+id/projectname_text"
@@ -98,19 +85,19 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:layout_gravity="center"
-                android:src="@drawable/icon_white"
                 android:layout_marginLeft="5dp"
+                android:src="@drawable/icon_white"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/task_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:gravity="center"
                 android:text="Parking Garage"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
-                android:layout_marginLeft="5dp"
                 android:visibility="gone" >
             </TextView>
         </LinearLayout>
@@ -120,10 +107,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
             android:text="Date"
             android:textColor="#FFFFFF"
-            android:textSize="15sp" 
-            android:layout_marginBottom="5dp">
+            android:textSize="15sp" >
         </TextView>
     </LinearLayout>
 

@@ -149,6 +149,10 @@ public class EntriesListAdapteroffline extends BaseAdapter{
 					singleton
 							.setSelectedLaborClassification(Utilities.eAligndata.get(position).getCLASSI_STAT());
 					singleton.setSelectedLaborHours((int)Double.parseDouble(Utilities.eAligndata.get(position).getHR_QTY())+"");
+					
+					singleton.setSelectedLaborTimeAndHalf((int)Double.parseDouble(Utilities.eAligndata.get(position).getTimeandHalf())+"");
+					singleton.setSelectedLaborDoubleTime((int)Double.parseDouble(Utilities.eAligndata.get(position).getDoubleTime())+"");
+					
 					// singleton.setSelectedLaborDescription(val[6]);
 					Intent intent = new Intent(
 							context,

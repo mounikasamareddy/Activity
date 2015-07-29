@@ -175,7 +175,7 @@ public class NameListActivity extends Activity{
                     for(int i=0; i < laborNameArray.length(); i++) {
                         JSONObject laborName = laborNameArray.getJSONObject(i);
                         lbName.add(laborName.getString("W").replace("\\", ""));
-                        dbAdapter.insertGlossary(singleton.getLNCID(), laborName.getString("W"));
+                        dbAdapter.insertGlossary(singleton.getLNCID(), laborName.getString("W").replace("\\", ""));
                     }
                 setAdapter();
                 } catch (JSONException e) {
@@ -194,6 +194,7 @@ public class NameListActivity extends Activity{
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+            	Log.d("labor","--->"+nameListView.getItemAtPosition(arg2));
                 singleton.setSelectedLaborName((String) (nameListView.getItemAtPosition(arg2)));
                 onBackPressed();
             }

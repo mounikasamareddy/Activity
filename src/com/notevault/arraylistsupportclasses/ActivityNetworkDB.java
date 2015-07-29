@@ -8,7 +8,14 @@ public class ActivityNetworkDB {
 	int Tid;
 	String ADate;
 	String Astatus;
+	int Shift;
 	
+	public int getShift() {
+		return Shift;
+	}
+	public void setShift(int shift) {
+		Shift = shift;
+	}
 	public String getAstatus() {
 		return Astatus;
 	}

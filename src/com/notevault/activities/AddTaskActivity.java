@@ -89,7 +89,7 @@ public class AddTaskActivity extends Activity{
 						}
 					
 				else{
-					Toast.makeText(getApplicationContext(), "ur in offline!", Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), "You are in offline!", Toast.LENGTH_LONG).show();
 //					newTaskName = editText.getText().toString().trim();
 //					System.out.println("new task name......." + newTaskName);
 //					

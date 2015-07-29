@@ -2,49 +2,96 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="#F5F5F5" 
     android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_marginRight="10dp"
+    android:background="#F5F5F5"
+    android:gravity="center"
+    android:orientation="vertical" >
 
-   <TextView
+    <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please enter new activity name." 
-        android:layout_marginTop="30dp"
-        android:textSize="18sp"
         android:layout_marginLeft="10dp"
-    	android:layout_marginRight="10dp"/>
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="30dp"
+        android:text="Please enter new activity name."
+        android:textSize="18sp" />
 
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:ems="10"
-        android:layout_marginTop="20dp"
-        android:singleLine="true"
-    	android:lines="1"
-   	 	android:maxLines="1"
-    	android:scrollHorizontally="true"
-    	android:ellipsize="end"
-    	android:inputType="text"
-    	android:background="@drawable/roundframe"
-    	android:paddingLeft="10dp" 
-    	android:layout_marginLeft="10dp"
-    	android:layout_marginRight="10dp">
-    </EditText>
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:padding="5dp" >
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/roundframe"
+            android:ellipsize="end"
+            android:ems="10"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLines="1"
+            android:paddingLeft="10dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true" >
+        </EditText>
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="10dip"
+            
+            android:background="@drawable/close1" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/shift"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/roundframe"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp" >
+
+        <TextView
+            android:id="@+id/shifttxt"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:text="Shift"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/shiftspinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dip"
+            android:layout_marginRight="10dp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_close_popup"
         android:layout_width="100dp"
         android:layout_height="40dp"
-        android:text="Copy"
+        android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
         android:background="#f49800"
+        android:text="Copy"
         android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        android:layout_marginBottom="20dp"/>
+        android:textStyle="bold" />
 
 </LinearLayout>

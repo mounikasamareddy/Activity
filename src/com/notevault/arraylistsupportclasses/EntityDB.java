@@ -6,15 +6,30 @@ public class EntityDB {
 	String CLASSI_STAT;
 	String Type;
 	String HR_QTY;
-int EIdentity;
-	
+	String TimeandHalf;
+	String DoubleTime;
+	int EIdentity;
 
 	int ID;
 	String Action;
 	String Date;
-	
 
-	
+	public String getTimeandHalf() {
+		return TimeandHalf;
+	}
+
+	public void setTimeandHalf(String timeandHalf) {
+		TimeandHalf = timeandHalf;
+	}
+
+	public String getDoubleTime() {
+		return DoubleTime;
+	}
+
+	public void setDoubleTime(String doubleTime) {
+		DoubleTime = doubleTime;
+	}
+
 	public String getHR_QTY() {
 		return HR_QTY;
 	}
@@ -86,7 +101,5 @@ int EIdentity;
 	public void setType(String type) {
 		Type = type;
 	}
-
-	
 
 }

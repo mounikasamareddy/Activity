@@ -279,7 +279,7 @@
             android:ellipsize="end"
             android:focusableInTouchMode="true"
             android:gravity="center|left"
-            android:hint="Quantity"
+            android:hint="Hours"
             android:inputType="numberDecimal"
             android:lines="1"
             android:maxLines="1"

@@ -158,7 +158,7 @@ public class EquipmentStatusList extends Activity{
                     for(int i=0; i < equipmentStatusArray.length(); i++) {
                         status.add(equipmentStatusArray.getString(i).replace("\\", ""));
                         singleton.setESCID(1);
-                        dbAdapter.insertGlossary(singleton.getESCID(), equipmentStatusArray.getString(i));
+                        dbAdapter.insertGlossary(singleton.getESCID(), equipmentStatusArray.getString(i).replace("\\", ""));
                     }
                     setAdapter();
                 } catch (JSONException e) {

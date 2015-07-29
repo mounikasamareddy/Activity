@@ -75,7 +75,9 @@ public void setSelectedEntriesIdentityoffline(int selectedEntriesIdentityoffline
 	}
 
 	private boolean newEntryFlag;
-    int selectedTaskIdentityoffline;
+	private boolean CopyEntryFlag;
+   
+	int selectedTaskIdentityoffline;
     int selectedActivityIdentityoffline;
 
     public boolean isSyncingToServer() {
@@ -96,7 +98,11 @@ public void setSelectedEntriesIdentityoffline(int selectedEntriesIdentityoffline
     private String selectedLaborTrade;
     private String selectedLaborClassification;
     private String selectedLaborHours;
-    private String selectedLaborDescription;
+    private String SelectedLaborTimeAndHalf;
+    private String SelectedLaborDoubleTime;
+    
+
+	private String selectedLaborDescription;
     private String selectedEquipmentName;
     private String selectedEquipmentCompany;
     private String selectedEquipmentStatus;
@@ -127,6 +133,13 @@ public void setSelectedEntriesIdentityoffline(int selectedEntriesIdentityoffline
         }
         return _singleton;
     }
+    public boolean isCopyEntryFlag() {
+		return CopyEntryFlag;
+	}
+
+	public void setCopyEntryFlag(boolean copyEntryFlag) {
+		CopyEntryFlag = copyEntryFlag;
+	}
 
     public boolean isOfflineEntry() {
         return offlineEntry;
@@ -595,5 +608,23 @@ public String getUsername() {
 public void setUsername(String username) {
 	Username = username;
 }
-	
+public String getSelectedLaborTimeAndHalf() {
+	return SelectedLaborTimeAndHalf;
+}
+
+public void setSelectedLaborTimeAndHalf(String selectedLaborTimeAndHalf) {
+	SelectedLaborTimeAndHalf = selectedLaborTimeAndHalf;
+}
+
+public String getSelectedLaborDoubleTime() {
+	return SelectedLaborDoubleTime;
+}
+
+public void setSelectedLaborDoubleTime(String selectedLaborDoubleTime) {
+	SelectedLaborDoubleTime = selectedLaborDoubleTime;
+}
+
+public void setSelectedTaskIdentityoffline(int selectedTaskIdentityoffline) {
+	this.selectedTaskIdentityoffline = selectedTaskIdentityoffline;
+}
 }

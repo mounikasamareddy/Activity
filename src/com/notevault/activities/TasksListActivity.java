@@ -78,10 +78,15 @@ public class TasksListActivity extends Activity {
 		System.out.println("onCreate called.");
 		singleton = Singleton.getInstance();
 		TextView projectName = (TextView) findViewById(R.id.projectname_text);
+		TextView tag = (TextView) findViewById(R.id.Name_text3);
+		
 		projectName.setText(singleton.getSelectedProjectName());
 
 		taskListView = (ListView) findViewById(R.id.list);
-
+		if(singleton.isCopyEntryFlag())
+		{
+			tag.setText("Tap the Task you would like to copy this Activity to.");
+		}
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 		if (singleton.isOnline()) {
 			GetProjectTask projectTask = new GetProjectTask();
@@ -89,8 +94,8 @@ public class TasksListActivity extends Activity {
 			mProgressDialog.show();
 			projectTask.execute();
 		} else {
-			Toast.makeText(getApplicationContext(), "Ur in offline",
-					Toast.LENGTH_LONG).show();
+//			Toast.makeText(getApplicationContext(), "Ur in offline",
+//					Toast.LENGTH_LONG).show();
 			readTasksFromDb();
 
 		}
@@ -101,8 +106,7 @@ public class TasksListActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				if (singleton.isOnline()) {
-					Intent taskIntent = new Intent(TasksListActivity.this,
-							AddTaskActivity.class);
+					Intent taskIntent = new Intent(TasksListActivity.this, AddTaskActivity.class);
 					startActivity(taskIntent);
 				} else {
 					Toast.makeText(getApplicationContext(), "Ur in  offline!",
@@ -119,7 +123,8 @@ public class TasksListActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				onBackPressed();
+				Intent intent= new Intent(TasksListActivity.this,ProjectListActivity.class);
+				startActivity(intent);
 			}
 		});
 
@@ -131,7 +136,7 @@ public class TasksListActivity extends Activity {
 		super.onResume();
 		System.out.println("Task activity onResume called.");
 		if (singleton.isOnline()) {
-
+			singleton.setCopyEntryFlag(false);
 			if (singleton.isReloadPage()) {
 
 				int size = singleton.getTaskList().size();
@@ -209,8 +214,11 @@ public class TasksListActivity extends Activity {
 				convertView = li.inflate(R.layout.customlist, null);
 				TextView tv = (TextView) convertView
 						.findViewById(R.id.textView1);
+				TextView taskId = (TextView) convertView
+						.findViewById(R.id.taskid);
+				taskId.setVisibility(View.VISIBLE);
 				tv.setText(values[position]);
-
+				taskId.setText(keys[position]+"");
 				ImageView orangeArrow = (ImageView) convertView
 						.findViewById(R.id.name_imageView2);
 				ImageView greyArrow = (ImageView) convertView
@@ -231,9 +239,12 @@ public class TasksListActivity extends Activity {
 						SimpleDateFormat format1 = new SimpleDateFormat(
 								"dd-MM-yyyy");
 						try {
-							singleton.setCurrentSelectedDateFormatted(format1
-									.parse(format1.format(curDate)).toString()
-									.replace(" 00:00:00 GMT+05:30", ","));
+							
+							String[] dateFormattedArray = format1.parse(format1.format(curDate)).toString().split(" ");
+							String dateFormatted = dateFormattedArray[0] + " " + dateFormattedArray[1] + " " + dateFormattedArray[2] + ", " + dateFormattedArray[5];
+							//System.err.println("dateFormatted: "+ dateFormatted);
+							singleton.setCurrentSelectedDateFormatted(dateFormatted);
+							
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
@@ -299,14 +310,13 @@ public class TasksListActivity extends Activity {
 					
 					
 					if(singleton.isOnline())
-					{JSONObject jsonTaskRequest = new JSONObject();
-					jsonTaskRequest.put("ProjectId",
-							singleton.getSelectedProjectID());
-					// jsonTaskRequest.put("UserId", singleton.getUserId());
-					jsonTaskRequest.put("ProjectDay",
-							singleton.getCurrentSelectedDate());
+					{
+						JSONObject jsonTaskRequest = new JSONObject();
+						jsonTaskRequest.put("ProjectId", singleton.getSelectedProjectID());
+						// jsonTaskRequest.put("UserId", singleton.getUserId());
+						jsonTaskRequest.put("ProjectDay", singleton.getCurrentSelectedDate());
 						System.out.println("request"+jsonTaskRequest);
-					return jsonDataPost.getAllProjectTasks(jsonTaskRequest);
+						return jsonDataPost.getAllProjectTasks(jsonTaskRequest);
 					}
 					else{
 						readTasksFromDb();
@@ -323,9 +333,10 @@ public class TasksListActivity extends Activity {
 		}
 
 		protected void onPostExecute(final String response) {
+			Log.d("taskResponse","--->"+response);
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
-				Toast.makeText(getApplicationContext(), "Ur in offline",
+				Toast.makeText(getApplicationContext(), "You are offline",
 						Toast.LENGTH_LONG).show();
 
 			} else {
@@ -358,7 +369,7 @@ public class TasksListActivity extends Activity {
 								JSONObject task = responseTasksArray
 										.getJSONObject(i);// JSONObject
 								keys[i] = task.getInt("TI");
-								values[i] = task.getString("TN");
+								values[i] = task.getString("TN").replace("\\", "");
 								singleton.getTaskList().put(keys[i], values[i]);
 								taskListStatus
 										.put(keys[i], task.getString("F"));

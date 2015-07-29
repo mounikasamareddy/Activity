@@ -56,7 +56,7 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 		TextView dateTextView = (TextView)findViewById(R.id.datetxt);
 		dateTextView.setText(singleton.getCurrentSelectedDateFormatted());
 
-		LinearLayout backLayout = (LinearLayout)findViewById(R.id.back_layout);
+		TextView backLayout = (TextView)findViewById(R.id.textView1);
 		backLayout.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -67,7 +67,7 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 		    	singleton.setNewEntryFlag(true);
 					showActionSheet();
 		    }
-		LinearLayout addImageLayout = (LinearLayout)findViewById(R.id.image_layout);
+		 ImageView addImageLayout = (ImageView)findViewById(R.id.addimage);
 		addImageLayout.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -158,6 +158,8 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 				singleton.setSelectedLaborTrade("");
 				singleton.setSelectedLaborClassification("");
 				singleton.setSelectedLaborHours("");
+				singleton.setSelectedLaborTimeAndHalf("");
+				singleton.setSelectedLaborDoubleTime("");
 				singleton.setSelectedLaborDescription("");
 				Intent intent = new Intent(EntriesListActivity.this, AddLabor.class);
 				startActivity(intent);

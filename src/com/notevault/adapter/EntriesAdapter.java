@@ -48,10 +48,12 @@ public class EntriesAdapter extends BaseAdapter{
 
 		UserHolder holder;
 		singleton = Singleton.getInstance();
+		int k=0;
 		if (convertView == null) {
 			convertView= infilate.inflate(R.layout.entridetails, null);
 			holder=new UserHolder();
 			holder.hrs = (TextView) convertView.findViewById(R.id.hrs);
+			holder.title = (TextView) convertView.findViewById(R.id.title);
 			holder.matirial = (TextView) convertView.findViewById(R.id.matirial);
 			holder.units = (TextView) convertView.findViewById(R.id.units);
 
@@ -64,19 +66,31 @@ public class EntriesAdapter extends BaseAdapter{
 		}
 		//Log.d("disable","---->"+Utilities.pdata.get(position).getHasActivities()+"  "+position+" "+Utilities.pdata.get(position).getPName());
 		double ratio;
+		if(k==0)
+		{
+			holder.title.setVisibility(View.VISIBLE);
+			k++;
+		}
+		else{
+			holder.title.setVisibility(View.GONE);
+		}
 		holder.hrs.setText(EntriesListByTypeActivity.totalhours+"");
 		holder.matirial.setText(EntriesListByTypeActivity.MaterialData.get(position)+"");
-		
-			ratio=EntriesListByTypeActivity.totalhours/EntriesListByTypeActivity.MaterialData.get(position);
+		if(EntriesListByTypeActivity.totalhours==0)
+		{
+			ratio=EntriesListByTypeActivity.MaterialData.get(position)/1;
+		}else
+		{
+			ratio=EntriesListByTypeActivity.MaterialData.get(position)/EntriesListByTypeActivity.totalhours;
 			
 		
-		
+		}
 		holder.units.setText(""+new DecimalFormat("00.000").format(ratio));
 		return convertView;
 	}
 
 	static class UserHolder {
-		TextView hrs,matirial,units;
+		TextView hrs,matirial,units,title;
 		
 	}
 

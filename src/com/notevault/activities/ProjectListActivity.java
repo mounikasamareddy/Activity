@@ -52,7 +52,7 @@ public class ProjectListActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_projectselection);
-
+		
 		singleton = Singleton.getInstance();
 		DbAdapter = DBAdapter.get_dbAdapter(this);
 
@@ -74,6 +74,7 @@ public class ProjectListActivity extends Activity {
 		if (singleton.isOnline()) {
 			
 			welcomusername.setText("Welcome "+singleton.getUsername()+",");
+			
 			int i = 0;
 			keys = new int[singleton.getProjectsList().size()];
 			values = new String[singleton.getProjectsList().size()];
@@ -84,6 +85,7 @@ public class ProjectListActivity extends Activity {
 			// Arrays.sort(keys);
 			int tempKey;
 			String tempValue;
+			
 			for (int l = 0; l < values.length; l++) {
 				for (int j = 0; j < values.length - l - 1; j++) {
 					if (values[j].compareToIgnoreCase(values[j + 1]) > 0) {
@@ -97,17 +99,21 @@ public class ProjectListActivity extends Activity {
 				}
 			}
 			System.out.println("List of Projects: " + Arrays.toString(values));
-			Log.d("projectdata", "--->" + Arrays.toString(values));
+			Log.d("projectdata", "--->" + Arrays.toString(values)+" "+values.length);
 			projectsValues = new String[values.length];
 			for (int j = 0; j < values.length; j++) {
 				Log.d("data", "--->" + values[j]);
 				projectsValues[j] = values[j];
 			}
 
-			projects.setMaxValue(4);
+			Log.d("project length","--->"+values.length);
+			projects.setMaxValue((values.length)-1);
+		
 			projects.setMinValue(0);
+			projects.setWrapSelectorWheel(false);
+			
 			projects.setDisplayedValues(projectsValues);
-
+			
 			projects.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
 			projects.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
@@ -125,6 +131,7 @@ public class ProjectListActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 
+					Log.d("checking","--->"+singleton.isOnline());
 					singleton
 							.setSelectedProjectName(values[selectedpickerindex]);
 					singleton.setSelectedProjectID(keys[selectedpickerindex]);
@@ -142,14 +149,15 @@ public class ProjectListActivity extends Activity {
 					try {
 						singleton.setCurrentSelectedDateFormatted(format1
 								.parse(format1.format(curDate)).toString()
-								.replace(" 00:00:00 GMT+05:30", ","));
+								.replace(" 00:00:00 GMT+08:00", ","));
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
 					singleton.setCurrentSelectedDate(new SimpleDateFormat(
 							"yyyyMMdd").format(curDate));
 					Intent intent;
-
+					 Log.d("projects enabled","--->"+singleton.isEnableTasks());
+				        Log.d("projects enabled","--->"+singleton.isEnableShiftTracking());
 					if (singleton.isEnableTasks()) {
 						if (k == 0) {
 							intent = new Intent(ProjectListActivity.this,
@@ -202,11 +210,13 @@ public class ProjectListActivity extends Activity {
 
 			DbAdapter.Close();
 
-			projects.setMaxValue(4);
+			projects.setMaxValue((projectsValues.length)-1);
 			projects.setMinValue(0);
-			projects.setDisplayedValues(projectsValues);
 			projects.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-
+			projects.setWrapSelectorWheel(false);
+			
+			projects.setDisplayedValues(projectsValues);
+			
 			projects.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
 				@Override
 				public void onValueChange(NumberPicker picker, int oldVal,
@@ -237,7 +247,7 @@ public class ProjectListActivity extends Activity {
 					try {
 						singleton.setCurrentSelectedDateFormatted(format1
 								.parse(format1.format(curDate)).toString()
-								.replace(" 00:00:00 GMT+05:30", ","));
+								.replace(" 00:00:00 GMT+08:00", ","));
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
@@ -273,7 +283,9 @@ public class ProjectListActivity extends Activity {
 			if (settingPreferences.getString(
 					String.valueOf(singleton.getUserId()), "")
 					.equalsIgnoreCase("true")) {
+				
 				singleton.setEnableTasks(true);
+				Log.d("check","---"+singleton.isEnableTasks());
 			}
 		}
 	}

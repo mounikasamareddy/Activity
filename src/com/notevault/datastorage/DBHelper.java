@@ -23,13 +23,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public final String ACTIVITIES_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Activities "  +
             "( AIdentity INTEGER PRIMARY KEY AUTOINCREMENT, ActID   VARCHAR(10),    ActName     VARCHAR(20), " +
             "   TaskID  INT(10),    TaskName    VARCHAR(20), " +
-            "   PID     INT(10),    ProjectDay  VARCHAR(8),     hasData	INT(1),  UserID INT(10),status VARCHAR(8));";
+            "   PID     INT(10),    ProjectDay  VARCHAR(8),     hasData	INT(1),  UserID INT(10),status VARCHAR(8),Shift VARCHAR(8));";
     public final String ENTRIES_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Entries "  +
             "( EIdentity INTEGER PRIMARY KEY AUTOINCREMENT, NAME    VARCHAR(20),    TRD_COMP    VARCHAR(20),    CLASSI_STAT VARCHAR(20)," +
             "   HR_QTY  INT(10),     TYPE        VARCHAR(1), " +
             "   ACTION  VARCHAR(1),     ID          VARCHAR(10),    PID         INT(10),        TID         INT(10), " +
             "   UserID  INT(10),        SubID       INT(10),        AID         INT(10),        AccountID   INT(10), " +
-            "   DATE        VARCHAR(8),status VARCHAR(8));";
+            "   DATE        VARCHAR(8),status VARCHAR(8),TimeandHalf INT(10),DoubleTime INT(10));";
     public final String LOGIN_TABLE_SCRIPT = "CREATE TABLE IF NOT EXISTS Login " +
             "(  username    VARCHAR(20),    password    VARCHAR(20), " +
             "   UserID      INT(10),        AccountID   INT(10),        SubID   INT(10), " +

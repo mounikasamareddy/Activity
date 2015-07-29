@@ -1,6 +1,7 @@
 package com.notevault.activities;
 
-import android.app.Activity;
+import com.notevault.pojo.Singleton;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,44 +10,55 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
-import com.notevault.pojo.Singleton;
 
-public class SettingActivity extends Activity{
+public class SettingActivity1 extends Fragment{
 
-    String values[] = {"About","Tutorial","Logout"};
-    private static ProgressDialog mProgressDialog;
-    ImageView backImageView;
-    static boolean navigatorFlag = false;
-    Singleton singleton;
-    SharedPreferences sharedpreferences, settingPreferences,settingshifttask,settingovertimetrack;
-    public static final String MyPREFERENCES = "MyPrefs" ;
-    public static final String EnableTaskPREFERENCES = "EnableTasks" ;
-    public static final String EnableSHIFTPREFERENCES = "EnableShift" ;
-    public static final String EnableOVERTIMETRACKPREFERENCES = "EnableovertimeShift" ;
+	 String values[] = {"About","Tutorial","Logout"};
+	    private static ProgressDialog mProgressDialog;
+	    ImageView backImageView;
+	    static boolean navigatorFlag = false;
+	    Singleton singleton;
+	    SharedPreferences sharedpreferences, settingPreferences,settingshifttask,settingovertimetrack;
+	    public static final String MyPREFERENCES = "MyPrefs" ;
+	    public static final String EnableTaskPREFERENCES = "EnableTasks" ;
+	    public static final String EnableSHIFTPREFERENCES = "EnableShift" ;
+	    public static final String EnableOVERTIMETRACKPREFERENCES = "EnableovertimeShift" ;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.setting_activity);
+
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.setting_activity, container,false);
         singleton = Singleton.getInstance();
-        settingPreferences = getSharedPreferences(EnableTaskPREFERENCES, Context.MODE_PRIVATE);
+        settingPreferences = getActivity().getSharedPreferences(EnableTaskPREFERENCES, Context.MODE_PRIVATE);
        
-        settingshifttask = getSharedPreferences(EnableSHIFTPREFERENCES, Context.MODE_PRIVATE);
-        settingovertimetrack = getSharedPreferences(EnableOVERTIMETRACKPREFERENCES, Context.MODE_PRIVATE);
+        settingshifttask =getActivity().getSharedPreferences(EnableSHIFTPREFERENCES, Context.MODE_PRIVATE);
+        settingovertimetrack = getActivity().getSharedPreferences(EnableOVERTIMETRACKPREFERENCES, Context.MODE_PRIVATE);
         
-        Switch enableTasksSwitch = (Switch)findViewById(R.id.switch1);
-        Switch enableShiftTrackingSwitch = (Switch)findViewById(R.id.switch2);
-        Switch enableOvertimeTrackingSwitch = (Switch)findViewById(R.id.switch3);
+        Switch enableTasksSwitch = (Switch)v.findViewById(R.id.switch1);
+        Switch enableShiftTrackingSwitch = (Switch)v.findViewById(R.id.switch2);
+        Switch enableOvertimeTrackingSwitch = (Switch)v.findViewById(R.id.switch3);
         
         
         if(settingPreferences.contains(String.valueOf(singleton.getUserId()))){
@@ -128,8 +140,8 @@ public class SettingActivity extends Activity{
             }
         });
 
-        ListView settingListView = (ListView)findViewById(R.id.listView1);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(this, R.layout.settingtextview, values);
+        ListView settingListView = (ListView)v.findViewById(R.id.listView1);
+        ArrayAdapter<String> ad = new ArrayAdapter<String>(getActivity(), R.layout.settingtextview, values);
         settingListView.setAdapter(ad);
         settingListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -137,22 +149,23 @@ public class SettingActivity extends Activity{
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                                     long arg3) {
             	Log.d("test","--->"+arg0.getItemAtPosition(arg2));
+            	
                 if(arg2 == 0){
-                    Intent aboutIntent = new Intent(SettingActivity.this, AboutActivity.class);
+                    Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
                     startActivity(aboutIntent);
 
                 }else if(arg2 == 1){
                     SettingActivity.navigatorFlag = true;
-                    Intent sentIntent = new Intent(SettingActivity.this, TutorialFragment.class);
+                    Intent sentIntent = new Intent(getActivity(), TutorialFragment.class);
                     startActivity(sentIntent);
                 }
                 else if (arg2 == 2) {
-                    sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+                    sharedpreferences = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
                     Editor editor = sharedpreferences.edit();
                     
                     editor.putString("loggedOut", "true");
                     editor.apply();
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(SettingActivity.this);
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
                     alertDialog.setTitle("Confirm Logout");
                     alertDialog.setMessage("Are you sure you want to logout?");
                     //alertDialog.setIcon(R.drawable.logout);
@@ -161,12 +174,12 @@ public class SettingActivity extends Activity{
 
                         public void onClick(DialogInterface dialog,int which) {
                             dialog.dismiss();
-                            mProgressDialog = new ProgressDialog(SettingActivity.this);
+                            mProgressDialog = new ProgressDialog(getActivity());
                             mProgressDialog.setMessage("Loading...");
                             mProgressDialog.setIndeterminate(false);
                             mProgressDialog.show();
                             mProgressDialog.dismiss();
-                            Intent logoutIntent = new Intent(SettingActivity.this, GettingStartedActivity.class);
+                            Intent logoutIntent = new Intent(getActivity(), GettingStartedActivity.class);
                             logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(logoutIntent);
@@ -183,15 +196,29 @@ public class SettingActivity extends Activity{
                     alertDialog.show();
                 }
             }
+
+			private SharedPreferences getSharedPreferences(
+					String mypreferences, int modePrivate) {
+				// TODO Auto-generated method stub
+				return null;
+			}
         });
 
-        backImageView = (ImageView)findViewById(R.id.imageView1);
+        backImageView = (ImageView)v.findViewById(R.id.imageView1);
         backImageView.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                onBackPressed();
+            	 Intent intent= new Intent(getActivity(),ProjectListActivity.class);
+            	 getActivity().startActivity(intent);
             }
         });
+        return v;
+
+       
     }
+
+	
+
+	
 }

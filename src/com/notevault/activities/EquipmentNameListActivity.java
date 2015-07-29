@@ -172,7 +172,7 @@ public class EquipmentNameListActivity extends Activity {
 								.getJSONObject(i);
 						name.add(equipmentName.getString("W").replace("\\", ""));
 						dbAdapter.insertGlossary(singleton.getENCID(),
-								equipmentName.getString("W"));
+								equipmentName.getString("W").replace("\\", ""));
 					}
 					setAdapter();
 				} catch (JSONException e) {
@@ -193,6 +193,9 @@ public class EquipmentNameListActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
+				Log.d("equiment","--->"+nameListView
+						.getItemAtPosition(arg2));
+	             
 				singleton.setSelectedEquipmentName((String) (nameListView
 						.getItemAtPosition(arg2)));
 				onBackPressed();

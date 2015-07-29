@@ -159,7 +159,7 @@ public class TradeListActivity extends Activity{
                     for(int i=0; i < laborTradesArray.length(); i++) {
                         JSONObject tradeName = laborTradesArray.getJSONObject(i);
                         trade.add(tradeName.getString("W").replace("\\", ""));
-                        dbAdapter.insertGlossary(singleton.getLTCID(), tradeName.getString("W"));
+                        dbAdapter.insertGlossary(singleton.getLTCID(), tradeName.getString("W").replace("\\", ""));
                     }
                     setAdapter();
                 } catch (JSONException e) {

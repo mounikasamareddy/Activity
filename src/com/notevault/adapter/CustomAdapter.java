@@ -20,14 +20,14 @@ import com.notevault.activities.R;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.Utilities;
 
-public class CustomAdapter extends BaseAdapter{
+public class CustomAdapter extends BaseAdapter {
 
 	Context context;
 	LayoutInflater infilate;
 	Singleton singleton;
 
 	public CustomAdapter(Context context) {
-		infilate=LayoutInflater.from(context);
+		infilate = LayoutInflater.from(context);
 		this.context = context;
 	}
 
@@ -56,24 +56,18 @@ public class CustomAdapter extends BaseAdapter{
 		UserHolder holder;
 		singleton = Singleton.getInstance();
 		if (convertView == null) {
-			convertView= infilate.inflate(R.layout.customlist2, null);
-			holder=new UserHolder();
+			convertView = infilate.inflate(R.layout.customlist2, null);
+			holder = new UserHolder();
 			holder.layout = (RelativeLayout) convertView
 					.findViewById(R.id.relativelay);
-		holder.label1=(TextView) convertView
-				.findViewById(R.id.label1);
-			holder.roundTv = (TextView) convertView
-					.findViewById(R.id.tv);
+			holder.label1 = (TextView) convertView.findViewById(R.id.label1);
+			holder.roundTv = (TextView) convertView.findViewById(R.id.tv);
 			holder.textView = (TextView) convertView
 					.findViewById(R.id.textView1);
-			holder.tv1 = (TextView) convertView
-					.findViewById(R.id.textView2);
-			holder.tv2 = (TextView) convertView
-					.findViewById(R.id.textView3);
-			holder.tv3 = (TextView) convertView
-					.findViewById(R.id.textView4);
-			holder.img = (ImageView) convertView
-					.findViewById(R.id.img);
+			holder.tv1 = (TextView) convertView.findViewById(R.id.textView2);
+			holder.tv2 = (TextView) convertView.findViewById(R.id.textView3);
+			holder.tv3 = (TextView) convertView.findViewById(R.id.textView4);
+			holder.img = (ImageView) convertView.findViewById(R.id.img);
 			holder.listbutton = (ImageView) convertView
 					.findViewById(R.id.listbutton);
 			convertView.setTag(holder);
@@ -82,15 +76,21 @@ public class CustomAdapter extends BaseAdapter{
 			holder = (UserHolder) convertView.getTag();
 
 		}
-		//Log.d("disable","---->"+Utilities.pdata.get(position).getHasActivities()+"  "+position+" "+Utilities.pdata.get(position).getPName());
-		
-		Log.d("header","--->"+Utilities.groupdata.get(position).getHeadname()+" "+Utilities.groupdata.get(position).getType()+" "+Utilities.groupdata.get(position).getName()+" "+Utilities.groupdata.get(position).getTrade()+
-				" "+Utilities.groupdata.get(position).getClassification()+" "+Utilities.groupdata.get(position).getHrs());
-		if(Utilities.groupdata.get(position).getHeadname().equals("Material")|| Utilities.groupdata.get(position).getHeadname().equals("Equipment")|| Utilities.groupdata.get(position).getHeadname().equals("Labor"))
-		{
-			Log.d("inside","-->"+Utilities.groupdata.get(position).getHeadname());
+		// Log.d("disable","---->"+Utilities.pdata.get(position).getHasActivities()+"  "+position+" "+Utilities.pdata.get(position).getPName());
+
+		// Log.d("header","--->"+Utilities.groupdata.get(position).getHeadname()+" "+Utilities.groupdata.get(position).getType()+" "+Utilities.groupdata.get(position).getName()+" "+Utilities.groupdata.get(position).getTrade()+
+		// " "+Utilities.groupdata.get(position).getClassification()+" "+Utilities.groupdata.get(position).getHrs());
+		if (Utilities.groupdata.get(position).getHeadname().equals("Material")
+				|| Utilities.groupdata.get(position).getHeadname()
+						.equals("Equipment")
+				|| Utilities.groupdata.get(position).getHeadname()
+						.equals("Labor")) {
+
 			holder.label1.setVisibility(View.VISIBLE);
-			holder.label1.setText(Utilities.groupdata.get(position).getHeadname());
+			Log.d("tagname", "--->"
+					+ Utilities.groupdata.get(position).getHeadname());
+			holder.label1.setText(Utilities.groupdata.get(position)
+					.getHeadname());
 			holder.roundTv.setVisibility(View.GONE);
 			holder.img.setVisibility(View.GONE);
 			holder.listbutton.setVisibility(View.GONE);
@@ -98,98 +98,146 @@ public class CustomAdapter extends BaseAdapter{
 			holder.tv1.setText("");
 			holder.tv2.setText("");
 			holder.tv3.setText("");
-			holder.layout.setBackgroundColor(Color.parseColor("#EBEBE9"));
-		}
-		else{
-			//holder.layout.setBackgroundColor(Color.WHITE);
+			//holder.layout.setBackgroundColor(Color.parseColor("#EBEBE9"));
+		} else {
+			// holder.layout.setBackgroundColor(Color.WHITE);
 			holder.label1.setVisibility(View.GONE);
 			holder.roundTv.setVisibility(View.VISIBLE);
 			holder.img.setVisibility(View.VISIBLE);
 			holder.listbutton.setVisibility(View.VISIBLE);
-		if(Utilities.groupdata.get(position).getType().equals("Labor"))
-		{
-		holder.roundTv.setText("L");
-		
-		}
-		else if(Utilities.groupdata.get(position).getType().equals("Equipment"))
-		{
-			holder.roundTv.setText("E");
-		}
-		else{
-			holder.roundTv.setText("M");
-		}
-		
-		holder.textView.setText(Utilities.groupdata.get(position).getName());
-		holder.tv1.setText(Utilities.groupdata.get(position).getTrade());
-		holder.tv2.setText(Utilities.groupdata.get(position).getClassification());
-		holder.tv3.setText((int) Utilities.groupdata.get(position).getHrs()+"");
-		
-		if (Utilities.groupdata.get(position).getType().equals("Labor")) {
-			holder.roundTv.setBackgroundResource(R.drawable.circleyellow);
-		} else if (Utilities.groupdata.get(position).getType().equals("Equipment")) {
-			holder.roundTv.setBackgroundResource(R.drawable.circleblack);
-		} else if (Utilities.groupdata.get(position).getType().equals("Material")) {
-			holder.roundTv.setBackgroundResource(R.drawable.circleblue);
-		}
-		convertView.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Log.d("disable","---->"+Utilities.groupdata.get(position).getEId());
-				singleton.setCurrentSelectedEntryID(
-						Utilities.groupdata.get(position).getEId());
-				singleton.setNewEntryFlag(false);
+			if (Utilities.groupdata.get(position).getType().equals("Labor")) {
+				holder.roundTv.setText("L");
 
-				if (Utilities.groupdata.get(position).getType().equals("Labor")) {
-					Log.d("labor","---->");
-					singleton.setSelectedLaborName(Utilities.groupdata.get(position).getName());
-					singleton.setSelectedLaborTrade(Utilities.groupdata.get(position).getTrade());
-					singleton
-							.setSelectedLaborClassification(Utilities.groupdata.get(position).getClassification());
-					singleton.setSelectedLaborHours((int)Utilities.groupdata.get(position).getHrs()+"");
-					
-					// singleton.setSelectedLaborDescription(val[6]);
-					Intent intent = new Intent(
-							context,
-							AddLabor.class);
-					context.startActivity(intent);
-				} else if (Utilities.groupdata.get(position).getType().equals("Equipment")) {
-					Log.d("Equipment","---->");
-					singleton.setSelectedEquipmentName(Utilities.groupdata.get(position).getName());
-					singleton
-							.setSelectedEquipmentCompany(Utilities.groupdata.get(position).getTrade());
-					singleton
-							.setSelectedEquipmentStatus(Utilities.groupdata.get(position).getClassification());
-					singleton.setSelectedEquipmentQty((int)Utilities.groupdata.get(position).getHrs()+"");
-					// singleton.setSelectedEquipmentDescription(val[6]);
-					Intent intent = new Intent(
-							context,
-							AddEquipment.class);
-					context.startActivity(intent);
-				} else if (Utilities.groupdata.get(position).getType().equals("Material")) {
-					singleton.setSelectedMaterialName(Utilities.groupdata.get(position).getName());
-					singleton
-							.setSelectedMaterialCompany(Utilities.groupdata.get(position).getTrade());
-					singleton.setSelectedMaterialStatus(Utilities.groupdata.get(position).getClassification());
-					singleton.setSelectedMaterialQty((int)Utilities.groupdata.get(position).getHrs()+"");
-					// singleton.setSelectedMaterialDescription(val[6]);
-					Intent intent = new Intent(
-							context,
-							AddMaterial.class);
-					context.startActivity(intent);
-				}
-			}
+				holder.textView.setText(Utilities.groupdata.get(position)
+						.getName());
+				holder.tv1
+						.setText(Utilities.groupdata.get(position).getTrade());
+				holder.tv2.setText(Utilities.groupdata.get(position)
+						.getClassification());
+				holder.tv3.setText((int)Utilities.groupdata.get(position)
+						.getHrs() + " hours");
+
+			} else if (Utilities.groupdata.get(position).getType()
+					.equals("Equipment")) {
+				holder.roundTv.setText("E");
+				holder.textView.setText(Utilities.groupdata.get(position)
+						.getName());
+				holder.tv1
+						.setText(Utilities.groupdata.get(position).getTrade());
+				holder.tv2.setText(Utilities.groupdata.get(position)
+						.getClassification());
+				holder.tv3.setText((int) Utilities.groupdata.get(position)
+						.getHrs() + " hours");
+			} else {
+				holder.roundTv.setText("M");
 				
-			
-		});
-		
+				holder.textView.setText(Utilities.groupdata.get(position)
+						.getName());
+				holder.tv1
+						.setText(Utilities.groupdata.get(position).getTrade());
+				holder.tv2
+				.setText(Utilities.groupdata.get(position).getClassification());
+				holder.tv3.setText((int)Utilities.groupdata.get(position)
+						.getHrs() + " sheets");
+			}
+
+			if (Utilities.groupdata.get(position).getType().equals("Labor")) {
+				holder.roundTv.setBackgroundResource(R.drawable.circleyellow);
+			} else if (Utilities.groupdata.get(position).getType()
+					.equals("Equipment")) {
+				holder.roundTv.setBackgroundResource(R.drawable.circleblack);
+			} else if (Utilities.groupdata.get(position).getType()
+					.equals("Material")) {
+				holder.roundTv.setBackgroundResource(R.drawable.circleblue);
+			}
+			convertView.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Log.d("disable", "---->"
+							+ Utilities.groupdata.get(position).getEId());
+					singleton.setCurrentSelectedEntryID(Utilities.groupdata
+							.get(position).getEId());
+					singleton.setNewEntryFlag(false);
+
+					if (Utilities.groupdata.get(position).getType()
+							.equals("Labor")) {
+						Log.d("labor", "---->");
+						singleton.setSelectedLaborName(Utilities.groupdata.get(
+								position).getName());
+						singleton.setSelectedLaborTrade(Utilities.groupdata
+								.get(position).getTrade());
+						singleton
+								.setSelectedLaborClassification(Utilities.groupdata
+										.get(position).getClassification());
+						singleton
+								.setSelectedLaborHours((int) Utilities.groupdata
+										.get(position).getHrs() + "");
+						singleton
+								.setSelectedLaborTimeAndHalf((int) Utilities.groupdata
+										.get(position).getTimeandhalf() + "");
+						singleton
+								.setSelectedLaborDoubleTime((int) Utilities.groupdata
+										.get(position).getDoubletime() + "");
+						// singleton.setSelectedLaborDescription(val[6]);
+						Intent intent = new Intent(context, AddLabor.class);
+						context.startActivity(intent);
+					} else if (Utilities.groupdata.get(position).getType()
+							.equals("Equipment")) {
+						Log.d("Equipment", "---->");
+						singleton.setSelectedEquipmentName(Utilities.groupdata
+								.get(position).getName());
+						singleton
+								.setSelectedEquipmentCompany(Utilities.groupdata
+										.get(position).getTrade());
+						singleton
+								.setSelectedEquipmentStatus(Utilities.groupdata
+										.get(position).getClassification());
+						singleton
+								.setSelectedEquipmentQty((int) Utilities.groupdata
+										.get(position).getHrs() + "");
+						singleton
+								.setSelectedLaborTimeAndHalf((int) Utilities.groupdata
+										.get(position).getTimeandhalf() + "");
+						singleton
+								.setSelectedLaborDoubleTime((int) Utilities.groupdata
+										.get(position).getDoubletime() + "");
+						// singleton.setSelectedEquipmentDescription(val[6]);
+						Intent intent = new Intent(context, AddEquipment.class);
+						context.startActivity(intent);
+					} else if (Utilities.groupdata.get(position).getType()
+							.equals("Material")) {
+						singleton.setSelectedMaterialName(Utilities.groupdata
+								.get(position).getName());
+						singleton
+								.setSelectedMaterialCompany(Utilities.groupdata
+										.get(position).getTrade());
+						singleton.setSelectedMaterialStatus(Utilities.groupdata
+								.get(position).getClassification());
+						singleton
+								.setSelectedMaterialQty((int) Utilities.groupdata
+										.get(position).getHrs() + "");
+						singleton
+								.setSelectedLaborTimeAndHalf((int) Utilities.groupdata
+										.get(position).getTimeandhalf() + "");
+						singleton
+								.setSelectedLaborDoubleTime((int) Utilities.groupdata
+										.get(position).getDoubletime() + "");
+						// singleton.setSelectedMaterialDescription(val[6]);
+						Intent intent = new Intent(context, AddMaterial.class);
+						context.startActivity(intent);
+					}
+				}
+
+			});
+
 		}
 		return convertView;
 	}
 
 	static class UserHolder {
-		TextView roundTv,textView,tv2,tv1,tv3,label1;
-		ImageView img,listbutton;
+		TextView roundTv, textView, tv2, tv1, tv3, label1;
+		ImageView img, listbutton;
 		RelativeLayout layout;
 	}
 

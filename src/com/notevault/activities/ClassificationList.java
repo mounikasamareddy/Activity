@@ -161,7 +161,7 @@ public class ClassificationList extends Activity{
                     for (int i = 0; i < laborClassificationArray.length(); i++) {
                         JSONObject laborClassification = laborClassificationArray.getJSONObject(i);
                         lbclassific.add(laborClassification.getString("W").replace("\\", ""));
-                        dbAdapter.insertGlossary(singleton.getLCCID(), laborClassification.getString("W"));
+                        dbAdapter.insertGlossary(singleton.getLCCID(), laborClassification.getString("W").replace("\\", ""));
                     }
                     setAdapter();
                 } catch (JSONException e) {

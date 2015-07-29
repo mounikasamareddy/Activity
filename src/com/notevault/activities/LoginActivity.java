@@ -1,14 +1,7 @@
 package com.notevault.activities;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -17,15 +10,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +18,6 @@ import android.R.color;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,7 +34,6 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -75,12 +57,13 @@ public class LoginActivity extends Activity {
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	private ProgressDialog mProgressDialog;
 	CheckBox rememberMe;
+	TextView trail;
 	public static HashMap<Integer, String> projectsListStatus = new HashMap<Integer, String>();
 	public static HashMap<Integer, String> projectsListActivityStatus = new HashMap<Integer, String>();
 	DBAdapter dbAdapter;
 	LoginTask sign;
 	private EditText userName, phoneNumber;
-
+String WelcomeName= null;
 	public boolean checkRememberMe() {
 		if (sharedPreferences.contains("rememberMe")) {
 			if (sharedPreferences.getString("rememberMe", "").equalsIgnoreCase(
@@ -125,7 +108,8 @@ public class LoginActivity extends Activity {
 		TextView msgTextView1 = (TextView) findViewById(R.id.text_msg1);
 		TextView msgTextView2 = (TextView) findViewById(R.id.text_msg2);
 		TextView msgTextView3 = (TextView) findViewById(R.id.text_msg3);
-		TextView msgContact = (TextView) findViewById(R.id.text_msg4);
+		
+		
 		userEditText = (EditText) findViewById(R.id.username);
 	Typeface custom_font = Typeface.createFromAsset(getAssets(),
 				"fonts/ufonts.com_gotham-book.ttf");
@@ -134,7 +118,7 @@ public class LoginActivity extends Activity {
 		msgTextView1.setTypeface(custom_font);
 		msgTextView2.setTypeface(custom_font);
 		msgTextView3.setTypeface(custom_font);
-		msgContact.setTypeface(custom_font);
+	
 
 		clickhereTextView.setOnClickListener(new View.OnClickListener() {
 
@@ -175,6 +159,15 @@ public class LoginActivity extends Activity {
 			}
 		});
 
+		msgTextView3.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://support.notevault.com"));
+				startActivity(browserIntent);
+				
+			}
+		});
 		sharedPreferences = getSharedPreferences(MyPREFERENCES,
 				Context.MODE_PRIVATE);
 	
@@ -213,14 +206,14 @@ public class LoginActivity extends Activity {
 		 * @Override public void onClick(View v) { onBackPressed(); } });
 		 */
 		TextView phoneNumberTextView = (TextView) findViewById(R.id.textView2);
-		phoneNumberTextView.setTypeface(custom_font);
-		phoneNumberTextView.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				makeCall();
-			}
-		});
+//		phoneNumberTextView.setTypeface(custom_font);
+//		phoneNumberTextView.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				makeCall();
+//			}
+//		});
 
 		loginButton.setOnClickListener(new OnClickListener() {
 
@@ -240,7 +233,7 @@ public class LoginActivity extends Activity {
 
 						// offline
 						Toast.makeText(getApplicationContext(),
-								"Ur in Offline.", Toast.LENGTH_SHORT).show();
+								"You are in Offline.", Toast.LENGTH_SHORT).show();
 						Cursor c = dbAdapter.queryCredentialsLogin();
 						if (c.getCount() != 0) {
 
@@ -301,8 +294,8 @@ public class LoginActivity extends Activity {
 								Log.d("grouped details offline","--->"+Utilities.lData.get(0).getAccountID()+" "+singleton.getSubscriberId());
 							}
 
-							startActivity(new Intent(getApplicationContext(),
-									ProjectListActivity.class));
+//							startActivity(new Intent(getApplicationContext(),
+//									ProjectListActivity.class));
 						} else {
 							Toast.makeText(
 									getApplicationContext(),
@@ -336,21 +329,21 @@ public class LoginActivity extends Activity {
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 	}
 
-	protected void makeCall() {
-		Log.i("Initiating call", "");
-		Intent phoneIntent = new Intent(Intent.ACTION_CALL);
-		phoneIntent.setData(Uri.parse("tel:+18587559800"));
-
-		try {
-			startActivity(phoneIntent);
-			finish();
-			Log.i("Finished making a call", "");
-		} catch (android.content.ActivityNotFoundException ex) {
-			Toast.makeText(LoginActivity.this,
-					"Call failed! Please try again later.", Toast.LENGTH_SHORT)
-					.show();
-		}
-	}
+//	protected void makeCall() {
+//		Log.i("Initiating call", "");
+//		Intent phoneIntent = new Intent(Intent.ACTION_CALL);
+//		phoneIntent.setData(Uri.parse("tel:+18587559800"));
+//
+//		try {
+//			startActivity(phoneIntent);
+//			finish();
+//			Log.i("Finished making a call", "");
+//		} catch (android.content.ActivityNotFoundException ex) {
+//			Toast.makeText(LoginActivity.this,
+//					"Call failed! Please try again later.", Toast.LENGTH_SHORT)
+//					.show();
+//		}
+//	}
 
 	private class LoginTask extends AsyncTask<Void, Void, String> {
 
@@ -505,7 +498,8 @@ public class LoginActivity extends Activity {
 							Log.d("grouped details online","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
 							singleton.setCompanyName(obj.getJSONObject("id")
 									.getString("Company"));
-							singleton.setUsername(obj.getJSONObject("id").getString("DisplayName"));
+							WelcomeName=obj.getJSONObject("id").getString("DisplayName");
+							singleton.setUsername(WelcomeName);
 							Cursor c = dbAdapter.queryCredentials(username,
 									password);
 

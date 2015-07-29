@@ -9,7 +9,21 @@ public class GroupData {
 	String Type;
 	int EId;
 	String headname;
+	double timeandhalf;
+	double doubletime;
 	
+	public double getTimeandhalf() {
+		return timeandhalf;
+	}
+	public void setTimeandhalf(double timeandhalf) {
+		this.timeandhalf = timeandhalf;
+	}
+	public double getDoubletime() {
+		return doubletime;
+	}
+	public void setDoubletime(double doubletime) {
+		this.doubletime = doubletime;
+	}
 	public String getHeadname() {
 		return headname;
 	}

@@ -19,14 +19,15 @@ import com.notevault.activities.R;
 import com.notevault.pojo.Singleton;
 import com.notevault.support.Utilities;
 
-public class TaskAdapter extends BaseAdapter{
+public class TaskAdapter extends BaseAdapter {
 
 	Context context;
 	LayoutInflater infilator;
 	Singleton singleton;
+
 	public TaskAdapter(Context context) {
-		this.context=context;
-		infilator=LayoutInflater.from(context);
+		this.context = context;
+		infilator = LayoutInflater.from(context);
 	}
 
 	@Override
@@ -52,11 +53,10 @@ public class TaskAdapter extends BaseAdapter{
 		UserHolder holder;
 		singleton = Singleton.getInstance();
 		if (convertView == null) {
-			convertView= infilator.inflate(R.layout.customlist, null);
-			holder=new UserHolder();
+			convertView = infilator.inflate(R.layout.customlist, null);
+			holder = new UserHolder();
 			holder.tv = (TextView) convertView.findViewById(R.id.textView1);
-		
-
+			holder.taskId = (TextView) convertView.findViewById(R.id.taskid);
 			holder.orangeArrow = (ImageView) convertView
 					.findViewById(R.id.name_imageView2);
 			holder.greyArrow = (ImageView) convertView
@@ -68,58 +68,65 @@ public class TaskAdapter extends BaseAdapter{
 			holder = (UserHolder) convertView.getTag();
 
 		}
-
+		
 		holder.tv.setText(Utilities.tdata.get(position).getTName());
+		
 		if (singleton.isEnableTasks()) {
 			if (Utilities.tdata.get(position).getHasData() == 1) {
 				holder.orangeArrow.setVisibility(View.VISIBLE);
 				holder.greyArrow.setVisibility(View.INVISIBLE);
-			}
-			else{
+			} else {
 				holder.orangeArrow.setVisibility(View.INVISIBLE);
 				holder.greyArrow.setVisibility(View.VISIBLE);
 			}
 
 		}
-		
+
 		holder.tv.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				
-				
-				singleton.setSelectedTaskID(Utilities.tdata.get(position).getTID());
 
-				singleton.setSelectedTaskName(Utilities.tdata.get(position).getTName());
-				singleton.setselectedTaskIdentityoffline(Utilities.tdata.get(position).getTIdentity());
+				singleton.setSelectedTaskID(Utilities.tdata.get(position)
+						.getTID());
+
+				singleton.setSelectedTaskName(Utilities.tdata.get(position)
+						.getTName());
+				singleton.setselectedTaskIdentityoffline(Utilities.tdata.get(
+						position).getTIdentity());
 				notifyDataSetChanged();
-				
 
 				Date curDate = new Date();
 				// System.out.println("Cur Date : ##################################### : "+
 				// curDate);
-				SimpleDateFormat format1 = new SimpleDateFormat(
-						"dd-MM-yyyy");
+				SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
 				try {
-					singleton.setCurrentSelectedDateFormatted(format1
+
+					String[] dateFormattedArray = format1
 							.parse(format1.format(curDate)).toString()
-							.replace(" 00:00:00 GMT+05:30", ","));
+							.split(" ");
+					String dateFormatted = dateFormattedArray[0] + " "
+							+ dateFormattedArray[1] + " "
+							+ dateFormattedArray[2] + ", "
+							+ dateFormattedArray[5];
+
+					singleton.setCurrentSelectedDateFormatted(dateFormatted);
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
 				singleton.setCurrentSelectedDate(new SimpleDateFormat(
 						"yyyyMMdd").format(curDate));
-				
-				
+
 				Intent intent = new Intent(context,
 						ActivitiesListActivity.class);
-				singleton.setSelectedTaskName(Utilities.tdata.get(position).getTName());
-				singleton.setSelectedTaskID(Utilities.tdata.get(position).getTID());
+				singleton.setSelectedTaskName(Utilities.tdata.get(position)
+						.getTName());
+				singleton.setSelectedTaskID(Utilities.tdata.get(position)
+						.getTID());
 				System.err.println("TaskName: "
 						+ singleton.getSelectedTaskName());
-				System.err.println("TaskID: "
-						+ singleton.getSelectedTaskID());
+				System.err.println("TaskID: " + singleton.getSelectedTaskID());
 				context.startActivity(intent);
 			}
 		});
@@ -128,7 +135,7 @@ public class TaskAdapter extends BaseAdapter{
 	}
 
 	static class UserHolder {
-		TextView tv;
+		TextView tv,taskId;
 		ImageView orangeArrow, greyArrow;
 	}
 

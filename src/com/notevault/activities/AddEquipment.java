@@ -214,7 +214,7 @@ public class AddEquipment extends Activity {
 				if (q.equalsIgnoreCase("")) {
 					if (!errorMsg.equalsIgnoreCase(""))
 						errorMsg += ", ";
-					errorMsg += "Quantity";
+					errorMsg += "Hours";
 				}
 				if (errorMsg.length() > 0) {
 					if (errorMsg.contains(",")) {
@@ -291,7 +291,7 @@ public class AddEquipment extends Activity {
 		public View getView(final int position, View convertView,
 				ViewGroup parent) {
 			LayoutInflater li = getLayoutInflater();
-			convertView = li.inflate(R.layout.customlist, null);
+			convertView = li.inflate(R.layout.entrieslistview, null);
 			TextView tv = (TextView) convertView.findViewById(R.id.textView1);
 			tv2 = (TextView) convertView.findViewById(R.id.textView2);
 			final String val[] = values[position].split("~");
@@ -413,7 +413,7 @@ public class AddEquipment extends Activity {
 						singleton.getSelectedEquipmentName(),
 						singleton.getSelectedEquipmentCompany(),
 						singleton.getSelectedEquipmentStatus(),
-						singleton.getSelectedEquipmentQty(), "E", "I", ID);
+						singleton.getSelectedEquipmentQty(), "E", "I", ID,0,0);
 				EntriesListByDateActivity.collectiveConcatenatedEntryList
 						.add("E" + glue + singleton.getSelectedEquipmentName()
 								+ glue
@@ -443,7 +443,7 @@ public class AddEquipment extends Activity {
 						singleton.getSelectedEquipmentCompany(),
 						singleton.getSelectedEquipmentStatus(),
 						singleton.getSelectedEquipmentQty(), "E", "I",
-						dbAdapter.generateOfflineEntryID());
+						dbAdapter.generateOfflineEntryID(),0,0);
 				System.out
 						.println("Add Equipment Entry unknown host exception.");
 			} else {
@@ -463,7 +463,7 @@ public class AddEquipment extends Activity {
 									singleton.getSelectedEquipmentCompany(),
 									singleton.getSelectedEquipmentStatus(),
 									singleton.getSelectedEquipmentQty(), "E",
-									"N", jObject.getString("EID"));
+									"N", jObject.getString("EID"),0,0);
 							System.out
 									.println("laborInsertResponse inside Add Labor Success: "
 											+ equipmentInsertResponse);
@@ -482,7 +482,7 @@ public class AddEquipment extends Activity {
 									singleton.getSelectedEquipmentCompany(),
 									singleton.getSelectedEquipmentStatus(),
 									singleton.getSelectedEquipmentQty(), "E",
-									"I", dbAdapter.generateOfflineEntryID());
+									"I", dbAdapter.generateOfflineEntryID(),0,0);
 							System.out
 									.println("laborInsertResponse inside Add Labor Failure: "
 											+ equipmentInsertResponse);
@@ -496,7 +496,7 @@ public class AddEquipment extends Activity {
 								singleton.getSelectedEquipmentCompany(),
 								singleton.getSelectedEquipmentStatus(),
 								singleton.getSelectedEquipmentQty(), "E", "I",
-								dbAdapter.generateOfflineEntryID());
+								dbAdapter.generateOfflineEntryID(),0,0);
 						e.printStackTrace();
 					}
 				} else {
@@ -506,7 +506,7 @@ public class AddEquipment extends Activity {
 							singleton.getSelectedEquipmentCompany(),
 							singleton.getSelectedEquipmentStatus(),
 							singleton.getSelectedEquipmentQty(), "E", "I",
-							dbAdapter.generateOfflineEntryID());
+							dbAdapter.generateOfflineEntryID(),0,0);
 					System.out
 							.println("An error occurred! Could not add entry.");
 				}

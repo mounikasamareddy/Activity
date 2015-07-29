@@ -11,7 +11,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -30,8 +29,11 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +41,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,11 +52,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.notevault.arraylistsupportclasses.ActivityDB;
 import com.notevault.arraylistsupportclasses.ActivityData;
+import com.notevault.arraylistsupportclasses.TasksDB;
 import com.notevault.arraysupportclasses.CalenderActivity;
 import com.notevault.datastorage.DBAdapter;
 import com.notevault.pojo.Singleton;
@@ -79,32 +86,62 @@ public class ActivitiesListActivity extends Activity {
 	private ImageView nextMonth;
 	private GridView calendarView;
 	GridCellAdapter adapter;
-	private TextView currentMonth;
+	EditText activityNameToCopy;
+	private TextView currentMonth,text1;
 	public String statusMessageForActivities;
 	private static final String dateTemplate = "MMMM yyyy";
 	RelativeLayout calendarClick;
 	private ListView customListView;
 	private SwipeListAdapter listAdapter;
-	private ProgressDialog mProgressDialog;
+	private ProgressDialog mdialog;
 	public static HashMap<String, String> activityListStatus = new HashMap<String, String>();
 	public String yearMonthdate;
 	DBAdapter dbAdapter;
 	List<CalenderActivity> data1;
 	private TextView backTask;
 	boolean newName = false;
-	LinearLayout messageDefaultHint;
-	String datevalues[];
+	LinearLayout messageDefaultHint,emptyText,llayout;
+	String datevalues[]= new String[0];
+	SharedPreferences settingPreferences;
 	int k = 0;
 	String runningYMDdata;
-
+	String shiftdata[] = { "None", "One", "Two", "Three" };
+	ArrayAdapter<String> spinnerAdapter;
+	Spinner spinner;
+	int spinnerSelectedItem;
+	Button laborSummary;
+	
+int shiftval=0;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState); 
+		
 		setContentView(R.layout.taskactivities);
-
+		laborSummary=(Button)findViewById(R.id.laboursummary);
+		emptyText=(LinearLayout) findViewById(R.id.emptytext);
+		llayout=(LinearLayout) findViewById(R.id.llayout);
 		messageDefaultHint = (LinearLayout) findViewById(R.id.activity_layout1);
 		messageDefaultHint.setVisibility(View.VISIBLE);
 		singleton = Singleton.getInstance();
+		
+		settingPreferences = getSharedPreferences(
+				SettingActivity.EnableSHIFTPREFERENCES, Context.MODE_PRIVATE);
+		if (settingPreferences.contains(String.valueOf(singleton.getUserId()))) {
+			if (settingPreferences.getString(
+					String.valueOf(singleton.getUserId()), "")
+					.equalsIgnoreCase("true")) {
+				singleton.setEnableShiftTracking(true);
+			}
+		}
+		laborSummary.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent= new Intent(getApplicationContext(),LaborSummary.class);
+				startActivity(intent);
+				
+			}
+		});
 		TextView projectName = (TextView) findViewById(R.id.projectname_text);
 
 		// Log.d("projectname", "---->" + singleton.getSelectedProjectName());
@@ -114,7 +151,7 @@ public class ActivitiesListActivity extends Activity {
 		// ****************
 		backTask = (TextView) findViewById(R.id.textView1);
 		if (singleton.isEnableTasks()) {
-			
+
 			backTask.setText("TASKS");
 			taskName.setText(singleton.getSelectedTaskName());
 			breadcrumb_separator.setVisibility(View.VISIBLE);
@@ -133,44 +170,31 @@ public class ActivitiesListActivity extends Activity {
 		if (singleton.isOnline()) {
 
 			
-			Log.d("grouped details","--->"+singleton.getAccountId()+" "+singleton.getSubscriberId());
 			
-			Log.d("online", "---->");
+			new Datesvalues().execute();
+			
 			if (singleton.isEnableTasks()) {
-				Log.d("mapval", "--->"+ singleton
-						.getSelectedTaskID());
-				
-				data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
-						.getSelectedTaskID());
-				Log.d("mapval", "--->"+ data1.size());
-				datevalues = new String[data1.size()];
-				if(data1.size()>0){
 
-					for (CalenderActivity val : data1) {
-						datevalues[k] = val.getDate();
-						Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
-						k++;
-					}
-					for(int i=0;i<datevalues.length;i++)
-					{
-						Log.d("dataval", "--->" + datevalues[i]);
-					}
 
-				}
+
 				GetTaskActivities taskActivities = new GetTaskActivities();
 				taskActivities.execute();
-			} else {
 				
+
+				
+				
+			} else {
+
 				new ProjectData().execute();
-				GetMyTaskActivities getMyTaskActivities = new GetMyTaskActivities();
-				getMyTaskActivities.execute();
+				
 			}
 		} else {
 
-			Log.d("offline", "---->");
+			//Log.d("offline", "---->");
 			String str = singleton.getCurrentSelectedDate();
-			readDbData(str);
-
+			
+				readDbData(str);
+			
 		}
 
 		calendarClick = (RelativeLayout) findViewById(R.id.calendare_layout);
@@ -292,6 +316,7 @@ public class ActivitiesListActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				singleton.setCopyEntryFlag(false);
 				onBackPressed();
 			}
 		});
@@ -301,6 +326,7 @@ public class ActivitiesListActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
+		
 		singleton.setReloadPage(true);
 	}
 
@@ -326,14 +352,20 @@ public class ActivitiesListActivity extends Activity {
 						Toast.LENGTH_SHORT).show();
 
 			} else {
-				Toast.makeText(getApplicationContext(), "copy to today",
-						Toast.LENGTH_SHORT).show();
+//				Toast.makeText(getApplicationContext(), "copy to today",
+//						Toast.LENGTH_SHORT).show();
 				singleton.setSelectedActivityName(dateFilteredValues[position]);
 				singleton.setSelectedActivityID(Integer
 						.parseInt(dateFilteredKeys[position]));
 				System.out.println("copy to today");
-
-				namePopupWindow();
+				if(singleton.isOnline())
+				{
+					namePopupWindow();
+				}
+				else{
+					Toast.makeText(getApplicationContext(), "You are in Offline.",
+							Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
 
@@ -342,8 +374,63 @@ public class ActivitiesListActivity extends Activity {
 			final Dialog dialog = new Dialog(ActivitiesListActivity.this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			dialog.setContentView(R.layout.popup);
-			final EditText activityNameToCopy = (EditText) dialog
+			LinearLayout shift= (LinearLayout)dialog.findViewById(R.id.shift);
+			Button close=(Button)dialog.findViewById(R.id.cancel);
+			
+			if(singleton.isEnableShiftTracking()){
+				
+				shift.setVisibility(View.VISIBLE);
+				spinner = (Spinner)dialog.findViewById(R.id.shiftspinner);
+				spinnerAdapter = new ArrayAdapter<String>(ActivitiesListActivity.this,
+						android.R.layout.simple_spinner_item, shiftdata);
+				spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				spinner.setAdapter(spinnerAdapter);
+				
+
+				for (int i = 0; i < shiftdata.length; i++) {
+					if (shiftdata[i].equals(singleton.getResentShiftItem())) {
+						spinnerSelectedItem = i;
+					}
+
+				}
+
+				spinner.setSelection(spinnerSelectedItem);
+				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View arg1,
+							int pos, long arg3) {
+						
+						shiftval=pos;
+//						Log.d("shif selected item", "-->"
+//								+ parent.getItemAtPosition(pos).toString());
+//						singleton.setResentShiftItem(parent.getItemAtPosition(pos)
+//								.toString());
+
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> arg0) {
+						// TODO Auto-generated method stub
+
+					}
+
+				});
+			}
+			else{
+				shift.setVisibility(View.GONE);
+			}
+			
+			activityNameToCopy = (EditText) dialog
 					.findViewById(R.id.editText1);
+			close.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					activityNameToCopy.setText("");
+					
+				}
+			});
 			activityNameToCopy.setText(singleton.getSelectedActivityName());
 			Button dialogButton = (Button) dialog
 					.findViewById(R.id.btn_close_popup);
@@ -351,11 +438,9 @@ public class ActivitiesListActivity extends Activity {
 			dialogButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mProgressDialog = new ProgressDialog(
-							ActivitiesListActivity.this);
-					mProgressDialog.setMessage("Loading...");
-					mProgressDialog.setIndeterminate(false);
-					mProgressDialog.show();
+					
+					
+				
 					if (!activityNameToCopy.getText().toString()
 							.equals(singleton.getSelectedActivityName()))
 						singleton.setSelectedActivityName(activityNameToCopy
@@ -364,6 +449,12 @@ public class ActivitiesListActivity extends Activity {
 					CopyEntriesTask copyTask = new CopyEntriesTask();
 					copyTask.execute();
 					dialog.dismiss();
+					Log.d("checking","--->"+singleton.isCopyEntryFlag());
+					singleton.setCopyEntryFlag(true);
+					Intent intent = new Intent(
+							ActivitiesListActivity.this,
+							TasksListActivity.class);
+					startActivity(intent);
 				}
 			});
 
@@ -421,12 +512,13 @@ public class ActivitiesListActivity extends Activity {
 						.get(position).getAIdentity());
 			}
 
-			Log.d("Aidentity","-->"+singleton.getselectedActivityIdentityoffline());
+			Log.d("Aidentity",
+					"-->" + singleton.getselectedActivityIdentityoffline());
 			System.err.println("activity name :"
 					+ singleton.getSelectedActivityName());
 			System.err.println("activity id :"
 					+ singleton.getSelectedActivityID());
-			Intent intent=new Intent(getApplicationContext(),
+			Intent intent = new Intent(getApplicationContext(),
 					EntriesListActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putInt("index", 2);
@@ -438,7 +530,12 @@ public class ActivitiesListActivity extends Activity {
 
 	// get activity list for selected task.
 	private class GetTaskActivities extends AsyncTask<Void, Void, String> {
-
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			mhandler.sendEmptyMessage(0);
+		}
 		@Override
 		protected String doInBackground(Void... arg0) {
 
@@ -516,6 +613,7 @@ public class ActivitiesListActivity extends Activity {
 			} else {
 				if (response != null) {
 					try {
+						
 						/*
 						 * Object json = new
 						 * JSONTokener(activitiesResponse).nextValue(); if (json
@@ -527,6 +625,8 @@ public class ActivitiesListActivity extends Activity {
 								response);
 						if (activitiesJSONResponse.getInt("Status") == 0
 								|| activitiesJSONResponse.getInt("Status") == 200) {
+							llayout.setVisibility(View.VISIBLE);
+							emptyText.setVisibility(View.GONE);
 							JSONArray jsonResponseActivitiesArray = activitiesJSONResponse
 									.getJSONArray("Activities");
 							System.out.println("Activities :"
@@ -538,11 +638,19 @@ public class ActivitiesListActivity extends Activity {
 							keys = new String[activitiesArrayLength];
 							values = new String[activitiesArrayLength];
 							dates = new String[activitiesArrayLength];
+							
+							
 							for (int i = 0; i < activitiesArrayLength; i++) {
 								JSONObject activity = jsonResponseActivitiesArray
 										.getJSONObject(i);
 								keys[i] = activity.getString("AI");// Integer.valueOf();
-								values[i] = activity.getString("AN");
+								String str=activity.getString("AN");
+								Log.d("data","--->"+str);
+								
+									
+								
+								values[i] = str.replace("\\", "");
+							Log.d("data","--->"+values[i]+" "+str);
 								dates[i] = singleton.getCurrentSelectedDate();// activity.getString("D").split(" ")[0].replace("-","");
 								// System.out.println(dates[i]);
 								activityListStatus.put(keys[i],
@@ -551,8 +659,7 @@ public class ActivitiesListActivity extends Activity {
 								// activity.getInt("Id"));
 								singleton.getActivitiesList().put(keys[i],
 										values[i]);
-								
-								
+
 							}
 
 							int delResponse = dbAdapter.deleteActivities(
@@ -571,6 +678,8 @@ public class ActivitiesListActivity extends Activity {
 
 						} else if (activitiesJSONResponse.getInt("Status") == 230) {
 							singleton.getActivitiesList().clear();
+							llayout.setVisibility(View.GONE);
+							emptyText.setVisibility(View.VISIBLE);
 							activityListStatus.clear();
 							keys = new String[0];
 							values = new String[0];
@@ -586,8 +695,33 @@ public class ActivitiesListActivity extends Activity {
 
 				}
 			}
+			mhandler.sendEmptyMessage(1);
 		}
 	}
+
+	Handler mhandler = new Handler() {
+
+		public void handleMessage(Message msg) {
+
+			switch (msg.what) {
+			case 0:
+				mdialog = ProgressDialog
+						.show(ActivitiesListActivity.this, "", "Loading...!");
+				removeMessages(0);
+				break;
+			
+			case 1:
+				if (mdialog.isShowing()) 
+				{
+					mdialog.cancel();
+				}
+				removeMessages(2);
+				break;
+
+			}
+		}
+
+	};
 
 	private class GetMyTaskActivities extends AsyncTask<Void, Void, String> {
 
@@ -629,21 +763,25 @@ public class ActivitiesListActivity extends Activity {
 				HttpsURLConnection.setDefaultHostnameVerifier(hv);
 
 				try {
-					JSONObject jsonMyTaskActivitiesRequest = new JSONObject();
 					
+					JSONObject jsonMyTaskActivitiesRequest = new JSONObject();
+
 					jsonMyTaskActivitiesRequest.put("TaskId",
 							singleton.getSelectedTaskID());
 					jsonMyTaskActivitiesRequest.put("ProjectDay",
 							singleton.getCurrentSelectedDate());
-					jsonMyTaskActivitiesRequest.put("UserId", singleton.getUserId());
-//					jsonMyTaskActivitiesRequest.put("ProjectId",
-//							singleton.getSelectedProjectID());
-//					jsonMyTaskActivitiesRequest.put("UserId",
-//							singleton.getUserId());
-//					jsonMyTaskActivitiesRequest.put("ProjectDay",
-//							singleton.getCurrentSelectedDate());
-//					System.out.println("My Task Activities Request: "
-//							+ jsonMyTaskActivitiesRequest);
+					jsonMyTaskActivitiesRequest.put("UserId",
+							singleton.getUserId());
+					// jsonMyTaskActivitiesRequest.put("ProjectId",
+					// singleton.getSelectedProjectID());
+					// jsonMyTaskActivitiesRequest.put("UserId",
+					// singleton.getUserId());
+					// jsonMyTaskActivitiesRequest.put("ProjectDay",
+					// singleton.getCurrentSelectedDate());
+					// System.out.println("My Task Activities Request: "
+					// + jsonMyTaskActivitiesRequest);
+					Log.d("get activities for taskid Request: ","--->"
+							+ jsonMyTaskActivitiesRequest);
 					System.out.println("get activities for taskid Request: "
 							+ jsonMyTaskActivitiesRequest);
 					return jsonDataPost
@@ -659,7 +797,7 @@ public class ActivitiesListActivity extends Activity {
 		}
 
 		protected void onPostExecute(final String response) {
-			System.out.println("MyTask Activities Response: " + response);
+			Log.d("MyTask Activities Response: ","--->" + response);
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
 				Toast.makeText(getApplicationContext(),
@@ -668,35 +806,49 @@ public class ActivitiesListActivity extends Activity {
 			} else {
 				if (response != null) {
 					try {
+						
 						JSONObject myTaskActivitiesJSONResponse = new JSONObject(
 								response);
 						singleton.getTaskList().clear();
 						TasksListActivity.taskListStatus.clear();
-
+						Log.d("MyTask Activities Response: ","--->" + myTaskActivitiesJSONResponse
+								.getInt("Status"));
 						if ((myTaskActivitiesJSONResponse.getInt("Status") == 0)
 								|| (myTaskActivitiesJSONResponse
 										.getInt("Status") == 200)
 								|| (myTaskActivitiesJSONResponse
 										.getInt("Status") == 230)) {
 
+							if(myTaskActivitiesJSONResponse
+									.getInt("Status") == 230)
+							{
+								llayout.setVisibility(View.GONE);
+								emptyText.setVisibility(View.VISIBLE);
+							}
+							else{
+							llayout.setVisibility(View.VISIBLE);
+							emptyText.setVisibility(View.GONE);
+							}
 							LoginActivity.projectsListActivityStatus.put(
 									singleton.getSelectedProjectID(), "T");
-							
-//							singleton
-//									.setSelectedTaskID(myTaskActivitiesJSONResponse
-//											.getInt("TI"));
-//							singleton
-//									.setSelectedTaskName(myTaskActivitiesJSONResponse
-//											.getString("TN"));
-							
+
+							// singleton
+							// .setSelectedTaskID(myTaskActivitiesJSONResponse
+							// .getInt("TI"));
+							// singleton
+							// .setSelectedTaskName(myTaskActivitiesJSONResponse
+							// .getString("TN"));
+
 							JSONArray myTaskActivitiesArray = new JSONArray(
 									myTaskActivitiesJSONResponse
 											.getString("Activities"));// myTaskActivitiesJSONResponse.getJSONArray("tasks");
 
 							int myTaskActivitiesArrayLength = myTaskActivitiesArray
 									.length();
+
+							Log.d("arraylength", "--->"
+									+ myTaskActivitiesArrayLength);
 							
-							Log.d("arraylength","--->"+myTaskActivitiesArrayLength);
 							keys = new String[myTaskActivitiesArrayLength];
 							values = new String[myTaskActivitiesArrayLength];
 							dates = new String[myTaskActivitiesArrayLength];
@@ -704,24 +856,29 @@ public class ActivitiesListActivity extends Activity {
 								JSONObject activity = myTaskActivitiesArray
 										.getJSONObject(i);// JSONObject
 								keys[i] = activity.getString("AI");
-								values[i] = activity.getString("AN");
+							String str=activity.getString("AN").replace("\\", "");
+							
+								values[i] = str;
+								Log.d("values","--->"+values[i]);
 								dates[i] = singleton.getCurrentSelectedDate();// activity.getString("D").split(" ")[0].replace("-","");
 								singleton.getActivitiesList().put(keys[i],
 										values[i]);
 								activityListStatus.put(keys[i],
 										activity.getString("F"));
-								
-								Log.d("datajson","--->"+keys[i]+" "+values[i]+dates[i]);
-							} 
+
+								Log.d("datajson", "--->" + keys[i] + " "
+										+ values[i] + dates[i]);
+							}
 							int delResponse = dbAdapter.deleteMyTaskActivities(
-									singleton.getSelectedTaskID(),
-									singleton.getCurrentSelectedDate());
+									singleton.getSelectedTaskID(),singleton.getCurrentSelectedDate()
+									);
+							Log.d("delete","--->"+delResponse);
 							System.out
 									.println("MyTaskActivities deletion response: "
 											+ delResponse);
 							if (singleton.getActivitiesList().size() > 0) {
-								for(int i=0;i<dates.length;i++)
-								writeActivitiesToDB(dates[i]);
+								
+									writeActivitiesToDB(singleton.getCurrentSelectedDate());
 							}
 							processListsAndSetAdapter();
 						} else {
@@ -737,6 +894,7 @@ public class ActivitiesListActivity extends Activity {
 							.println("An error occurred! Could not fetch activities.");
 				}
 			}
+			
 		}
 	}
 
@@ -936,7 +1094,6 @@ public class ActivitiesListActivity extends Activity {
 			// Get a reference to the Day gridcell
 			gridcell = (Button) row.findViewById(R.id.calendar_day_gridcell);
 			orangeDot = (ImageView) row.findViewById(R.id.orangedot);
-
 			gridcell.setOnClickListener(this);
 
 			// ACCOUNT FOR SPACING
@@ -951,8 +1108,8 @@ public class ActivitiesListActivity extends Activity {
 			// Set the Day GridCell
 			gridcell.setText(theday);
 			gridcell.setTag(theyear + "-" + themonth + "-" + theday);
-			//Log.d("year month day", "--->" + theyear + "-" + themonth + "-"
-				//	+ theday.length());
+			// Log.d("year month day", "--->" + theyear + "-" + themonth + "-"
+			// + theday.length());
 			if (theday.length() == 1) {
 				runningYMDdata = theyear + "" + themonth + "0" + theday;
 			} else {
@@ -963,15 +1120,64 @@ public class ActivitiesListActivity extends Activity {
 						.getColor(R.color.lightgray));
 			}
 			if (day_color[1].equals("WHITE")) {
-
 				
+				
+				if(singleton.isOnline())
+				{
+					Log.d("online","--->"+datevalues.length);
+				if(datevalues.length==0)
+				{
+				//Toast.makeText(getApplicationContext(), "Calender Dates not at loading", 100).show();
+				//offline dates
+				List<ActivityDB> data;
+				data1 = dbAdapter.getAllActivityRecordsForCalender();
+				datevalues = new String[data1.size()];
+				if (data1.size() > 0) {
+					Log.d("length", "--->" + data1.size());
+					datevalues = new String[data1.size()];
+					k = 0;
+					for (CalenderActivity val : data1) {
 
+						Log.d("DB data", "--->" + val.getDate() + " " + val.getAId()
+								+ " " + val.getAName() + " " + val.getTid());
+						datevalues[k] = val.getDate();
+						k++;
+					}
 					for (int i = 0; i < datevalues.length; i++) {
 						Log.d("present date", "--->" + datevalues[i] + "  "
 								+ runningYMDdata);
 						if (datevalues[i].equals(runningYMDdata)) {
 							orangeDot.setVisibility(View.VISIBLE);
 						}
+
+					}
+
+				}
+				}
+				else{
+					for (int i = 0; i < datevalues.length; i++) {
+						Log.d("present date", "--->" + datevalues[i] + "  "
+								+ runningYMDdata);
+						if (datevalues[i].equals(runningYMDdata)) {
+							orangeDot.setVisibility(View.VISIBLE);
+						}
+
+					}
+				}
+				}
+				else{
+					if(datevalues.length>0)
+					{
+						Log.d("offline","--->"+datevalues.length);
+					for (int i = 0; i < datevalues.length; i++) {
+						Log.d("present date", "--->" + datevalues[i] + "  "
+								+ runningYMDdata);
+						if (datevalues[i].equals(runningYMDdata)) {
+							orangeDot.setVisibility(View.VISIBLE);
+						}
+
+					}
+					}	
 					
 				}
 				gridcell.setTextColor(getResources().getColor(
@@ -980,18 +1186,16 @@ public class ActivitiesListActivity extends Activity {
 			}
 			if (day_color[1].equals("BLUE")) {
 
-				//Log.d("present date", "--->" + yearMonthdate.substring(4, 6)
-					//	+ " " + yearMonthdate.substring(0, 4));
+				// Log.d("present date", "--->" + yearMonthdate.substring(4, 6)
+				// + " " + yearMonthdate.substring(0, 4));
 
-				
+				for (int i = 0; i < datevalues.length; i++) {
+					// Log.d("present date", "--->" + datevalues[i] + "  "
+					// + runningYMDdata);
+					if (datevalues[i].equals(runningYMDdata)) {
+						orangeDot.setVisibility(View.VISIBLE);
+					}
 
-					for (int i = 0; i < datevalues.length; i++) {
-						//Log.d("present date", "--->" + datevalues[i] + "  "
-							//	+ runningYMDdata);
-						if (datevalues[i].equals(runningYMDdata)) {
-							orangeDot.setVisibility(View.VISIBLE);
-						}
-					
 				}
 				if (themonth.equals(yearMonthdate.substring(4, 6))
 						&& theyear.equals(yearMonthdate.substring(0, 4))) {
@@ -1031,6 +1235,7 @@ public class ActivitiesListActivity extends Activity {
 
 		@Override
 		public void onClick(View view) {
+			
 			String date_month_year = (String) view.getTag();
 			// Log.d("clickdate", "---->" + date_month_year);
 			SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
@@ -1038,9 +1243,12 @@ public class ActivitiesListActivity extends Activity {
 				singleton.setCurrentSelectedDate(new SimpleDateFormat(
 						"yyyyMMdd").format(new SimpleDateFormat("yyyy-MM-d")
 						.parse(date_month_year)));
-				singleton.setCurrentSelectedDateFormatted(df2
-						.parse(date_month_year).toString()
-						.replace("00:00:00 GMT+05:30", ","));
+				
+				String[] dateFormattedArray = df2.parse(date_month_year).toString().split(" ");
+				String dateFormatted = dateFormattedArray[0] + " " + dateFormattedArray[1] + " " + dateFormattedArray[2] + ", " + dateFormattedArray[5];
+				//System.err.println("dateFormatted: "+ dateFormatted);
+				singleton.setCurrentSelectedDateFormatted(dateFormatted);
+				
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -1066,18 +1274,16 @@ public class ActivitiesListActivity extends Activity {
 				// sqlite data
 				// Log.d("offline", "--->");
 				String dateupdate = date_month_year.replace("-", "");
-				Log.d("check","--->"+dateupdate.length());
-				if(dateupdate.length()==8)
-				{
+				Log.d("check", "--->" + dateupdate.length());
+				if (dateupdate.length() == 8) {
 					dateupdate = dateupdate.substring(0, 6) + ""
 							+ dateupdate.substring(6, dateupdate.length());
 					Log.d("date1", "---->" + dateupdate);
-				}
-				else{
-				dateupdate = dateupdate.substring(0, 6) + "0"
-						+ dateupdate.substring(6, dateupdate.length());
-				Log.d("date1", "---->" + dateupdate);
-				
+				} else {
+					dateupdate = dateupdate.substring(0, 6) + "0"
+							+ dateupdate.substring(6, dateupdate.length());
+					Log.d("date1", "---->" + dateupdate);
+
 				}
 				readDbData(dateupdate);
 			}
@@ -1103,24 +1309,25 @@ public class ActivitiesListActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-if(singleton.isOnline())
-{
-	
-		if (singleton.isReloadPage()) {
-			singleton.setReloadPage(false);
-			listAdapter.notifyDataSetChanged();
-			this.onCreate(null);
+
+		Log.d("onresume","--->"+singleton.isReloadPage());
+		if (singleton.isOnline()) {
+			singleton.setReloadPage(true);
+			if (singleton.isReloadPage()) {
+				
+				
+
+				this.onCreate(null);
+				singleton.setReloadPage(false);
+			}
+
+		} else {
+			String str = singleton.getCurrentSelectedDate();
+
+			Log.d("offine onresume", "--->" + str);
+
+			readDbData(str);
 		}
-		
-}
-else{
-	String str = singleton.getCurrentSelectedDate();
-	
-	Log.d("offine onresume","--->"+str);
-	
-	readDbData(str);
-}
 	}
 
 	// copy to today and copy to yesterday api calls.
@@ -1182,10 +1389,17 @@ else{
 							+ singleton.getCurrentSelectedDate());
 					jsonlabor.put("ToProjectDay", singleton.getToDate());
 					jsonlabor.put("DateCreated", dc);
+					if(singleton.isEnableShiftTracking()){
+						
+						jsonlabor.put("Shift", shiftval);
+					}
+					
+					Log.d("copy checking","--->"+activityNameToCopy.getText().toString());
 					if (newName)
-						jsonlabor.put("Name",
-								singleton.getSelectedActivityName());
+						jsonlabor.put("Name",singleton.getSelectedActivityName()
+								);
 					System.out.println(jsonlabor);
+					Log.d("copy","--->"+jsonlabor);
 					return jsonDataPost.copyActivityToDay(jsonlabor);
 
 				} catch (JSONException e) {
@@ -1200,8 +1414,8 @@ else{
 		}
 
 		protected void onPostExecute(final String result) {
-			mProgressDialog.dismiss();
-
+		//	mProgressDialog.dismiss();
+			Log.d("responce","--->"+result);
 			if (result != null) {
 				try {
 					JSONObject jsonObject = new JSONObject(result);
@@ -1211,10 +1425,7 @@ else{
 						if (jsonObject.getString("AI").equals("null")) {
 							System.out.println("AI: "
 									+ jsonObject.getString("AI"));
-							Toast.makeText(
-									getApplicationContext(),
-									"A server error occurred. Please contact support.",
-									Toast.LENGTH_SHORT).show();
+							
 						} else {
 							try {
 								singleton
@@ -1231,9 +1442,10 @@ else{
 									.getToDate());
 							singleton.setSelectedActivityID(Integer
 									.parseInt(jsonObject.getString("AI")));// Integer.parseInt();
+							
 							Intent intent = new Intent(
 									ActivitiesListActivity.this,
-									EntriesListActivity.class);
+									TasksListActivity.class);
 							startActivity(intent);
 						}
 					}
@@ -1346,6 +1558,7 @@ else{
 		// String[] values = singleton.getActivitiesList().keySet().toArray(new
 		// String[singleton.getActivitiesList().size()]);
 		long insertResponse = 0;
+		Log.d("@!#$@$#%$^","--->"+values.length);
 		for (int i = 0; i < values.length; i++) {
 
 			Log.d("insert val", "--->" + keys[i] + "  " + values[i] + " "
@@ -1354,7 +1567,7 @@ else{
 					singleton.getSelectedTaskID(), Projectday,
 					activityListStatus.get(keys[i]).equals("T") ? 1 : 0,
 					singleton.getUserId());
-			
+
 			Log.d("Activities insertion response: ", "--->" + insertResponse);
 		}
 		System.out.println("Activities insertion response: " + insertResponse);
@@ -1366,9 +1579,9 @@ else{
 		System.out.println("keys: " + Arrays.toString(keys));
 		System.out.println("values: " + Arrays.toString(values));
 		System.out.println(Arrays.toString(dates));
-		Log.d("keys","--->"+Arrays.toString(keys));
-		Log.d("values","--->"+Arrays.toString(values));
-		Log.d("dates","--->"+Arrays.toString(dates));
+		Log.d("keys", "--->" + Arrays.toString(keys));
+		Log.d("values", "--->" + Arrays.toString(values));
+		Log.d("dates", "--->" + Arrays.toString(dates));
 		int size = 0;
 
 		String date = null;
@@ -1422,7 +1635,7 @@ else{
 																// background of
 																// list item
 		customListView.setOnTouchListener(touchListener);
-		
+
 		customListView.setAdapter(listAdapter);
 
 		/*
@@ -1431,7 +1644,7 @@ else{
 		// ((ListAdapterSwipe)cmn_list_view.getAdapter()).notifyDataSetInvalidated();
 	}
 
-	public class ProjectData extends AsyncTask<Void,Void,String>{
+	public class ProjectData extends AsyncTask<Void, Void, String> {
 
 		@Override
 		protected String doInBackground(Void... arg0) {
@@ -1468,7 +1681,7 @@ else{
 				HttpsURLConnection.setDefaultSSLSocketFactory(sc
 						.getSocketFactory());
 				HttpsURLConnection.setDefaultHostnameVerifier(hv);
-				
+
 				try {
 					JSONObject jsonTaskRequest = new JSONObject();
 					jsonTaskRequest.put("ProjectId",
@@ -1476,7 +1689,7 @@ else{
 					// jsonTaskRequest.put("UserId", singleton.getUserId());
 					jsonTaskRequest.put("ProjectDay",
 							singleton.getCurrentSelectedDate());
-					System.out.println("request"+jsonTaskRequest);
+					System.out.println("request" + jsonTaskRequest);
 					return jsonDataPost.getAllProjectTasks(jsonTaskRequest);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1485,12 +1698,12 @@ else{
 				e.printStackTrace();
 			}
 			return null;
-				
-				
+
 		}
+
 		@Override
 		protected void onPostExecute(String response) {
-			Log.d("result","-->"+response);
+			Log.d("result", "-->" + response);
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
 				Toast.makeText(getApplicationContext(), "Ur in offline",
@@ -1500,8 +1713,7 @@ else{
 				String taskResponse = response;
 				if (taskResponse != null) {
 					try {
-						
-						
+
 						Object json = new JSONTokener(taskResponse).nextValue();
 						if (json instanceof JSONObject) {
 							System.out.println("Response is an object.");
@@ -1518,115 +1730,256 @@ else{
 									.getJSONArray("tasks");
 							int responseTasksArrayLength = responseTasksArray
 									.length();
-							
+
 							for (int i = 0; i < responseTasksArrayLength; i++) {
 								JSONObject task = responseTasksArray
 										.getJSONObject(i);// JSONObject
 								String requiredTaskName = task.getString("TN");
-								Log.d("test","--->"+requiredTaskName);
-								if(requiredTaskName.equals("My Task"))
-								{
-									Log.d("tasktest","--->"+task.getInt("TI"));
-									singleton.setSelectedTaskID(task.getInt("TI"));
-									Log.d("tasktest","--->"+singleton.getSelectedTaskID());
-									Log.d("mapval", "--->"+ singleton
-											.getSelectedTaskID());
-									
-									data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
-											.getSelectedTaskID());
-									Log.d("mapval", "--->"+ data1.size());
-									datevalues = new String[data1.size()];
-									if(data1.size()>0){
-
-										for (CalenderActivity val : data1) {
-											datevalues[k] = val.getDate();
-											Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
-											k++;
-										}
-										for(int j=0;j<datevalues.length;j++)
-										{
-											Log.d("dataval", "--->" + datevalues[j]);
-										}
-
-									}
+								Log.d("test", "--->" + requiredTaskName);
+								if (requiredTaskName.equals("My Task")) {
+									Log.d("tasktest",
+											"--->" + task.getInt("TI"));
+									singleton.setSelectedTaskID(task
+											.getInt("TI"));
+									Log.d("tasktest",
+											"--->"
+													+ singleton
+															.getSelectedTaskID());
+									GetMyTaskActivities getMyTaskActivities = new GetMyTaskActivities();
+									getMyTaskActivities.execute();
+//									Log.d("mapval",
+//											"--->"
+//													+ singleton
+//															.getSelectedTaskID());
+//
+//									data1 = dbAdapter
+//											.getAllActivityRecordsForCalender(singleton
+//													.getSelectedTaskID());
+//									Log.d("mapval", "--->" + data1.size());
+//									datevalues = new String[data1.size()];
+//									if (data1.size() > 0) {
+//
+//										for (CalenderActivity val : data1) {
+//											datevalues[k] = val.getDate();
+//											Log.d("mapval",
+//													"--->" + val.getDate()
+//															+ " "
+//															+ val.getAId()
+//															+ " "
+//															+ val.getAName()
+//															+ " "
+//															+ val.getTid());
+//											k++;
+//										}
+//										for (int j = 0; j < datevalues.length; j++) {
+//											Log.d("dataval", "--->"
+//													+ datevalues[j]);
+//										}
+//
+//									}
 								}
 							}
 						}
-						
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
-					} else {
-						System.out
-								.println("An error occurred! Could not fetch tasks");
+
+					} catch (JSONException e) {
+						e.printStackTrace();
 					}
+				} else {
+					System.out
+							.println("An error occurred! Could not fetch tasks");
+				}
+			}
+
+		}
+
+	}
+
+	private class Datesvalues extends AsyncTask<Void, Void, String> {
+
+		@Override
+		protected String doInBackground(Void... arg0) {
+
+			try {
+				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+					@Override
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					@Override
+					public void checkClientTrusted(
+							java.security.cert.X509Certificate[] arg0,
+							String arg1) {
+					}
+
+					@Override
+					public void checkServerTrusted(
+							java.security.cert.X509Certificate[] chain,
+							String authType) {
+					}
+				} };
+
+				HostnameVerifier hv = new HostnameVerifier() {
+
+					@Override
+					public boolean verify(String hostname, SSLSession session) {
+						return false;
+					}
+				};
+				SSLContext sc = SSLContext.getInstance("SSL");
+				sc.init(null, trustAllCerts, new SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(sc
+						.getSocketFactory());
+				HttpsURLConnection.setDefaultHostnameVerifier(hv);
+
+				try {
+
+					JSONObject jsondates = new JSONObject();
+					jsondates
+							.put("ProjectId", singleton.getSelectedProjectID());
+					System.out.println("activity id..................."
+							+ singleton.getSelectedActivityID());
+					jsondates.put("LimitDays", 60);
+					jsondates.put("UserId", singleton.getUserId());
+					Log.d("dates", "--->" + jsondates);
+					return jsonDataPost.getActivityCount(jsondates);
+
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
 
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		protected void onPostExecute(final String result) {
+			Log.d("result", "--->" + result);
+			int length=0;
+			int k=0;
+			try {
+				if (result != null) {
+					JSONObject jobj = new JSONObject(result);
+					JSONArray json = jobj.getJSONArray("labor");
+					length=length+json.length();
+					JSONArray json1 = jobj.getJSONArray("equipment");
+					length=length+json1.length();
+					JSONArray json2 = jobj.getJSONArray("material");
+					length=length+json2.length();
+				
+					datevalues = new String[length];
+					Log.d("dataval", "--->" + datevalues.length);
+					for (int i = 0; i < json.length(); i++) {
+						JSONObject c = json.getJSONObject(i);
+
+						datevalues[k] = c.getString("Pday");
+
+						Log.d("result", "--->" + datevalues[k]);
+						k++;
+
 					}
-		
+					for (int i = 0; i < json1.length(); i++) {
+						JSONObject c = json1.getJSONObject(i);
+
+						datevalues[k] = c.getString("Pday");
+
+						Log.d("result", "--->" + datevalues[k]);
+						k++;
+					}
+					for (int i = 0; i < json2.length(); i++) {
+						JSONObject c = json2.getJSONObject(i);
+
+						datevalues[k] = c.getString("Pday");
+
+						Log.d("result", "--->" + datevalues[k]);
+						k++;
+					}
+					
+					for (int i = 0; i < datevalues.length; i++) {
+						Log.d("dataval", "--->" + datevalues[i]);
+					}
+					
+				} else {
+
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
-		
 
-	
-	
-	
-	
+	}
+
 	private void readDbData(String date) {
-		customListView = (ListView) findViewById(R.id.list2);
-
-		// Tid table identity value stored in Tid in Activity table
-
-		int Tid = singleton.getSelectedTaskID();
+		
+	
 		Utilities.adata.clear();
 		List<ActivityDB> data;
-		Log.d("tid", "--->" + Tid);
-		if (Tid == 0) {   
-			data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
-					.getSelectedTaskIdentityoffline());
+		data1 = dbAdapter.getAllActivityRecordsForCalender();
 		datevalues = new String[data1.size()];
-		if(data1.size()>0){
-
+		if (data1.size() > 0) {
+			Log.d("length", "--->" + data1.size());
+			datevalues = new String[data1.size()];
+			k = 0;
 			for (CalenderActivity val : data1) {
+
+				Log.d("DB data", "--->" + val.getDate() + " " + val.getAId()
+						+ " " + val.getAName() + " " + val.getTid());
 				datevalues[k] = val.getDate();
-				Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
 				k++;
 			}
-			for(int i=0;i<datevalues.length;i++)
-			{
+			for (int i = 0; i < datevalues.length; i++) {
 				Log.d("dataval", "--->" + datevalues[i]);
 			}
 
+		}
+		
+		Log.d("task", "--->" +singleton.isEnableTasks());
+		
+		// Tid table identity value stored in Tid in Activity table
+		if(singleton.isEnableTasks())
+		{
+			int Tid = singleton.getSelectedTaskID();
+			
+			
+		}
+		else{
+			
+			List<TasksDB> taskdata= dbAdapter.getAllTaskRecords(singleton.getSelectedProjectID());
+			Log.d("project id","--->"+singleton.getSelectedProjectID()+"..."+taskdata.size());
+			Log.d("task len", "--->" +taskdata.size());
+			singleton.setSelectedTaskID(0);
+			Log.d("tid", "--->" + singleton.getSelectedTaskID());
+			if(taskdata.size()>0){
+				
+			for (TasksDB val : taskdata) {
+			
+				if(val.getTName().equals("My Task"))
+				{	
+					singleton.setSelectedTaskID(val.getTID());
+					Log.d("tid", "--->" + singleton.getSelectedTaskID());
+					break;
+				}
+			
+			}
+			}
+			else{
+
+			}
 		}
 			
-			data = dbAdapter.getAllActivityRecords(
-					singleton.getSelectedTaskIdentityoffline(), date);
-			Log.d("tid", "--->" + singleton.getSelectedTaskIdentityoffline()
-					+ "   " + date + " " + data.size());
-		} else {
-			data1 = dbAdapter.getAllActivityRecordsForCalender(singleton
-					.getSelectedTaskID());
-		datevalues = new String[data1.size()];
-		if(data1.size()>0){
-			Log.d("length","--->"+data1.size());
-			datevalues= new String[data1.size()];
-			k=0;
-			for (CalenderActivity val : data1) {
-				
-				Log.d("mapval", "--->" + val.getDate()+" "+val.getAId()+" "+val.getAName()+" "+val.getTid());
-				datevalues[k] = val.getDate();
-				k++;
-			}
-			for(int i=0;i<datevalues.length;i++)
-			{
-				Log.d("dataval", "--->" + datevalues[i]);
-			}
-
-		}
-			data = dbAdapter.getAllActivityRecords(Tid, date);
-			Log.d("tid", "--->" + Tid + "   " + date + " " + data.size());
-		}
-
+		if(!(singleton.getSelectedTaskID()==0))
+		{
+		data = dbAdapter.getAllActivityRecords(singleton.getSelectedTaskID(), date);
+		Log.d("tid", "--->" + singleton.getSelectedTaskID() + "   " + date + " " + data.size());
+		if(data.size()>0)
+		{
+			llayout.setVisibility(View.VISIBLE);
+			emptyText.setVisibility(View.GONE);
 		for (ActivityDB val : data) {
 			ActivityData details = new ActivityData();
 			details.setAIdentity(val.getAIdentity());
@@ -1636,6 +1989,10 @@ else{
 			details.setTid(val.getTid());
 			Utilities.adata.add(details);
 
+		}}
+		else{
+			llayout.setVisibility(View.GONE);
+			emptyText.setVisibility(View.VISIBLE);
 		}
 		// Log.d("arraylength", "---->" + Utilities.tdata.size());
 		dateFilteredValues = new String[Utilities.adata.size()];
@@ -1643,8 +2000,9 @@ else{
 		for (int i = 0; i < Utilities.adata.size(); i++) {
 			dateFilteredValues[i] = Utilities.adata.get(i).getAName();
 			dateFilteredKeys[i] = Utilities.adata.get(i).getAId() + "";
-			//Log.d("taskdata", "---->" + Utilities.adata.get(i).getAId());
-			//Log.d("taskdata", "---->" + Utilities.adata.get(i).getAIdentity());
+			// Log.d("taskdata", "---->" + Utilities.adata.get(i).getAId());
+			// Log.d("taskdata", "---->" +
+			// Utilities.adata.get(i).getAIdentity());
 			Log.d("taskdata", "---->" + Utilities.adata.get(i).getTDate());
 		}
 		// Log.d("oflineId", "---->" + Arrays.toString(dateFilteredKeys));
@@ -1661,7 +2019,8 @@ else{
 																// list item
 		customListView.setOnTouchListener(touchListener);
 		customListView.setAdapter(listAdapter);
-
+		}
 	}
-
+	
+	
 }

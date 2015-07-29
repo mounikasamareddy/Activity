@@ -23,7 +23,7 @@ public class ServerUtilities {
     Singleton singleton = Singleton.getInstance();
     public static boolean unknownHostException = false;
     public static String apiDomainURI = "https://dev.notevault.com/mobile/collector.php?req=";
-
+   
     public String authenticate(JSONObject jsonObject){
         singleton.setHTTPResponseStatusCode(0);
         JSONResponseString = "";
@@ -179,7 +179,27 @@ public class ServerUtilities {
         }
         return JSONResponseString;
     }
-
+    public String addActivityShiftToTask(JSONObject jsonObject){
+        singleton.setHTTPResponseStatusCode(0);
+        JSONResponseString = "";
+        String addActivityToTaskURL = apiDomainURI + "addActivityToTask";
+        try {
+            HttpPost httppost = new HttpPost(addActivityToTaskURL);
+            httppost.setHeader("Content-type", "application/json");
+            httppost.setEntity(new ByteArrayEntity(jsonObject.toString().getBytes("UTF8")));
+            HttpResponse response = httpclient.execute(httppost);
+            singleton.setHTTPResponseStatusCode(response.getStatusLine().getStatusCode());
+            System.out.println("add TaskActivity Request response code: " +  singleton.getHTTPResponseStatusCode());
+            JSONResponseString = EntityUtils.toString(response.getEntity());
+            System.out.println("Response(Activity) json string: " + JSONResponseString);
+        }catch (UnknownHostException e){
+            unknownHostException = true;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return JSONResponseString;
+    }
 	/*public String projectName(JSONObject jsonObject){
 
 		String resString;
@@ -867,6 +887,48 @@ public class ServerUtilities {
         return JSONResponseString;
     }
 
+    public String getLaborSummary(JSONObject jsonObject){
+        singleton.setHTTPResponseStatusCode(0);
+        JSONResponseString = "";
+        String getCopyofLaborEntriesURL = apiDomainURI + "getLaborSummary";//ToDay
+        try {
+            HttpPost httppost = new HttpPost(getCopyofLaborEntriesURL);
+            httppost.setHeader("Content-type", "application/json");
+            httppost.setEntity(new ByteArrayEntity(jsonObject.toString().getBytes("UTF8")));
+            HttpResponse response = httpclient.execute(httppost);
+            singleton.setHTTPResponseStatusCode(response.getStatusLine().getStatusCode());
+            System.out.println("getLaborSummary Request response code: " + singleton.getHTTPResponseStatusCode());
+            JSONResponseString = EntityUtils.toString(response.getEntity());
+            System.out.println("Response(getLaborSummary) json string: " + JSONResponseString);
+        }catch (UnknownHostException e){
+            unknownHostException = true;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return JSONResponseString;
+    }
+    public String getActivityCount(JSONObject jsonObject){
+        singleton.setHTTPResponseStatusCode(0);
+        JSONResponseString = "";
+        String getCopyofLaborEntriesURL = apiDomainURI + "getActivityCount";//ToDay
+        try {
+            HttpPost httppost = new HttpPost(getCopyofLaborEntriesURL);
+            httppost.setHeader("Content-type", "application/json");
+            httppost.setEntity(new ByteArrayEntity(jsonObject.toString().getBytes("UTF8")));
+            HttpResponse response = httpclient.execute(httppost);
+            singleton.setHTTPResponseStatusCode(response.getStatusLine().getStatusCode());
+            System.out.println("getActivityCount Request response code: " + singleton.getHTTPResponseStatusCode());
+            JSONResponseString = EntityUtils.toString(response.getEntity());
+            System.out.println("Response(getActivityCount) json string: " + JSONResponseString);
+        }catch (UnknownHostException e){
+            unknownHostException = true;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return JSONResponseString;
+    }
 	public String passwordRecovery(JSONObject jsonObject) {
 		 	singleton.setHTTPResponseStatusCode(0);
 	        JSONResponseString = "";
