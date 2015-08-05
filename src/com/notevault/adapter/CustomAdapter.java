@@ -115,7 +115,7 @@ public class CustomAdapter extends BaseAdapter {
 				holder.tv2.setText(Utilities.groupdata.get(position)
 						.getClassification());
 				holder.tv3.setText((int)Utilities.groupdata.get(position)
-						.getHrs() + " hours");
+						.getHrs() + "");
 
 			} else if (Utilities.groupdata.get(position).getType()
 					.equals("Equipment")) {
@@ -127,7 +127,7 @@ public class CustomAdapter extends BaseAdapter {
 				holder.tv2.setText(Utilities.groupdata.get(position)
 						.getClassification());
 				holder.tv3.setText((int) Utilities.groupdata.get(position)
-						.getHrs() + " hours");
+						.getHrs() + "");
 			} else {
 				holder.roundTv.setText("M");
 				
@@ -138,7 +138,7 @@ public class CustomAdapter extends BaseAdapter {
 				holder.tv2
 				.setText(Utilities.groupdata.get(position).getClassification());
 				holder.tv3.setText((int)Utilities.groupdata.get(position)
-						.getHrs() + " sheets");
+						.getHrs() + "");
 			}
 
 			if (Utilities.groupdata.get(position).getType().equals("Labor")) {

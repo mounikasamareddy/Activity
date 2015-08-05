@@ -22,7 +22,7 @@ public class ServerUtilities {
     private static HttpClient httpclient = new DefaultHttpClient();
     Singleton singleton = Singleton.getInstance();
     public static boolean unknownHostException = false;
-    public static String apiDomainURI = "https://dev.notevault.com/mobile/collector.php?req=";
+    public static String apiDomainURI = "https://mobile2.notevault.com/mobile/collector.php?req=";
    
     public String authenticate(JSONObject jsonObject){
         singleton.setHTTPResponseStatusCode(0);

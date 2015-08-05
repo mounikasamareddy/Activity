@@ -10,6 +10,7 @@
         android:orientation="vertical" >
 
         <LinearLayout
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dip"
@@ -17,38 +18,12 @@
             android:weightSum="2" >
 
             <TextView
-                android:id="@+id/title"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1.5"
                 android:text="Production"
-                android:textSize="18sp"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dip"
-            android:orientation="horizontal"
-            android:weightSum="2" >
-
-            <TextView
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1.5"
-                android:text="Total Activity Hours:"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/hrs"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1.01"
-                android:textSize="15sp" />
+                android:textSize="18sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -76,6 +51,30 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.5"
+                android:text="Total Activity Hours:"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/hrs"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.01"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dip"
@@ -87,7 +86,7 @@
                 android:layout_height="30dip"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1.5"
-                android:text="Hours Per Unit:"
+                android:text="Units Per Hour:"
                 android:textSize="15sp" />
 
             <TextView

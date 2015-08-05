@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ import android.widget.Toast;
 
 import com.notevault.arraylistsupportclasses.ActivityDB;
 import com.notevault.arraylistsupportclasses.ActivityData;
+import com.notevault.arraylistsupportclasses.ProjectData;
 import com.notevault.arraylistsupportclasses.TasksDB;
 import com.notevault.arraysupportclasses.CalenderActivity;
 import com.notevault.datastorage.DBAdapter;
@@ -117,7 +119,8 @@ int shiftval=0;
 		super.onCreate(savedInstanceState); 
 		
 		setContentView(R.layout.taskactivities);
-		laborSummary=(Button)findViewById(R.id.laboursummary);
+		laborSummary = (Button)findViewById(R.id.laboursummary);
+		laborSummary.setVisibility(View.GONE);
 		emptyText=(LinearLayout) findViewById(R.id.emptytext);
 		llayout=(LinearLayout) findViewById(R.id.llayout);
 		messageDefaultHint = (LinearLayout) findViewById(R.id.activity_layout1);
@@ -157,9 +160,7 @@ int shiftval=0;
 			breadcrumb_separator.setVisibility(View.VISIBLE);
 			taskName.setVisibility(View.VISIBLE);
 		} else {
-
 			backTask.setText("PROJECTS");
-
 		}
 
 		dateTextView = (TextView) findViewById(R.id.Calendar_text);
@@ -167,26 +168,13 @@ int shiftval=0;
 		dateTextView.setText(singleton.getCurrentSelectedDateFormatted());
 
 		dbAdapter = DBAdapter.get_dbAdapter(this);
-		if (singleton.isOnline()) {
-
-			
-			
+		if (singleton.isOnline()) {			
 			new Datesvalues().execute();
-			
 			if (singleton.isEnableTasks()) {
-
-
-
 				GetTaskActivities taskActivities = new GetTaskActivities();
 				taskActivities.execute();
-				
-
-				
-				
 			} else {
-
 				new ProjectData().execute();
-				
 			}
 		} else {
 
@@ -302,8 +290,7 @@ int shiftval=0;
 							AddActivity.class);
 					startActivity(intent);
 				} else {
-					Toast.makeText(getApplicationContext(), "Ur in  offline!",
-							Toast.LENGTH_LONG).show();
+					
 					Intent intent = new Intent(ActivitiesListActivity.this,
 							AddActivity.class);
 					startActivity(intent);
@@ -345,11 +332,19 @@ int shiftval=0;
 
 			if (singleton.getCurrentSelectedDate()
 					.equals(singleton.getToDate())) {
-
+				if(singleton.isOnline())
+				{
 				Toast.makeText(
 						getApplicationContext(),
 						"Cannot copy from today to today! Please select another date.",
 						Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(
+							getApplicationContext(),
+							"You are in Offline.",
+							Toast.LENGTH_SHORT).show();
+				}
 
 			} else {
 //				Toast.makeText(getApplicationContext(), "copy to today",
@@ -357,12 +352,13 @@ int shiftval=0;
 				singleton.setSelectedActivityName(dateFilteredValues[position]);
 				singleton.setSelectedActivityID(Integer
 						.parseInt(dateFilteredKeys[position]));
-				System.out.println("copy to today");
+			Log.d("copy to today","--->");
 				if(singleton.isOnline())
 				{
 					namePopupWindow();
 				}
 				else{
+					
 					Toast.makeText(getApplicationContext(), "You are in Offline.",
 							Toast.LENGTH_SHORT).show();
 				}
@@ -449,12 +445,9 @@ int shiftval=0;
 					CopyEntriesTask copyTask = new CopyEntriesTask();
 					copyTask.execute();
 					dialog.dismiss();
-					Log.d("checking","--->"+singleton.isCopyEntryFlag());
-					singleton.setCopyEntryFlag(true);
-					Intent intent = new Intent(
-							ActivitiesListActivity.this,
-							TasksListActivity.class);
-					startActivity(intent);
+					
+
+					
 				}
 			});
 
@@ -469,20 +462,37 @@ int shiftval=0;
 					.getTime()));
 			if (singleton.getCurrentSelectedDate()
 					.equals(singleton.getToDate())) {
+				if(singleton.isOnline())
+				{
 				Toast.makeText(
 						getApplicationContext(),
 						"Cannot copy from yesterday to yesterday! Please select another date.",
 						Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(
+							getApplicationContext(),
+							"You are in Offline.",
+							Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				Toast.makeText(getApplicationContext(), "copy to yesterday",
-						Toast.LENGTH_SHORT).show();
+				
 				singleton.setSelectedActivityName(dateFilteredValues[position]);
 				singleton.setSelectedActivityID(Integer
 						.parseInt(dateFilteredKeys[position]));
-
-				System.err.println("toDate : " + singleton.getToDate());
-				System.out.println("copy to yesterday");
-				namePopupWindow();
+					if(singleton.isOnline())
+					{
+						System.err.println("toDate : " + singleton.getToDate());
+						System.out.println("copy to yesterday");
+						namePopupWindow();
+					}
+					else{
+						Toast.makeText(
+								getApplicationContext(),
+								"You are in Offline.",
+								Toast.LENGTH_SHORT).show();
+					}
+				
 			}
 		}
 
@@ -504,27 +514,78 @@ int shiftval=0;
 		@Override
 		public void OnClickListView(int position) {
 
-			singleton.setSelectedActivityName(dateFilteredValues[position]);
-			singleton.setSelectedActivityID(Integer
-					.parseInt(dateFilteredKeys[position]));
-			if (Utilities.adata.size() != 0) {
-				singleton.setselectedActivityIdentityoffline(Utilities.adata
-						.get(position).getAIdentity());
+			
+			if(singleton.isOnline())
+			{
+				Log.d("onlinecheck","--->"+dateFilteredValues[position]);
+				
+				
+				singleton.setSelectedActivityName(dateFilteredValues[position]);
+				singleton.setSelectedActivityID(Integer
+						.parseInt(dateFilteredKeys[position]));
+				Log.d("~!#@#$#^%*&(^*","--->"+singleton.getSelectedActivityName()+"...."+singleton.getSelectedActivityID());
+				if(singleton.getSelectedActivityID()==0)
+				{
+					Log.d("success","--->");
+					
+					Intent intent = getIntent();
+				    finish();
+				    startActivity(intent);
+				}
+				else{
+					if (Utilities.adata.size() != 0) {
+						singleton.setselectedActivityIdentityoffline(Utilities.adata
+								.get(position).getAIdentity());
+					}
+
+					Log.d("Aidentity",
+							"-->" + singleton.getselectedActivityIdentityoffline());
+					System.err.println("activity name :"
+							+ singleton.getSelectedActivityName());
+					System.err.println("activity id :"
+							+ singleton.getSelectedActivityID());
+					Intent intent = new Intent(getApplicationContext(),
+							EntriesListActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putInt("index", 2);
+
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
+				
+				
+				
+				
 			}
+			else{
+				
+				singleton.setSelectedActivityName(dateFilteredValues[position]);
+				singleton.setSelectedActivityID(Integer
+						.parseInt(dateFilteredKeys[position]));
+				Log.d("~!#@#$#^%*&(^*","--->"+singleton.getSelectedActivityName()+"...."+singleton.getSelectedActivityID());
+				if (Utilities.adata.size() != 0) {
+					singleton.setselectedActivityIdentityoffline(Utilities.adata
+							.get(position).getAIdentity());
+				}
 
-			Log.d("Aidentity",
-					"-->" + singleton.getselectedActivityIdentityoffline());
-			System.err.println("activity name :"
-					+ singleton.getSelectedActivityName());
-			System.err.println("activity id :"
-					+ singleton.getSelectedActivityID());
-			Intent intent = new Intent(getApplicationContext(),
-					EntriesListActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putInt("index", 2);
+				Log.d("Aidentity",
+						"-->" + singleton.getselectedActivityIdentityoffline());
+				System.err.println("activity name :"
+						+ singleton.getSelectedActivityName());
+				System.err.println("activity id :"
+						+ singleton.getSelectedActivityID());
+				Intent intent = new Intent(getApplicationContext(),
+						EntriesListActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putInt("index", 2);
 
-			intent.putExtras(bundle);
-			startActivity(intent);
+				intent.putExtras(bundle);
+				startActivity(intent);		
+			}
+			
+			
+			
+			
 		}
 	};
 
@@ -711,11 +772,19 @@ int shiftval=0;
 				break;
 			
 			case 1:
-				if (mdialog.isShowing()) 
-				{
-					mdialog.cancel();
-				}
-				removeMessages(2);
+				if (mdialog!=null) {
+					if (mdialog.isShowing()) 
+					{
+						try {
+							mdialog.cancel();
+					       
+					    } catch (final IllegalArgumentException e) {
+					        // Handle or log or ignore
+					    }
+					} 
+		        }
+				
+				removeMessages(1);
 				break;
 
 			}
@@ -894,7 +963,7 @@ int shiftval=0;
 							.println("An error occurred! Could not fetch activities.");
 				}
 			}
-			
+			mhandler1.sendEmptyMessage(1);
 		}
 	}
 
@@ -1422,9 +1491,23 @@ int shiftval=0;
 					int Status = jsonObject.getInt("Status");
 					if (Status == 0 || Status == 200) {
 						// singleton.setSelectedActivityName("");
+						Log.d("date","--->"+jsonObject.getString("AI").equals("null"));
 						if (jsonObject.getString("AI").equals("null")) {
 							System.out.println("AI: "
 									+ jsonObject.getString("AI"));
+							try {
+								singleton
+										.setCurrentSelectedDateFormatted(new SimpleDateFormat(
+												"E MMM dd, yyyy")
+												.format(new SimpleDateFormat(
+														"yyyyMMdd")
+														.parse(singleton
+																.getToDate())));
+								Log.d("date","--->"+singleton
+										.getCurrentSelectedDateFormatted());
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}
 							
 						} else {
 							try {
@@ -1435,6 +1518,8 @@ int shiftval=0;
 														"yyyyMMdd")
 														.parse(singleton
 																.getToDate())));
+								Log.d("date","--->"+singleton
+										.getCurrentSelectedDateFormatted());
 							} catch (ParseException e) {
 								e.printStackTrace();
 							}
@@ -1443,10 +1528,23 @@ int shiftval=0;
 							singleton.setSelectedActivityID(Integer
 									.parseInt(jsonObject.getString("AI")));// Integer.parseInt();
 							
+							singleton.setCopyEntryFlag(true);
 							Intent intent = new Intent(
-									ActivitiesListActivity.this,
-									TasksListActivity.class);
+								ActivitiesListActivity.this,
+								EntriesListActivity.class);
+								//TasksListActivity.class);
+							Bundle bundle = new Bundle();
+							bundle.putInt("index", 2);
+
+							intent.putExtras(bundle);
 							startActivity(intent);
+							
+//							Intent intent = new Intent(
+//									ActivitiesListActivity.this,
+//									ActivitiesListActivity.class);
+//									//TasksListActivity.class);
+//							startActivity(intent);
+//							finish();
 						}
 					}
 				} catch (JSONException e) {
@@ -1507,21 +1605,22 @@ int shiftval=0;
 
 			if (singleton.isOnline()) {
 				tv.setText(dateFilteredValues[position]);
-
-				if (ActivitiesListActivity.activityListStatus.get(
-						dateFilteredKeys[position]).equals("T")) {
-					orangeArrow.setVisibility(View.VISIBLE);
-					greyArrow.setVisibility(View.INVISIBLE);
-				}
+				//Log.d("test","---"+ActivitiesListActivity.activityListStatus.size());
+				orangeArrow.setVisibility(View.VISIBLE);
+				greyArrow.setVisibility(View.INVISIBLE);
+//				if (ActivitiesListActivity.activityListStatus.get(
+//						dateFilteredKeys[position]).equals("T")) {
+//					orangeArrow.setVisibility(View.VISIBLE);
+//					greyArrow.setVisibility(View.INVISIBLE);
+//				}
 			} else {
 				tv.setText(dateFilteredValues[position]);
-				if (Utilities.adata.get(position).getHasdata() == 1) {
+				
+
 					orangeArrow.setVisibility(View.VISIBLE);
 					greyArrow.setVisibility(View.INVISIBLE);
-				} else {
-					orangeArrow.setVisibility(View.INVISIBLE);
-					greyArrow.setVisibility(View.VISIBLE);
-				}
+				
+				
 			}
 
 			return convertView;
@@ -1645,7 +1744,12 @@ int shiftval=0;
 	}
 
 	public class ProjectData extends AsyncTask<Void, Void, String> {
-
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			mhandler1.sendEmptyMessage(0);
+		}
 		@Override
 		protected String doInBackground(Void... arg0) {
 			try {
@@ -1793,6 +1897,36 @@ int shiftval=0;
 		}
 
 	}
+	Handler mhandler1 = new Handler() {
+
+		public void handleMessage(Message msg) {
+
+			switch (msg.what) {
+			case 0:
+				mdialog = ProgressDialog
+						.show(ActivitiesListActivity.this, "", "Loading...!");
+				removeMessages(0);
+				break;
+			
+			case 1:
+				if (mdialog!=null) {
+					if (mdialog.isShowing()) 
+					{ try {
+						mdialog.cancel();
+				       
+				    } catch (final IllegalArgumentException e) {
+				        // Handle or log or ignore
+				    }
+						
+					} 
+		        }
+				removeMessages(1);
+				break;
+
+			}
+		}
+
+	};
 
 	private class Datesvalues extends AsyncTask<Void, Void, String> {
 
@@ -1954,7 +2088,7 @@ int shiftval=0;
 			Log.d("task len", "--->" +taskdata.size());
 			singleton.setSelectedTaskID(0);
 			Log.d("tid", "--->" + singleton.getSelectedTaskID());
-			if(taskdata.size()>0){
+			
 				
 			for (TasksDB val : taskdata) {
 			
@@ -1966,10 +2100,7 @@ int shiftval=0;
 				}
 			
 			}
-			}
-			else{
-
-			}
+			
 		}
 			
 		if(!(singleton.getSelectedTaskID()==0))
@@ -1980,8 +2111,9 @@ int shiftval=0;
 		{
 			llayout.setVisibility(View.VISIBLE);
 			emptyText.setVisibility(View.GONE);
-		for (ActivityDB val : data) {
-			ActivityData details = new ActivityData();
+			for (ActivityDB val : data) {
+			
+			ActivityData details = new ActivityData(val.getAIdentity(),val.getAId(),val.getAName(),val.getHasdata(),val.getTid());
 			details.setAIdentity(val.getAIdentity());
 			details.setAId(val.getAId());
 			details.setAName(val.getAName());
@@ -1994,17 +2126,19 @@ int shiftval=0;
 			llayout.setVisibility(View.GONE);
 			emptyText.setVisibility(View.VISIBLE);
 		}
+		
 		// Log.d("arraylength", "---->" + Utilities.tdata.size());
 		dateFilteredValues = new String[Utilities.adata.size()];
 		dateFilteredKeys = new String[Utilities.adata.size()];
+		//Collections.sort(Utilities.adata, new ActivityData.OrderByAName());
 		for (int i = 0; i < Utilities.adata.size(); i++) {
 			dateFilteredValues[i] = Utilities.adata.get(i).getAName();
 			dateFilteredKeys[i] = Utilities.adata.get(i).getAId() + "";
-			// Log.d("taskdata", "---->" + Utilities.adata.get(i).getAId());
-			// Log.d("taskdata", "---->" +
-			// Utilities.adata.get(i).getAIdentity());
+			
 			Log.d("taskdata", "---->" + Utilities.adata.get(i).getTDate());
 		}
+		
+		
 		// Log.d("oflineId", "---->" + Arrays.toString(dateFilteredKeys));
 		// Log.d("oflineName", "---->" + Arrays.toString(dateFilteredValues));
 		dbAdapter.Close();

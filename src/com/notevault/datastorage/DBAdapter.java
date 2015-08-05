@@ -176,7 +176,7 @@ public class DBAdapter {
 	}
 
 	public long insertEntry(String NAME, String TRD_COMP, String CLASSI_STAT,
-			String HR_QTY, String TYPE, String ACTION, String ID,int timeandhalf,int doubletime) {
+			String HR_QTY, String TYPE, String ACTION, String ID) {
 		Log.d("insert", "--->" + ID);
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("NAME", NAME);
@@ -194,8 +194,7 @@ public class DBAdapter {
 		contentValues.put("AccountID", singleton.getAccountId());
 		contentValues.put("SubID", singleton.getSubscriberId());
 		contentValues.put("DATE", singleton.getCurrentSelectedDate());
-		contentValues.put("TimeandHalf", timeandhalf);
-		contentValues.put("DoubleTime",doubletime);
+
 		opnToWrite();
 		long val = SQLObj.insert("Entries", null, contentValues);
 		Close();
@@ -206,8 +205,8 @@ public class DBAdapter {
 			String CLASSI_STAT, String HR_QTY, String TYPE, String ACTION,
 			String ID, int Tid, int Aid, String status, int timeandhalf,
 			int doubletime) {
-		
-		Log.d("db","--->"+timeandhalf+"..."+doubletime);
+
+		Log.d("db", "--->" + timeandhalf + "..." + doubletime);
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("NAME", NAME);
 		contentValues.put("TRD_COMP", TRD_COMP);
@@ -544,7 +543,8 @@ public class DBAdapter {
 		// Select All Query
 		opnToWrite();
 		List<CalenderActivity> dataList = new ArrayList<CalenderActivity>();
-		String selectQuery = "SELECT  * FROM Activities where PID="+singleton.getSelectedProjectID()+"";
+		String selectQuery = "SELECT  * FROM Activities where PID="
+				+ singleton.getSelectedProjectID() + "";
 
 		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
 
@@ -630,7 +630,7 @@ public class DBAdapter {
 				data.setStatus(cursor.getString(15));
 				data.setTimeandhalf(cursor.getInt(16));
 				data.setDoubletime(cursor.getInt(17));
-				
+
 				dataList.add(data);
 
 				// Adding contact to list
@@ -811,7 +811,7 @@ public class DBAdapter {
 
 	public List<EntityDB> getAllEntityRecordsByLName(String Lname) {
 		opnToWrite();
-		
+
 		List<EntityDB> dataList = new ArrayList<EntityDB>();
 		String selectQuery = "SELECT  * FROM Entries where ACTION IN('N','U')";
 
@@ -838,33 +838,35 @@ public class DBAdapter {
 		}
 		return dataList;
 	}
-		public List<EntityDB> getAllEntityRecordsByLNameAndHrs(String projectday) {
-			opnToWrite();
-			
-			List<EntityDB> dataList = new ArrayList<EntityDB>();
-			String selectQuery = "SELECT  * FROM Entries where ACTION IN('N','U') and TYPE='L' and DATE='"+projectday+"'";
 
-			Cursor cursor = SQLObj.rawQuery(selectQuery, null);
+	public List<EntityDB> getAllEntityRecordsByLNameAndHrs(String projectday) {
+		opnToWrite();
 
-			// looping through all rows and adding to list
-			if (cursor.moveToFirst()) {
-				do {
-					EntityDB data = new EntityDB();
-					data.setEIdentity(cursor.getInt(0));
-					data.setNAME(cursor.getString(1));
-					data.setTRD_COMP(cursor.getString(2));
-					data.setCLASSI_STAT(cursor.getString(3));
-					data.setHR_QTY(cursor.getString(4));
-					data.setType(cursor.getString(5));
-					data.setAction(cursor.getString(6));
-					data.setID(cursor.getInt(7));
+		List<EntityDB> dataList = new ArrayList<EntityDB>();
+		String selectQuery = "SELECT  * FROM Entries where ACTION IN('N','U') and TYPE='L' and DATE='"
+				+ projectday + "'";
 
-					dataList.add(data);
+		Cursor cursor = SQLObj.rawQuery(selectQuery, null);
 
-					// Adding contact to list
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				EntityDB data = new EntityDB();
+				data.setEIdentity(cursor.getInt(0));
+				data.setNAME(cursor.getString(1));
+				data.setTRD_COMP(cursor.getString(2));
+				data.setCLASSI_STAT(cursor.getString(3));
+				data.setHR_QTY(cursor.getString(4));
+				data.setType(cursor.getString(5));
+				data.setAction(cursor.getString(6));
+				data.setID(cursor.getInt(7));
 
-				} while (cursor.moveToNext());
-			}
+				dataList.add(data);
+
+				// Adding contact to list
+
+			} while (cursor.moveToNext());
+		}
 		// return contact list
 		return dataList;
 	}
@@ -1216,6 +1218,26 @@ public class DBAdapter {
 			String action, String ID) {
 		Log.d("db", "--->" + singleton.getSelectedEntityIdentity());
 		ContentValues contentValues = new ContentValues();
+		contentValues.put("NAME", name);
+		contentValues.put("TRD_COMP", trade_company);
+		contentValues.put("CLASSI_STAT", classification_status);
+		contentValues.put("HR_QTY", hr_qty);
+		contentValues.put("ACTION", action);
+		contentValues.put("TYPE", type);
+
+		opnToWrite();
+		long val = SQLObj.update("Entries", contentValues, "ID = '" + ID + "'",
+				null);
+		Close();
+		return val;
+	}
+
+	public int updateEntryOffline1(String name, String trade_company,
+			String classification_status, String hr_qty, String type,
+			String action) {
+
+		ContentValues contentValues = new ContentValues();
+
 		contentValues.put("EIdentity", singleton.getSelectedEntityIdentity());
 		contentValues.put("NAME", name);
 		contentValues.put("TRD_COMP", trade_company);
@@ -1225,12 +1247,8 @@ public class DBAdapter {
 		contentValues.put("TYPE", type);
 
 		opnToWrite();
-		long val = SQLObj.update("Entries", contentValues,
-				"PID = " + singleton.getSelectedProjectID() + " and SubID = "
-						+ singleton.getSubscriberId() + " and AID = "
-						+ singleton.getSelectedActivityID() + " and DATE = '"
-						+ singleton.getCurrentSelectedDate() + "' and ID = '"
-						+ ID + "'", null);
+		int val = SQLObj.update("Entries", contentValues, "EIdentity= "
+				+ singleton.getSelectedEntityIdentity(), null);
 		Close();
 		return val;
 	}
@@ -1331,10 +1349,7 @@ public class DBAdapter {
 
 	public int deleteGlossary(int GCID) {
 		opnToWrite();
-		int val = SQLObj.delete("Glossary",
-				"PID = " + singleton.getSelectedProjectID()
-						+ " and CompanyID = " + singleton.getCompanyId()
-						+ " and GCID = " + GCID, null);
+		int val = SQLObj.delete("Glossary", "GCID = " + GCID, null);
 		Close();
 		return val;
 	}

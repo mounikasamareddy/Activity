@@ -99,18 +99,20 @@
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
+        <FrameLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:gravity="right"
-            android:layout_marginTop="5dip"
             android:orientation="horizontal" >
 
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right|center"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dip"
                 android:text="Hour"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -120,10 +122,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left|center"
                 android:layout_marginBottom="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/arrow2" />
-        </LinearLayout>
+        </FrameLayout>
+
     </RelativeLayout>
 
 </LinearLayout>

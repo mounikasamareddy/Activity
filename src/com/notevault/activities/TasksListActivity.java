@@ -125,6 +125,7 @@ public class TasksListActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent= new Intent(TasksListActivity.this,ProjectListActivity.class);
 				startActivity(intent);
+				
 			}
 		});
 
@@ -399,7 +400,13 @@ public class TasksListActivity extends Activity {
 							.println("An error occurred! Could not fetch tasks");
 				}
 			}
-			mProgressDialog.dismiss();
+			try {
+				mProgressDialog.dismiss();
+		       
+		    } catch (final IllegalArgumentException e) {
+		        // Handle or log or ignore
+		    }
+			
 		}
 	}
 

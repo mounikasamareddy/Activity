@@ -19,6 +19,7 @@ import javax.net.ssl.X509TrustManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +29,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -62,7 +65,7 @@ public class NetworkStateChange extends BroadcastReceiver {
 	int projectid;
 	int Tidentity;
 	String tName, newActivityName;
-	
+	private ProgressDialog mdialog;
 	Singleton singleton;
 	List<ActivityNetworkDB> data2, data1;
 	List<EntriesNetworkDB> entries1, entries2;
@@ -76,6 +79,11 @@ public class NetworkStateChange extends BroadcastReceiver {
 	int ID = 0, tasksize, activitysize, EPid, EAid, Etid, Eidentity1,
 			Eidentity2, Eidentity3;
 	String name, trade, clasification, hrs, entridate, hours;
+
+	
+	
+	
+	
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -765,7 +773,7 @@ this.context=context;
 				}
 
 			}
-
+			
 		}
 
 	}
@@ -1153,7 +1161,12 @@ this.context=context;
 	}
 
 	private class DeleteLaborTask extends AsyncTask<Void, Void, String> {
-
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			
+		}
 		@Override
 		protected String doInBackground(Void... arg0) {
 
@@ -1257,5 +1270,6 @@ this.context=context;
 
 		}
 	}
+	
 
 }

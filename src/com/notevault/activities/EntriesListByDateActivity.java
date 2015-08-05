@@ -82,7 +82,7 @@ public class EntriesListByDateActivity extends Activity {
 			enteredlist.setAdapter(mAdapter1);
 		} else {
 
-			Log.d("entered offline", "---->");
+			//Log.d("entered offline", "---->");
 			readEntriesFromDB();
 
 		}
@@ -131,7 +131,7 @@ public class EntriesListByDateActivity extends Activity {
 			TextView tv1 = (TextView) convertView.findViewById(R.id.textView2);
 			TextView tv2 = (TextView) convertView.findViewById(R.id.textView3);
 			TextView tv3 = (TextView) convertView.findViewById(R.id.textView4);
-			Log.d("adapter", "--->");
+			//Log.d("adapter", "--->");
 			TextView roundTv = (TextView) convertView.findViewById(R.id.tv);
 
 			if (singleton.isOnline()) {
@@ -219,7 +219,7 @@ public class EntriesListByDateActivity extends Activity {
 				}
 			} else {
 
-				Log.d("offline", "--->");
+				//Log.d("offline", "--->");
 				roundTv.setText(Utilities.eAligndate.get(position).getTYPE());
 				tv.setText(Utilities.eAligndate.get(position).getNAME());
 				tv1.setText(Utilities.eAligndate.get(position).getTRD_COMP());
@@ -331,7 +331,7 @@ public class EntriesListByDateActivity extends Activity {
 		System.out.println("Entries By Date On resume called.");
 
 		singleton.setReloadPage(true);
-		Log.d(" enteredonresume", "--->" + singleton.isReloadPage());
+		//Log.d(" enteredonresume", "--->" + singleton.isReloadPage());
 		if (singleton.isOnline()) {
 			if (singleton.isReloadPage()) {
 				System.out.println("Reloading the page.");
@@ -456,16 +456,7 @@ public class EntriesListByDateActivity extends Activity {
 									String classification = e.getString("Cl")
 											.replace("\\", "");
 									double hour = e.getDouble("H");
-									double timeandhours = 0;
-									double doubletime = 0;
-									if (e.getString("TH").equals("")) {
-										timeandhours = 0;
-										doubletime = 0;
-									} else {
-										timeandhours = e.getDouble("TH");
-
-										doubletime = e.getDouble("DT");
-									}
+									
 									String id = String.valueOf(e.getInt("I"));
 									String dateCreated = e.getString("D");
 									// String desc = e.getString("N");
@@ -482,8 +473,7 @@ public class EntriesListByDateActivity extends Activity {
 											+ glue + name + glue + trade + glue
 											+ classification + glue + hour
 											+ glue + id + glue + dateCreated
-											+ glue + timeandhours + glue
-											+ doubletime);
+											);
 
 									Log.d("dateCreated", "--->" + dateCreated);
 								}
@@ -798,8 +788,7 @@ public class EntriesListByDateActivity extends Activity {
 									collectiveConcatenatedEntryList.add(type
 											+ glue + name + glue + company
 											+ glue + status + glue + qty + glue
-											+ id + glue + dateCreated + glue
-											+ 0 + glue + 0);
+											+ id + glue + dateCreated);
 									for (int j = 0; j < collectiveConcatenatedEntryList
 											.size(); j++) {
 										Log.d("collectives",
@@ -848,9 +837,8 @@ public class EntriesListByDateActivity extends Activity {
 				// dbAdapter.insertEntry(entry[1],entry[2],entry[3],
 				// Double.parseDouble(entry[4]),entry[6],entry[0],"N",entry[5]);
 				insertResponse = dbAdapter.insertEntry(entry[1], entry[2],
-						entry[3], entry[4], entry[0], "N", entry[5],
-						(int) Double.parseDouble(entry[7]),
-						(int) Double.parseDouble(entry[8]));
+						entry[3], entry[4], entry[0], "N", entry[5]
+						);
 				Log.d("insert", "--->" + insertResponse);
 				System.out.println(value);
 			}

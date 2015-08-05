@@ -256,8 +256,41 @@ public class AddEquipment extends Activity {
 						mProgressDialog.setIndeterminate(false);
 						mProgressDialog.show();
 						System.out.println("update code should execute");
+						if(singleton.isOnline())
+						{
 						UpdateEntries updateEquipment = new UpdateEntries();
 						updateEquipment.execute();
+						}
+						else{
+
+							Log.d("update code should execute", "--->"+singleton
+									.getSelectedLaborName());
+							
+							if (singleton.getCurrentSelectedEntryID() == 0) {
+								
+								
+								long upentry = dbAdapter.updateEntryOffline1(singleton
+										.getSelectedEquipmentName(), singleton
+										.getSelectedEquipmentCompany(), singleton
+										.getSelectedEquipmentStatus(), singleton
+										.getSelectedEquipmentQty(), "E",
+										"N");
+								Log.d("updateentity eId =0", "-->" + upentry);
+							} else {
+
+								long equipmentUpdateResponse = dbAdapter.updateEntry(singleton
+										.getSelectedEquipmentName(), singleton
+										.getSelectedEquipmentCompany(), singleton
+										.getSelectedEquipmentStatus(), singleton
+										.getSelectedEquipmentQty(), "E", "U", String
+										.valueOf(singleton.getCurrentSelectedEntryID()));
+								Log.d("updateentity eId =something", "-->"
+										+ equipmentUpdateResponse);
+							}
+							singleton.setReloadPage(true);
+							onBackPressed();
+						
+						}
 					}
 				} else {
 					// display alert(errorMsg);
@@ -413,7 +446,7 @@ public class AddEquipment extends Activity {
 						singleton.getSelectedEquipmentName(),
 						singleton.getSelectedEquipmentCompany(),
 						singleton.getSelectedEquipmentStatus(),
-						singleton.getSelectedEquipmentQty(), "E", "I", ID,0,0);
+						singleton.getSelectedEquipmentQty(), "E", "I", ID);
 				EntriesListByDateActivity.collectiveConcatenatedEntryList
 						.add("E" + glue + singleton.getSelectedEquipmentName()
 								+ glue
@@ -443,7 +476,7 @@ public class AddEquipment extends Activity {
 						singleton.getSelectedEquipmentCompany(),
 						singleton.getSelectedEquipmentStatus(),
 						singleton.getSelectedEquipmentQty(), "E", "I",
-						dbAdapter.generateOfflineEntryID(),0,0);
+						dbAdapter.generateOfflineEntryID());
 				System.out
 						.println("Add Equipment Entry unknown host exception.");
 			} else {
@@ -463,7 +496,7 @@ public class AddEquipment extends Activity {
 									singleton.getSelectedEquipmentCompany(),
 									singleton.getSelectedEquipmentStatus(),
 									singleton.getSelectedEquipmentQty(), "E",
-									"N", jObject.getString("EID"),0,0);
+									"N", jObject.getString("EID"));
 							System.out
 									.println("laborInsertResponse inside Add Labor Success: "
 											+ equipmentInsertResponse);
@@ -482,7 +515,7 @@ public class AddEquipment extends Activity {
 									singleton.getSelectedEquipmentCompany(),
 									singleton.getSelectedEquipmentStatus(),
 									singleton.getSelectedEquipmentQty(), "E",
-									"I", dbAdapter.generateOfflineEntryID(),0,0);
+									"I", dbAdapter.generateOfflineEntryID());
 							System.out
 									.println("laborInsertResponse inside Add Labor Failure: "
 											+ equipmentInsertResponse);
@@ -496,7 +529,7 @@ public class AddEquipment extends Activity {
 								singleton.getSelectedEquipmentCompany(),
 								singleton.getSelectedEquipmentStatus(),
 								singleton.getSelectedEquipmentQty(), "E", "I",
-								dbAdapter.generateOfflineEntryID(),0,0);
+								dbAdapter.generateOfflineEntryID());
 						e.printStackTrace();
 					}
 				} else {
@@ -506,7 +539,7 @@ public class AddEquipment extends Activity {
 							singleton.getSelectedEquipmentCompany(),
 							singleton.getSelectedEquipmentStatus(),
 							singleton.getSelectedEquipmentQty(), "E", "I",
-							dbAdapter.generateOfflineEntryID(),0,0);
+							dbAdapter.generateOfflineEntryID());
 					System.out
 							.println("An error occurred! Could not add entry.");
 				}
@@ -599,24 +632,19 @@ public class AddEquipment extends Activity {
 				Toast.makeText(getApplicationContext(),
 						"Sorry! Server could not be reached.",
 						Toast.LENGTH_LONG).show();
-				if (singleton.isOfflineEntry())
-					equipmentUpdateResponse = dbAdapter.updateEntry(
-							singleton.getSelectedEquipmentName(),
-							singleton.getSelectedEquipmentCompany(),
-							singleton.getSelectedEquipmentStatus(),
-							singleton.getSelectedEquipmentQty(),
-							"E",
-							"I",
-							"OF"
-									+ String.valueOf(singleton
-											.getCurrentSelectedEntryID()));
-				else
-					equipmentUpdateResponse = dbAdapter.updateEntry(singleton
-							.getSelectedEquipmentName(), singleton
-							.getSelectedEquipmentCompany(), singleton
-							.getSelectedEquipmentStatus(), singleton
-							.getSelectedEquipmentQty(), "E", "U", String
-							.valueOf(singleton.getCurrentSelectedEntryID()));
+//				if (singleton.isOfflineEntry())
+//					equipmentUpdateResponse = dbAdapter.updateEntry(
+//							singleton.getSelectedEquipmentName(),
+//							singleton.getSelectedEquipmentCompany(),
+//							singleton.getSelectedEquipmentStatus(),
+//							singleton.getSelectedEquipmentQty(),
+//							"E",
+//							"I",
+//							"OF"
+//									+ String.valueOf(singleton
+//											.getCurrentSelectedEntryID()));
+//				else
+					
 			} else {
 				if (result != null) {
 
@@ -747,7 +775,7 @@ public class AddEquipment extends Activity {
 
 		protected void onPostExecute(final String result) {
 			long equipmentDeleteResponse = 0;
-			mProgressDialog.dismiss();
+			
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
 				Toast.makeText(getApplicationContext(),
@@ -756,17 +784,17 @@ public class AddEquipment extends Activity {
 				Toast.makeText(getApplicationContext(),
 						"Sorry! Server could not be reached.",
 						Toast.LENGTH_LONG).show();
-				if (singleton.isOfflineEntry())
-					equipmentDeleteResponse = dbAdapter.deleteEntryByID("OF"
-							+ String.valueOf(singleton
-									.getCurrentSelectedEntryID()));
-				else
-					equipmentDeleteResponse = dbAdapter.updateEntry(singleton
-							.getSelectedEquipmentName(), singleton
-							.getSelectedEquipmentCompany(), singleton
-							.getSelectedEquipmentStatus(), singleton
-							.getSelectedEquipmentQty(), "E", "D", String
-							.valueOf(singleton.getCurrentSelectedEntryID()));
+//				if (singleton.isOfflineEntry())
+//					equipmentDeleteResponse = dbAdapter.deleteEntryByID("OF"
+//							+ String.valueOf(singleton
+//									.getCurrentSelectedEntryID()));
+//				else
+//					equipmentDeleteResponse = dbAdapter.updateEntry(singleton
+//							.getSelectedEquipmentName(), singleton
+//							.getSelectedEquipmentCompany(), singleton
+//							.getSelectedEquipmentStatus(), singleton
+//							.getSelectedEquipmentQty(), "E", "D", String
+//							.valueOf(singleton.getCurrentSelectedEntryID()));
 			} else {
 				if (result != null) {
 
@@ -774,23 +802,23 @@ public class AddEquipment extends Activity {
 					int StatusCode = singleton.getHTTPResponseStatusCode();
 					if (StatusCode == 200 || StatusCode == 0) {
 						equipmentDeleteResponse = dbAdapter
-								.deleteEntryByID("OF"
-										+ String.valueOf(singleton
-												.getCurrentSelectedEntryID()));
+								.deleteEntryByID(String.valueOf(singleton
+										.getCurrentSelectedEntryID()));
 					} else {
-						if (singleton.isOfflineEntry())
-							equipmentDeleteResponse = dbAdapter
-									.deleteEntryByID("OF"
-											+ String.valueOf(singleton
-													.getCurrentSelectedEntryID()));
-						else
-							equipmentDeleteResponse = dbAdapter.updateEntry(
-									singleton.getSelectedEquipmentName(),
-									singleton.getSelectedEquipmentCompany(),
-									singleton.getSelectedEquipmentStatus(),
-									singleton.getSelectedEquipmentQty(), "E",
-									"D", String.valueOf(singleton
-											.getCurrentSelectedEntryID()));
+						//readDbData();
+//						if (singleton.isOfflineEntry())
+//							equipmentDeleteResponse = dbAdapter
+//									.deleteEntryByID("OF"
+//											+ String.valueOf(singleton
+//													.getCurrentSelectedEntryID()));
+//						else
+//							equipmentDeleteResponse = dbAdapter.updateEntry(
+//									singleton.getSelectedEquipmentName(),
+//									singleton.getSelectedEquipmentCompany(),
+//									singleton.getSelectedEquipmentStatus(),
+//									singleton.getSelectedEquipmentQty(), "E",
+//									"D", String.valueOf(singleton
+//											.getCurrentSelectedEntryID()));
 					}
 					/*
 					 * Intent intent = new Intent(AddEquipment.this,
@@ -801,19 +829,7 @@ public class AddEquipment extends Activity {
 				} else {
 					System.out
 							.println("An error occurred! Could not delete entry.");
-					if (singleton.isOfflineEntry())
-						equipmentDeleteResponse = dbAdapter
-								.deleteEntryByID("OF"
-										+ String.valueOf(singleton
-												.getCurrentSelectedEntryID()));
-					else
-						equipmentDeleteResponse = dbAdapter.updateEntry(
-								singleton.getSelectedEquipmentName(), singleton
-										.getSelectedEquipmentCompany(),
-								singleton.getSelectedEquipmentStatus(),
-								singleton.getSelectedEquipmentQty(), "E", "D",
-								String.valueOf(singleton
-										.getCurrentSelectedEntryID()));
+					//readDbData();
 				}
 			}
 			singleton.setReloadPage(true);

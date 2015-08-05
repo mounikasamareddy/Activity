@@ -56,7 +56,8 @@ public class AddActivity extends Activity {
 	ArrayAdapter<String> adapter;
 	Spinner spinner;
 	int spinnerSelectedItem;
-int shiftval=0;
+	int shiftval = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,7 +68,6 @@ int shiftval=0;
 		singleton = Singleton.getInstance();
 		dbAdapter = DBAdapter.get_dbAdapter(this);
 
-		
 		settingPreferences = getSharedPreferences(
 				SettingActivity.EnableSHIFTPREFERENCES, Context.MODE_PRIVATE);
 		if (settingPreferences.contains(String.valueOf(singleton.getUserId()))) {
@@ -100,8 +100,8 @@ int shiftval=0;
 				@Override
 				public void onItemSelected(AdapterView<?> parent, View arg1,
 						int pos, long arg3) {
-					
-					shiftval=pos;
+
+					shiftval = pos;
 					Log.d("shif selected item", "-->"
 							+ parent.getItemAtPosition(pos).toString());
 					singleton.setResentShiftItem(parent.getItemAtPosition(pos)
@@ -125,12 +125,13 @@ int shiftval=0;
 		editText = (EditText) findViewById(R.id.editText1);
 		editText.setHint("Enter a short description of the activity");
 
-		LinearLayout addImageLayout = (LinearLayout) findViewById(R.id.image_layout);
+		final LinearLayout addImageLayout = (LinearLayout) findViewById(R.id.image_layout);
 		addImageLayout.setOnClickListener(new OnClickListener() {
 
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
+				addImageLayout.setEnabled(false);
 				newActivityName = editText.getText().toString().trim();
 				if (newActivityName.equals("")) {
 					AlertDialog alertDialog = new AlertDialog.Builder(
@@ -146,14 +147,15 @@ int shiftval=0;
 					alertDialog.show();
 				} else {
 					if (singleton.isOnline()) {
-						Log.d("shift tracking","--->"+singleton.isEnableShiftTracking());
+						Log.d("shift tracking",
+								"--->" + singleton.isEnableShiftTracking());
 						if (singleton.isEnableShiftTracking()) {
-							Log.d("add activity","--->"+newActivityName);
+							Log.d("add activity", "--->" + newActivityName);
 							AddActivityProjectShift addActivityShift = new AddActivityProjectShift();
 							addActivityShift.execute();
-							
+
 						} else {
-							Log.d("add activity","--->"+newActivityName);
+							Log.d("add activity", "--->" + newActivityName);
 							AddActivityProject addActivity = new AddActivityProject();
 							addActivity.execute();
 						}
@@ -173,10 +175,8 @@ int shiftval=0;
 				onBackPressed();
 			}
 		});
-		
-	}
 
-	
+	}
 
 	private class AddActivityProject extends AsyncTask<Void, Void, String> {
 
@@ -298,14 +298,14 @@ int shiftval=0;
 							"An error occurred while adding activity!",
 							Toast.LENGTH_LONG).show();
 				}
-			
-				
-				} catch (JSONException e) {
+
+			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
+
 	private class AddActivityProjectShift extends AsyncTask<Void, Void, String> {
 
 		// String addActivityResponseString;
@@ -355,21 +355,22 @@ int shiftval=0;
 							+ new SimpleDateFormat("HH:mm:ss")
 									.format(new Date());
 					JSONObject jsonAddActivityShift = new JSONObject();
-					jsonAddActivityShift
-							.put("TaskId", singleton.getSelectedTaskID());
-					
+					jsonAddActivityShift.put("TaskId",
+							singleton.getSelectedTaskID());
+
 					jsonAddActivityShift.put("DateCreated", GMTdateTime);
-					
+
 					jsonAddActivityShift.put("Name", newActivityName);
-					
+
 					jsonAddActivityShift.put("UserId", singleton.getUserId());
 					jsonAddActivityShift.put("Shift", shiftval);
-					
-					Log.d("Request: jsonAddActivity: ","--->"
+
+					Log.d("Request: jsonAddActivity: ", "--->"
 							+ jsonAddActivityShift);
 					// System.out.println("GMT Date: %%%%%%%%%%%%%%%%%%%%%%%%%%%% : "+
 					// GMTdateTime);
-					return jsonDataPost.addActivityShiftToTask(jsonAddActivityShift);
+					return jsonDataPost
+							.addActivityShiftToTask(jsonAddActivityShift);
 
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -379,13 +380,13 @@ int shiftval=0;
 			}
 			return null;
 		}
+
 		@Override
 		protected void onPostExecute(String param) {
-			Log.d("Response add activity shift ..","--->"
-					+ param);
+			Log.d("Response add activity shift ..", "--->" + param);
 			try {
 				JSONObject json = new JSONObject(param);
-				Log.d("status","--->"+json.getInt("AI"));
+				Log.d("status", "--->" + json.getInt("AI"));
 				int Status = json.getInt("Status");
 				if (Status == 0 || Status == 200) {
 					singleton.setSelectedActivityID(Integer.parseInt(json
@@ -419,7 +420,7 @@ int shiftval=0;
 					intent.putExtras(bundle);
 					startActivity(intent);
 					finish();
-					
+
 				} else if (Status == 201) {
 					Toast.makeText(getApplicationContext(),
 							"An activity with this name already exists!",
@@ -432,66 +433,68 @@ int shiftval=0;
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
+
 	protected void Insertintodb() {
 		// Log.d("taskdata","---->"+singleton.getSelectedTaskID());
 		List<ActivityDB> data;
 		Log.d("checking",
-				"-->"
-						+ singleton.getSelectedTaskID()
-						+ "  "
-						+ singleton
-								.getSelectedTaskIdentityoffline()
-						+ " "
+				"-->" + singleton.getSelectedTaskID() + "  "
+						+ singleton.getSelectedTaskIdentityoffline() + " "
 						+ singleton.getSelectedActivityID());
-if(singleton.isEnableShiftTracking())
-{
-	long act1 = dbAdapter.inserActivityoffline(0,
-			newActivityName.replace("\\", ""),
-			singleton.getSelectedTaskID(), 0, "offline",shiftval);
-	Log.d("activity created with task offline status",
-			"--->" + act1 + " "
-					+ singleton.getSelectedTaskID());
-}else{
-	long act1 = dbAdapter.inserActivityoffline(0,
-			newActivityName.replace("\\", ""),
-			singleton.getSelectedTaskID(), 0, "offline",10);
-	Log.d("activity created with task offline status",
-			"--->" + act1 + " "
-					+ singleton.getSelectedTaskID());
-}
 		
+		  String s1 = newActivityName.substring(0, 1).toUpperCase();
+		    String nameCapitalized = s1 + newActivityName.substring(1);
+		if (singleton.isEnableShiftTracking()) {
+			long act1 = dbAdapter.inserActivityoffline(0,
+					nameCapitalized.replace("\\", ""),
+					singleton.getSelectedTaskID(), 0, "offline", shiftval);
+			Log.d("activity created with task offline status", "--->" + act1
+					+ " " + singleton.getSelectedTaskID());
 			
-			data = dbAdapter.getAllActivityRecords();
-			for (ActivityDB val : data) {
-				Log.d("activity created with task id=0", "--->"
-						+ val.getAIdentity());
-				singleton
-						.setselectedActivityIdentityoffline(val
-								.getAIdentity());
-			}
-			singleton.setSelectedActivityID(0);
+		} else {
 
-			singleton.setSelectedActivityName(newActivityName);
+			Log.d("activity created with task offline status", "--->"
+					+ singleton.getSelectedTaskID());
+			if (singleton.getSelectedTaskID() == 0) {
 
+				Toast.makeText(getApplicationContext(),
+						"Sorry! Could not add an activity please try later",
+						Toast.LENGTH_SHORT).show();
+			} else {
+
+				long act1 = dbAdapter.inserActivityoffline(0,
+						nameCapitalized.replace("\\", ""),
+						singleton.getSelectedTaskID(), 0, "offline", 10);
+			}}
+				data = dbAdapter.getAllActivityRecords();
+				for (ActivityDB val : data) {
+					Log.d("activity created with task id=0",
+							"--->" + val.getAIdentity());
+					singleton.setselectedActivityIdentityoffline(val
+							.getAIdentity());
+				}
+				singleton.setSelectedActivityID(0);
+
+				singleton.setSelectedActivityName(nameCapitalized);
+
+				dbAdapter.updateTask(singleton.getSelectedProjectID(),
+						singleton.getSelectedTaskID(),
+						singleton.getCurrentSelectedDate());
+				Intent intent = new Intent(AddActivity.this,
+						EntriesListActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putInt("index", 1);
+
+				intent.putExtras(bundle);
+				startActivity(intent);
+
+				finish();
+
+			
 		
 
-		dbAdapter.updateTask(singleton.getSelectedProjectID(),
-				singleton.getSelectedTaskID(),
-				singleton.getCurrentSelectedDate());
-		Intent intent = new Intent(AddActivity.this,
-				EntriesListActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putInt("index", 1);
-
-		intent.putExtras(bundle);
-		startActivity(intent);
-
-		finish();
-
-	
-		
 	}
 }

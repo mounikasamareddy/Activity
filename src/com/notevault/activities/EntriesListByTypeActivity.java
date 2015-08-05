@@ -273,18 +273,18 @@ public class EntriesListByTypeActivity extends Activity {
 											"\\", "");
 									String classification = e.getString("Cl")
 											.replace("\\", "");
-									Log.d("data","--->"+e.getString("TH")+"...");
-									double timeandhours=0;
-									double doubletime=0;
-									if(e.getString("TH").equals(""))
-									{
-										 timeandhours=0;
-										 doubletime=0;
-									}else{
-										 timeandhours = e.getDouble("TH");
-
-										doubletime = e.getDouble("DT");
-									}
+									
+//									double timeandhours=0;
+//									double doubletime=0;
+//									if(e.getString("TH").equals(""))
+//									{
+//										 timeandhours=0;
+//										 doubletime=0;
+//									}else{
+//										 timeandhours = e.getDouble("TH");
+//
+//										doubletime = e.getDouble("DT");
+//									}
 									double hour = e.getDouble("H");
 									String id = String.valueOf(e.getInt("I"));
 									String dateCreated = e.getString("D");
@@ -292,8 +292,8 @@ public class EntriesListByTypeActivity extends Activity {
 									entries.add(type + glue + name + glue
 											+ trade + glue + classification
 											+ glue + hour + glue + id + glue
-											+ dateCreated + glue + timeandhours
-											+ glue + doubletime);
+											+ dateCreated 
+											);
 
 									Log.d("check", "--->" + type + glue + name
 											+ glue + trade + glue
@@ -305,8 +305,7 @@ public class EntriesListByTypeActivity extends Activity {
 									data.setTrade(trade);
 									data.setClassification(classification);
 									data.setHrs(hour);
-									data.setTimeandhalf(timeandhours);
-									data.setDoubletime(doubletime);
+									
 									data.setEId(Integer.parseInt(id));
 									Utilities.groupdata.add(data);
 								}
@@ -713,9 +712,8 @@ public class EntriesListByTypeActivity extends Activity {
 				// Log.d("@%$#^%^&^(*","--->"+entry[7]+" "+entry[8]);
 				
 				insertResponse = dbAdapter.insertEntry(entry[1], entry[2],
-						entry[3], entry[4], entry[0], "N", entry[5],
-						(int) Double.parseDouble(entry[7]),
-						(int) Double.parseDouble(entry[8]));
+						entry[3], entry[4], entry[0], "N", entry[5]
+						);
 				Log.d("insert", "--->" + insertResponse);
 				System.out.println(value);
 			}
@@ -734,11 +732,11 @@ public class EntriesListByTypeActivity extends Activity {
 		MaterialData.clear();
 		mAdapter1 = new EntriesAdapter(EntriesListByTypeActivity.this);
 		if (Tid == 0 && Aid == 0) {
-			Log.d("both", "-->" + singleton.getSelectedTaskIdentityoffline());
+			Log.d("both", "-->" + singleton.getselectedActivityIdentityoffline());
 			data = dbAdapter.getAllEntityRecords(singleton
-					.getSelectedTaskIdentityoffline());
+					.getselectedActivityIdentityoffline());
 			Log.d("activity id=0",
-					"--->" + singleton.getSelectedTaskIdentityoffline() + " "
+					"--->" + singleton.getselectedActivityIdentityoffline() + " "
 							+ data.size());
 		} else if (Aid == 0) {
 			Log.d("activity id=0",

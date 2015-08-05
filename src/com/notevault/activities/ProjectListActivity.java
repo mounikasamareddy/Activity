@@ -144,12 +144,15 @@ public class ProjectListActivity extends Activity {
 					Date curDate = new Date();
 					// System.out.println("Cur Date : ##################################### : "+
 					// curDate);
-					SimpleDateFormat format1 = new SimpleDateFormat(
-							"dd-MM-yyyy");
+					SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
 					try {
-						singleton.setCurrentSelectedDateFormatted(format1
-								.parse(format1.format(curDate)).toString()
-								.replace(" 00:00:00 GMT+08:00", ","));
+						String[] dateFormattedArray = format1.parse(format1.format(curDate)).toString().split(" ");
+						String dateFormatted = dateFormattedArray[0] + " " + dateFormattedArray[1] + " " + dateFormattedArray[2] + ", " + dateFormattedArray[5];
+						
+						//System.out.println(dateFormatted);
+						
+						//String dateFormatted = format1.parse(format1.format(curDate)).toString().replace(" 00:00:00 GMT+08:00", ",");
+						singleton.setCurrentSelectedDateFormatted(dateFormatted);
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}

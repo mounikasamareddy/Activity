@@ -153,12 +153,15 @@ public class EquipmentStatusList extends Activity{
                 try {
                     JSONObject equipmentStatusObj = new JSONObject(response);
                     JSONArray equipmentStatusArray = new JSONArray(equipmentStatusObj.getString("Estatus"));
-                    dbAdapter.deleteGlossary(singleton.getESCID());
+                
+                    int delete=dbAdapter.deleteGlossary(1);
+                    Log.d("delete","--->"+delete);
                     status.clear();
                     for(int i=0; i < equipmentStatusArray.length(); i++) {
                         status.add(equipmentStatusArray.getString(i).replace("\\", ""));
                         singleton.setESCID(1);
-                        dbAdapter.insertGlossary(singleton.getESCID(), equipmentStatusArray.getString(i).replace("\\", ""));
+                        
+                        dbAdapter.insertGlossary(1, equipmentStatusArray.getString(i).replace("\\", ""));
                     }
                     setAdapter();
                 } catch (JSONException e) {
@@ -186,7 +189,8 @@ public class EquipmentStatusList extends Activity{
     	status.clear();
     	
     	Log.d("val","--->"+singleton.getESCID()+" "+singleton.getMSCID());
-		List<EStatus> data = dbAdapter.getAllCStatusRecords(singleton.getESCID());
+    	
+		List<EStatus> data = dbAdapter.getAllCStatusRecords(1);// 1 for status of equitement
 
 		for (EStatus val : data) {
 

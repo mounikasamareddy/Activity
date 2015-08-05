@@ -41,7 +41,7 @@ import android.widget.Toast;
 public class AddMaterial extends Activity {
 
 	Singleton singleton;
-	String values[] = { "Name", "Company", "Unit of Measure" };
+	String values[] = { "Name", "Company", "Status" };
 	ServerUtilities jsonDataPost = new ServerUtilities();
 	TextView deleteTextView;
 	ImageView addMaterialEntriesView;
@@ -269,8 +269,44 @@ public class AddMaterial extends Activity {
 						mProgressDialog.setIndeterminate(false);
 						mProgressDialog.show();
 						System.out.println("update code should execute");
+						if(singleton.isOnline())
+						{
 						UpdateEntries updateMaterial = new UpdateEntries();
 						updateMaterial.execute();
+						}
+						else{
+
+							Log.d("update code should execute", "--->"+singleton
+									.getSelectedLaborName());
+							
+							if (singleton.getCurrentSelectedEntryID() == 0) {
+								
+								
+								long upentry = dbAdapter.updateEntryOffline1(singleton
+										.getSelectedMaterialName(), singleton
+										.getSelectedMaterialCompany(), singleton
+										.getSelectedMaterialStatus(), singleton
+										.getSelectedMaterialQty(), "M",
+										"N");
+								Log.d("updateentity eId =0", "-->" + upentry);
+							} else {
+
+								long upentry = dbAdapter.updateEntry(singleton
+										.getSelectedMaterialName(), singleton
+										.getSelectedMaterialCompany(), singleton
+										.getSelectedMaterialStatus(), singleton
+										.getSelectedMaterialQty(), "M", "U", String
+										.valueOf(singleton.getCurrentSelectedEntryID()));
+								Log.d("updateentity eId =something", "-->"
+										+ upentry);
+							}
+							singleton.setReloadPage(true);
+							onBackPressed();
+						
+							
+						}
+
+				
 					}
 				} else {
 					// display alert(errorMsg);
@@ -307,6 +343,7 @@ public class AddMaterial extends Activity {
 			convertView = li.inflate(R.layout.entrieslistview, null);
 			TextView tv = (TextView) convertView.findViewById(R.id.textView1);
 			TextView tv2 = (TextView) convertView.findViewById(R.id.textView2);
+			System.err.println("Entry value: "+values[position]);
 			final String val[] = values[position].split("~");
 			tv.setText(val[0]);
 			tv2.setVisibility(View.VISIBLE);
@@ -444,7 +481,7 @@ public class AddMaterial extends Activity {
 						singleton.getSelectedMaterialCompany(),
 						singleton.getSelectedMaterialStatus(),
 						singleton.getSelectedMaterialQty(), "M", "I",
-						dbAdapter.generateOfflineEntryID(),0,0);
+						dbAdapter.generateOfflineEntryID());
 			} else {
 				if (result != null) {
 
@@ -459,7 +496,7 @@ public class AddMaterial extends Activity {
 									singleton.getSelectedMaterialCompany(),
 									singleton.getSelectedMaterialStatus(),
 									singleton.getSelectedMaterialQty(), "M",
-									"N", jObject.getString("MID"),0,0);
+									"N", jObject.getString("MID"));
 							System.out
 									.println("materialInsertResponse inside Add Labor Success: "
 											+ materialInsertResponse);
@@ -476,7 +513,7 @@ public class AddMaterial extends Activity {
 									singleton.getSelectedMaterialCompany(),
 									singleton.getSelectedMaterialStatus(),
 									singleton.getSelectedMaterialQty(), "M",
-									"I", dbAdapter.generateOfflineEntryID(),0,0);
+									"I", dbAdapter.generateOfflineEntryID());
 							System.out
 									.println("materialInsertResponse inside Add Labor Failure: "
 											+ materialInsertResponse);
@@ -489,7 +526,7 @@ public class AddMaterial extends Activity {
 								singleton.getSelectedMaterialCompany(),
 								singleton.getSelectedMaterialStatus(),
 								singleton.getSelectedMaterialQty(), "M", "I",
-								dbAdapter.generateOfflineEntryID(),0,0);
+								dbAdapter.generateOfflineEntryID());
 					}
 				} else {
 					System.out
@@ -499,7 +536,7 @@ public class AddMaterial extends Activity {
 							singleton.getSelectedMaterialCompany(),
 							singleton.getSelectedMaterialStatus(),
 							singleton.getSelectedMaterialQty(), "M", "I",
-							dbAdapter.generateOfflineEntryID(),0,0);
+							dbAdapter.generateOfflineEntryID());
 				}
 			}
 			singleton.setReloadPage(true);
@@ -596,27 +633,26 @@ public class AddMaterial extends Activity {
 						"Sorry! Server could not be reached.",
 						Toast.LENGTH_LONG).show();
 				Log.d("update post","--->"+
-				singleton
-				.getSelectedMaterialQty());
+				singleton.getSelectedMaterialQty());
 				
-				if (singleton.isOfflineEntry())
-					materialUpdateResponse = dbAdapter.updateEntry(
-							singleton.getSelectedMaterialName(),
-							singleton.getSelectedMaterialCompany(),
-							singleton.getSelectedMaterialStatus(),
-							singleton.getSelectedMaterialQty(),
-							"M",
-							"I",
-							"OF"
-									+ String.valueOf(singleton
-											.getCurrentSelectedEntryID()));
-				else
-					materialUpdateResponse = dbAdapter.updateEntry(singleton
-							.getSelectedMaterialName(), singleton
-							.getSelectedMaterialCompany(), singleton
-							.getSelectedMaterialStatus(), singleton
-							.getSelectedMaterialQty(), "M", "U", String
-							.valueOf(singleton.getCurrentSelectedEntryID()));
+//				if (singleton.isOfflineEntry())
+//					materialUpdateResponse = dbAdapter.updateEntry(
+//							singleton.getSelectedMaterialName(),
+//							singleton.getSelectedMaterialCompany(),
+//							singleton.getSelectedMaterialStatus(),
+//							singleton.getSelectedMaterialQty(),
+//							"M",
+//							"I",
+//							"OF"
+//									+ String.valueOf(singleton
+//											.getCurrentSelectedEntryID()));
+//				else
+//					materialUpdateResponse = dbAdapter.updateEntry(singleton
+//							.getSelectedMaterialName(), singleton
+//							.getSelectedMaterialCompany(), singleton
+//							.getSelectedMaterialStatus(), singleton
+//							.getSelectedMaterialQty(), "M", "U", String
+//							.valueOf(singleton.getCurrentSelectedEntryID()));
 			} else {
 				if (result != null) {
 					System.out.println("Update material response: " + result);
@@ -662,25 +698,25 @@ public class AddMaterial extends Activity {
 				} else {
 					System.out
 							.println("An error occurred! Could not update entry.");
-					if (singleton.isOfflineEntry())
-						materialUpdateResponse = dbAdapter.updateEntry(
-								singleton.getSelectedMaterialName(),
-								singleton.getSelectedMaterialCompany(),
-								singleton.getSelectedMaterialStatus(),
-								singleton.getSelectedMaterialQty(),
-								"M",
-								"I",
-								"OF"
-										+ String.valueOf(singleton
-												.getCurrentSelectedEntryID()));
-					else
-						materialUpdateResponse = dbAdapter.updateEntry(
-								singleton.getSelectedMaterialName(), singleton
-										.getSelectedMaterialCompany(),
-								singleton.getSelectedMaterialStatus(),
-								singleton.getSelectedMaterialQty(), "M", "U",
-								String.valueOf(singleton
-										.getCurrentSelectedEntryID()));
+//					if (singleton.isOfflineEntry())
+//						materialUpdateResponse = dbAdapter.updateEntry(
+//								singleton.getSelectedMaterialName(),
+//								singleton.getSelectedMaterialCompany(),
+//								singleton.getSelectedMaterialStatus(),
+//								singleton.getSelectedMaterialQty(),
+//								"M",
+//								"I",
+//								"OF"
+//										+ String.valueOf(singleton
+//												.getCurrentSelectedEntryID()));
+//					else
+//						materialUpdateResponse = dbAdapter.updateEntry(
+//								singleton.getSelectedMaterialName(), singleton
+//										.getSelectedMaterialCompany(),
+//								singleton.getSelectedMaterialStatus(),
+//								singleton.getSelectedMaterialQty(), "M", "U",
+//								String.valueOf(singleton
+//										.getCurrentSelectedEntryID()));
 				}
 			}
 			singleton.setReloadPage(true);
@@ -742,66 +778,33 @@ public class AddMaterial extends Activity {
 		}
 
 		protected void onPostExecute(final String result) {
-			mProgressDialog.dismiss();
-			long materialDeleteResponse = 0;
+			
+			long laborDeleteResponse = 0;
 			if (ServerUtilities.unknownHostException) {
 				ServerUtilities.unknownHostException = false;
-				Toast.makeText(getApplicationContext(),
-						"Sorry! Server could not be reached.",
-						Toast.LENGTH_LONG).show();
-				if (singleton.isOfflineEntry())
-					materialDeleteResponse = dbAdapter.deleteEntryByID("OF"
-							+ String.valueOf(singleton
-									.getCurrentSelectedEntryID()));
-				else
-					materialDeleteResponse = dbAdapter.updateEntry(singleton
-							.getSelectedMaterialName(), singleton
-							.getSelectedMaterialCompany(), singleton
-							.getSelectedMaterialStatus(), singleton
-							.getSelectedMaterialQty(), "M", "D", String
-							.valueOf(singleton.getCurrentSelectedEntryID()));
+				
 			} else {
 				if (result != null) {
 					System.out.println("Update material response: " + result);
 					int StatusCode = singleton.getHTTPResponseStatusCode();
 					if (StatusCode == 200 || StatusCode == 0) {
 
-					} else {
-						if (singleton.isOfflineEntry())
-							materialDeleteResponse = dbAdapter
-									.deleteEntryByID("OF"
-											+ String.valueOf(singleton
-													.getCurrentSelectedEntryID()));
-						else
-							materialDeleteResponse = dbAdapter.updateEntry(
-									singleton.getSelectedMaterialName(),
-									singleton.getSelectedMaterialCompany(),
-									singleton.getSelectedMaterialStatus(),
-									singleton.getSelectedMaterialQty(), "M",
-									"D", String.valueOf(singleton
-											.getCurrentSelectedEntryID()));
-					}
+						laborDeleteResponse = dbAdapter
+								.deleteEntryByID(String.valueOf(singleton
+										.getCurrentSelectedEntryID()));
+						
+					} 
+						
 					/*
 					 * Intent intent = new Intent(AddMaterial.this,
 					 * EntriesListActivity.class);
 					 * intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					 * startActivity(intent); finish();
 					 */
-				} else {
+				}else {
 					System.out
 							.println("An error occurred! Could not delete entry.");
-					if (singleton.isOfflineEntry())
-						materialDeleteResponse = dbAdapter.deleteEntryByID("OF"
-								+ String.valueOf(singleton
-										.getCurrentSelectedEntryID()));
-					else
-						materialDeleteResponse = dbAdapter.updateEntry(
-								singleton.getSelectedMaterialName(), singleton
-										.getSelectedMaterialCompany(),
-								singleton.getSelectedMaterialStatus(),
-								singleton.getSelectedMaterialQty(), "M", "D",
-								String.valueOf(singleton
-										.getCurrentSelectedEntryID()));
+					
 				}
 			}
 			singleton.setReloadPage(true);

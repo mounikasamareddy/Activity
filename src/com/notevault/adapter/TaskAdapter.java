@@ -70,7 +70,7 @@ public class TaskAdapter extends BaseAdapter {
 		}
 		
 		holder.tv.setText(Utilities.tdata.get(position).getTName());
-		
+		holder.taskId.setText(Utilities.tdata.get(position).getTID()+"");
 		if (singleton.isEnableTasks()) {
 			if (Utilities.tdata.get(position).getHasData() == 1) {
 				holder.orangeArrow.setVisibility(View.VISIBLE);

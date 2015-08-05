@@ -31,7 +31,7 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
 		setContentView(R.layout.activitydetails);
 		Bundle b = getIntent().getExtras();
 	    int index = b.getInt("index");
-	    Log.d("data","--->"+index);
+
 	   
 
 			
@@ -51,9 +51,11 @@ public class EntriesListActivity extends TabActivity implements OnTabChangeListe
             breadcrumb_separator.setVisibility(View.VISIBLE);
             taskName.setVisibility(View.VISIBLE);
         }
+	    
 		taskName.setText(singleton.getSelectedTaskName());
 
 		TextView dateTextView = (TextView)findViewById(R.id.datetxt);
+		Log.d("!~@#$@%$E&^T(&_)(+_)&*^%&$%^@","--->"+singleton.getCurrentSelectedDateFormatted());
 		dateTextView.setText(singleton.getCurrentSelectedDateFormatted());
 
 		TextView backLayout = (TextView)findViewById(R.id.textView1);
